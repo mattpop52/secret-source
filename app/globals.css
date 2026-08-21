@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* The shop is one committed dark identity, so the page itself is painted
+   before any component mounts — no white flash on a slow connection. */
+html {
+  background-color: #0a0a0a;
+  color-scheme: dark;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,0 +1,165 @@
+/*
+ * Secret Source — brand tokens and the handful of utilities the shop's
+ * signature devices need (hazard tape, stencil type, grain, marquee).
+ * Scoped to [data-ss-root], which sits on <body>.
+ */
+
+[data-ss-root] {
+  color-scheme: dark;
+
+  /* ── Brand, lifted straight off the logo ─────────────────────────────── */
+  --ss-black: #0a0a0a;
+  --ss-pitch: #050505;
+  --ss-panel: #121211;
+  --ss-panel-high: #1a1a18;
+  --ss-orange: #faa703;
+  --ss-orange-hot: #ffbe38;
+  --ss-orange-deep: #c07f00;
+  --ss-bone: #fafaf2;
+  --ss-smoke: #a4a099;
+  --ss-hairline: rgb(250 250 242 / 14%);
+  --ss-hairline-strong: rgb(250 250 242 / 28%);
+  --ss-sold: #6b6862;
+
+  background-color: var(--ss-black);
+  color: var(--ss-bone);
+  font-family: var(--font-ss-body), system-ui, sans-serif;
+}
+
+/* ── Type roles ────────────────────────────────────────────────────────── */
+
+.ss-display {
+  font-family:
+    var(--font-ss-display), var(--font-ss-stencil), system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+/* The logo's lettering carries a hard offset shadow; headlines borrow it so
+   display type reads as part of the same hand-painted family. */
+.ss-display-shadow {
+  text-shadow: 0.055em 0.055em 0 rgb(0 0 0 / 85%);
+}
+
+.ss-stencil {
+  font-family: var(--font-ss-stencil), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.ss-num {
+  font-family: var(--font-ss-stencil), system-ui, sans-serif;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ── Hazard tape: the shop's structural motif ──────────────────────────── */
+
+.ss-tape {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ss-orange) 0,
+    var(--ss-orange) 14px,
+    #0a0a0a 14px,
+    #0a0a0a 28px
+  );
+}
+
+.ss-tape-thin {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ss-orange) 0,
+    var(--ss-orange) 7px,
+    #0a0a0a 7px,
+    #0a0a0a 14px
+  );
+}
+
+/* ── Surfaces ──────────────────────────────────────────────────────────── */
+
+.ss-crate {
+  background-color: var(--ss-panel);
+  border: 1px solid var(--ss-hairline);
+}
+
+/* Perforated edge, the way a docket tears off a pad. */
+.ss-docket {
+  background-color: var(--ss-panel);
+  border: 1px dashed var(--ss-hairline-strong);
+}
+
+.ss-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+/* ── Marquee ───────────────────────────────────────────────────────────── */
+
+@keyframes ss-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.ss-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ss-marquee 38s linear infinite;
+}
+
+.ss-marquee-track-fast {
+  animation-duration: 22s;
+}
+
+.ss-marquee:hover .ss-marquee-track {
+  animation-play-state: paused;
+}
+
+/* ── Focus, uniform everywhere ─────────────────────────────────────────── */
+
+[data-ss-root] :focus-visible {
+  outline: 2px solid var(--ss-orange);
+  outline-offset: 2px;
+}
+
+/* ── Reveal on scroll ──────────────────────────────────────────────────── */
+
+@keyframes ss-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ss-rise {
+  animation: ss-rise 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ss-root] .ss-marquee-track,
+  [data-ss-root] .ss-rise {
+    /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation utility it turns off */
+    animation: none !important;
+  }
+
+  [data-ss-root] * {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
+    transition-duration: 0.01ms !important;
+  }
+}
