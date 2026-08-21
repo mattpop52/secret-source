@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { PaintDrips } from "./paint-drips";
 
 const SEEN_KEY = "ss-splash-v1";
 
@@ -10,6 +11,7 @@ const EXIT_MS = 1150;
 
 const CORNERS = [
   { src: "/brand/paint-tl.png", className: "ss-paint-tl", w: 300, h: 210 },
+  { src: "/brand/paint-tc.png", className: "ss-paint-tc", w: 231, h: 150 },
   { src: "/brand/paint-tr.png", className: "ss-paint-tr", w: 300, h: 240 },
   { src: "/brand/paint-bl.png", className: "ss-paint-bl", w: 210, h: 340 },
   { src: "/brand/paint-br.png", className: "ss-paint-br", w: 340, h: 210 },
@@ -108,6 +110,8 @@ export function Splash() {
     <div className="ss-splash" data-state={phase}>
       <div className="ss-splash-ground" />
       <div className="ss-splash-vignette" />
+
+      <PaintDrips />
 
       {CORNERS.map((corner) => (
         <Image

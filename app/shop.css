@@ -476,3 +476,144 @@ html[data-splash="showing"] body {
     }
   }
 }
+
+/* ── Running paint ────────────────────────────────────────────────────────
+   Drips leave the masses along the top edge and keep going, passing behind
+   the wordmark and the shop button on their way to the bottom. Stem and bulb
+   are animated separately: scaling a single rounded shape would squash its
+   tip, so the stem stretches and the bulb rides down at its end. */
+
+.ss-drips {
+  /* Drip widths are authored for desktop; a phone gets a slimmer set, or the
+     paint swamps the wordmark it is supposed to be running behind. */
+  --drip-scale: 1;
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ss-drip {
+  --w: calc(var(--drip-w) * var(--drip-scale));
+
+  position: absolute;
+  top: -2px;
+  left: var(--drip-x);
+  width: var(--w);
+  height: var(--drip-run);
+}
+
+.ss-drip-stem {
+  position: absolute;
+  inset: 0;
+  background-color: var(--ss-orange);
+  border-radius: 0 0 calc(var(--w) / 2) calc(var(--w) / 2);
+  transform: scaleY(0);
+  transform-origin: top center;
+  will-change: transform;
+  animation: ss-drip-run var(--drip-dur) cubic-bezier(0.32, 0, 0.36, 1)
+    var(--drip-delay) both;
+}
+
+.ss-drip-bulb {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(var(--w) * 1.5);
+  height: calc(var(--w) * 1.5);
+  margin-left: calc(var(--w) * -0.75);
+  background-color: var(--ss-orange);
+  border-radius: 50%;
+  transform: translateY(calc(var(--w) * -0.75));
+  will-change: transform;
+  animation: ss-drip-bulb var(--drip-dur) cubic-bezier(0.32, 0, 0.36, 1)
+    var(--drip-delay) both;
+}
+
+@keyframes ss-drip-run {
+  from {
+    transform: scaleY(0) scaleX(1.04);
+  }
+  to {
+    /* Thins as it stretches, the way a real run of paint does. */
+    transform: scaleY(1) scaleX(0.86);
+  }
+}
+
+@keyframes ss-drip-bulb {
+  from {
+    transform: translateY(calc(var(--w) * -0.75)) scale(0.78);
+  }
+  to {
+    transform: translateY(calc(var(--drip-run) - var(--w) * 0.75)) scale(1);
+  }
+}
+
+/* The paint masses sit over the drips, so every drip emerges from under one. */
+.ss-paint {
+  z-index: 2;
+}
+
+.ss-paint-tc {
+  top: 0;
+  left: 50%;
+  width: clamp(120px, 21vw, 320px);
+  margin-left: calc(clamp(120px, 21vw, 320px) / -2);
+  transform-origin: top center;
+  animation:
+    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.13s both,
+    ss-ooze-tr 9s ease-in-out 1.25s infinite alternate;
+}
+
+.ss-splash-backdrop {
+  z-index: 3;
+}
+
+.ss-splash-centre {
+  z-index: 4;
+}
+
+.ss-splash-flood {
+  z-index: 5;
+}
+
+@media (max-width: 640px) {
+  .ss-drips {
+    --drip-scale: 0.5;
+  }
+
+  /* Fewer runs on a narrow screen — the ones that matter are the long left,
+     right and centre runs, the last of which passes behind the button. */
+  .ss-drip:nth-child(2),
+  .ss-drip:nth-child(6),
+  .ss-drip:nth-child(9),
+  .ss-drip:nth-child(n + 10) {
+    display: none;
+  }
+}
+
+/* On the way out the drips go with the flood rather than carrying on. */
+.ss-splash[data-state="leaving"] .ss-drips {
+  animation: ss-splash-clear 0.3s ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Paint that has already arrived, with nothing in motion. */
+  .ss-drip-stem {
+    /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat the animation it replaces */
+    animation: none !important;
+    transform: scaleY(1);
+  }
+
+  .ss-drip-bulb {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason */
+    animation: none !important;
+    transform: translateY(calc(var(--drip-run) - var(--w) * 0.75));
+  }
+
+  .ss-drip-stem {
+    transform: scaleY(1) scaleX(0.86);
+  }
+}
