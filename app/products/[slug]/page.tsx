@@ -10,6 +10,7 @@ import {
   discountPercent,
   formatPrice,
   getBrandName,
+  getCategoryName,
   getProduct,
   getRelatedProducts,
   isSoldOut,
@@ -59,6 +60,7 @@ export default async function ProductPage({
   }
 
   const brandName = getBrandName(product.brand);
+  const categoryName = getCategoryName(product.category);
   const discount = discountPercent(product);
   const soldOut = isSoldOut(product);
   const related = getRelatedProducts(product);
@@ -86,7 +88,16 @@ export default async function ProductPage({
           <li>
             <Link
               className="hover:text-[var(--ss-bone)]"
-              href={`/collections/${product.brand}`}
+              href={`/collections/${product.category}`}
+            >
+              {categoryName}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link
+              className="hover:text-[var(--ss-bone)]"
+              href={`/collections/${product.category}/${product.brand}`}
             >
               {brandName}
             </Link>

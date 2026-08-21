@@ -2,12 +2,17 @@
  * Secret Source catalogue.
  *
  * ─────────────────────────────────────────────────────────────────────────
- * PLACEHOLDER STOCK. Every product, price, colourway and size run below is
- * sample data written to build and demo the storefront — none of it came
- * from a real inventory list. Replace this file's `PRODUCTS` array with the
- * real stock (and set `image` on each product) before taking orders.
- * Prices are the single source of truth for Stripe: the checkout route reads
- * them from here on the server, never from the browser.
+ * Categories come first (Tracksuits, and more as they're photographed);
+ * brands are subcategories inside a category — the same brand can sit in
+ * more than one category once other categories exist.
+ *
+ * Every product below is real stock, photographed in hand. What's still
+ * placeholder: `priceCents` (market-rate estimates, not the real ticket
+ * price) and each item's `sizes` (real resale stock is one unit, one size —
+ * the exact size is guessed at "M" pending the actual tag). Swap both for
+ * confirmed numbers before taking orders; nothing else about these five
+ * needs replacing. Prices are the single source of truth for Stripe: the
+ * checkout route reads them from here on the server, never from the browser.
  * ─────────────────────────────────────────────────────────────────────────
  */
 
@@ -24,10 +29,17 @@ export type GarmentShape =
   | "slide"
   | "figure";
 
+export type Category = {
+  slug: string;
+  name: string;
+  /** Shown under the category name on collection headers and the shelf grid. */
+  line: string;
+};
+
 export type Brand = {
   slug: string;
   name: string;
-  /** Shown under the brand name on collection headers and the brand rail. */
+  /** Shown under the brand name on collection headers and brand tiles. */
   line: string;
 };
 
@@ -39,6 +51,9 @@ export type SizeOption = {
 export type Product = {
   slug: string;
   name: string;
+  /** Category slug — the shop's primary taxonomy. */
+  category: string;
+  /** Brand slug — a subcategory inside `category`. */
   brand: string;
   shape: GarmentShape;
   /** Colourway name plus the two fills the vector artwork is painted with. */
@@ -59,306 +74,151 @@ export type Product = {
   badge?: "just-in" | "restock" | "last-pair";
 };
 
-export const BRANDS: Brand[] = [
-  { slug: "trapstar", name: "Trapstar", line: "London. Irongate. Decoded." },
-  { slug: "syna-world", name: "Syna World", line: "Central Cee's own line." },
+export const CATEGORIES: Category[] = [
   {
-    slug: "broken-planet",
-    name: "Broken Planet",
-    line: "Out of the ordinary.",
+    slug: "tracksuits",
+    name: "Tracksuits",
+    line: "Hoodie or crewneck, matched bottoms, one unit each.",
   },
-  { slug: "corteiz", name: "Corteiz", line: "Rules the world." },
-  {
-    slug: "essentials",
-    name: "FOG Essentials",
-    line: "Quiet, heavy, everywhere.",
-  },
-  { slug: "jordan", name: "Air Jordan", line: "The retros that hold value." },
-  { slug: "nike", name: "Nike", line: "Dunks, Air Max, AF1." },
-  { slug: "yeezy", name: "Yeezy", line: "Foams, slides, 350s." },
-  { slug: "labubu", name: "Labubu", line: "Sealed blind boxes and pop-ups." },
 ];
 
-const APPAREL_SIZES = (stock: boolean[]): SizeOption[] =>
-  ["XS", "S", "M", "L", "XL", "XXL"].map((label, index) => ({
-    label,
-    inStock: stock[index] ?? false,
-  }));
+export const BRANDS: Brand[] = [
+  {
+    slug: "the-north-face",
+    name: "The North Face",
+    line: "Heavyweight fleece, embroidered chest logo.",
+  },
+  {
+    slug: "essentials",
+    name: "Essentials Fear of God",
+    line: "Flocked back branding, oversized cut.",
+  },
+  { slug: "dior", name: "Dior", line: "CD-icon hardware, tonal drawcords." },
+  {
+    slug: "moncler",
+    name: "Moncler",
+    line: "Tricolour collar trim, patch badge.",
+  },
+];
 
-const UK_SHOE_SIZES = (stock: boolean[]): SizeOption[] =>
-  ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11", "UK 12"].map(
-    (label, index) => ({ label, inStock: stock[index] ?? false }),
-  );
-
-const ONE_SIZE: SizeOption[] = [{ label: "One size", inStock: true }];
+// A single, one-off unit in stock: the site's own fiction — "everything on
+// the shelf is one of one" — matches how resale stock actually moves. Swap
+// the label for the size on the real tag once it's been checked.
+const ONE_UNIT = (label = "M"): SizeOption[] => [{ label, inStock: true }];
 
 export const PRODUCTS: Product[] = [
   {
-    slug: "trapstar-irongate-arch-fade-tracksuit-grey-blue",
-    name: "Irongate Arch Fade Tracksuit",
-    brand: "trapstar",
+    slug: "the-north-face-drew-peak-tracksuit-grey",
+    name: "Drew Peak Tracksuit",
+    category: "tracksuits",
+    brand: "the-north-face",
     shape: "tracksuit",
-    colourway: { name: "Grey / Blue", fill: "#8E9297", accent: "#3E7BD1" },
-    priceCents: 14_999,
-    compareAtCents: 24_999,
-    sizes: APPAREL_SIZES([false, true, true, true, true, false]),
-    code: "SS-TRP-0142",
+    colourway: { name: "Heather Grey", fill: "#B7B7B4", accent: "#45443F" },
+    priceCents: 12_999,
+    sizes: ONE_UNIT(),
+    code: "SS-TNF-0001",
     blurb:
-      "Hoodie and bottoms, sold as a set. The arch fade sits across the chest and drops down the left leg — the pairing that never sits on a rail for long.",
+      "Drew Peak hoodie and matching joggers in heather grey, embroidered half-dome chest logo, tags still on.",
     details: [
-      "Hooded top and matching bottoms included",
+      "Pullover hood and matching joggers, sold as a set",
       "Heavyweight brushed-back cotton fleece",
-      "Regular fit — take your usual size, size up for a boxier drape",
-      "Machine wash cold, inside out, hang to dry",
+      "Embroidered half-dome logo at chest, printed wordmark at left cuff",
+      "New with tags",
     ],
-    badge: "restock",
+    image: "/products/the-north-face-grey-tracksuit.jpg",
+    badge: "just-in",
   },
   {
-    slug: "trapstar-chenille-decoded-hoodie-black-red",
-    name: "Chenille Decoded Hoodie",
-    brand: "trapstar",
-    shape: "hoodie",
-    colourway: { name: "Black / Infrared", fill: "#161616", accent: "#E23A21" },
-    priceCents: 12_999,
-    sizes: APPAREL_SIZES([false, true, true, true, false, false]),
-    code: "SS-TRP-0119",
-    blurb:
-      "The chenille patch work everyone knows, on the heaviest body Trapstar puts out. Infrared on black, still the hardest of the run.",
-    details: [
-      "Chenille patch appliqué across the chest",
-      "Double-lined hood with flat drawcords",
-      "Ribbed cuffs and hem",
-      "Regular fit",
-    ],
-  },
-  {
-    slug: "syna-world-logo-tracksuit-baby-blue",
-    name: "Syna Logo Tracksuit",
-    brand: "syna-world",
+    slug: "essentials-fog-tracksuit-black",
+    name: "Essentials Tracksuit",
+    category: "tracksuits",
+    brand: "essentials",
     shape: "tracksuit",
-    colourway: {
-      name: "Baby Blue / White",
-      fill: "#A9CDEB",
-      accent: "#FAFAF2",
-    },
-    priceCents: 11_999,
-    compareAtCents: 15_999,
-    sizes: APPAREL_SIZES([true, true, true, false, true, false]),
-    code: "SS-SYN-0231",
+    colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
+    priceCents: 17_999,
+    sizes: ONE_UNIT(),
+    code: "SS-FOG-0002",
     blurb:
-      "Zip-through hood and straight-leg bottoms in the baby blue that shifts fastest every restock.",
+      "Fear of God Essentials hoodie and sweatpants in triple black — flocked wordmark across the back, repeated on the left leg.",
     details: [
-      "Zip-through hooded top and matching bottoms",
-      "Mid-weight loopback cotton",
-      "Embroidered script at chest and thigh",
-      "Straight leg with elasticated cuff",
+      "Pullover hood and matching sweatpants, sold as a set",
+      "Heavyweight cotton-blend fleece, dropped shoulder",
+      'Flocked "Essentials / Fear of God" branding on the back and left leg',
+      "New with tags",
     ],
+    image: "/products/essentials-fog-black-tracksuit.jpg",
     badge: "just-in",
   },
   {
-    slug: "syna-world-short-set-black",
-    name: "Syna Short Set",
-    brand: "syna-world",
-    shape: "shorts-set",
-    colourway: { name: "Black / Bone", fill: "#141414", accent: "#D8D4C8" },
-    priceCents: 8999,
-    sizes: APPAREL_SIZES([false, true, true, true, false, false]),
-    code: "SS-SYN-0244",
+    slug: "dior-cd-icon-tracksuit-stone",
+    name: "CD Icon Tracksuit",
+    category: "tracksuits",
+    brand: "dior",
+    shape: "tracksuit",
+    colourway: { name: "Stone", fill: "#C9BFA9", accent: "#EFE9DC" },
+    priceCents: 32_999,
+    sizes: ONE_UNIT(),
+    code: "SS-DIOR-0003",
     blurb:
-      "Tee and shorts, cut to sit heavy in the heat. The set most people buy twice.",
+      "Dior hoodie and joggers in stone, CD-icon hardware at the chest and left thigh, tonal drawcords throughout.",
     details: [
-      "Short-sleeve tee and matching shorts",
-      "240gsm cotton jersey",
-      "Elasticated waist with tonal drawcord",
-      "Boxy fit",
+      "Pullover hood and matching joggers, sold as a set",
+      "Technical jersey with a soft, brushed hand-feel",
+      "CD-icon hardware badge at chest and thigh",
+      "New with tags",
     ],
-  },
-  {
-    slug: "broken-planet-out-of-the-ordinary-hoodie-sand",
-    name: "Out Of The Ordinary Hoodie",
-    brand: "broken-planet",
-    shape: "hoodie",
-    colourway: { name: "Desert Sand", fill: "#C6A87C", accent: "#5D4A32" },
-    priceCents: 13_999,
-    sizes: APPAREL_SIZES([false, false, true, true, true, false]),
-    code: "SS-BPM-0087",
-    blurb:
-      "Cracked-earth graphics on a sand body, in the boxy cut Broken Planet built its name on.",
-    details: [
-      "400gsm heavyweight cotton fleece",
-      "Puff-print graphic front and back",
-      "Oversized fit — size down for a regular drape",
-      "Ribbed cuffs and hem",
-    ],
-  },
-  {
-    slug: "broken-planet-straight-leg-joggers-charcoal",
-    name: "Straight Leg Joggers",
-    brand: "broken-planet",
-    shape: "joggers",
-    colourway: { name: "Charcoal", fill: "#3A3A3C", accent: "#8C8C8E" },
-    priceCents: 11_999,
-    sizes: APPAREL_SIZES([false, true, true, true, true, false]),
-    code: "SS-BPM-0092",
-    blurb:
-      "The joggers that finish the hoodie. Straight through the leg, weighted hem.",
-    details: [
-      "Matching 400gsm fleece",
-      "Straight leg, unelasticated hem",
-      "Zip side pockets",
-      "Elasticated waist with flat drawcord",
-    ],
-  },
-  {
-    slug: "corteiz-alcatraz-cargos-olive",
-    name: "Alcatraz Cargos",
-    brand: "corteiz",
-    shape: "cargos",
-    colourway: { name: "Olive", fill: "#5A6141", accent: "#2E3222" },
-    priceCents: 10_999,
-    sizes: APPAREL_SIZES([false, true, true, true, false, false]),
-    code: "SS-CRTZ-0310",
-    blurb:
-      "Bellowed pockets, drawcord hem, the Alcatraz tab at the thigh. Sold in minutes on drop day — sold here whenever you want them.",
-    details: [
-      "Cotton ripstop with bellowed cargo pockets",
-      "Drawcord hem and adjustable waist",
-      "Relaxed through the thigh, tapered below the knee",
-      "Alcatraz woven tab",
-    ],
-    badge: "last-pair",
-  },
-  {
-    slug: "corteiz-4starz-puffer-black",
-    name: "4Starz Puffer",
-    brand: "corteiz",
-    shape: "puffer",
-    colourway: { name: "Triple Black", fill: "#101010", accent: "#FAA703" },
-    priceCents: 22_999,
-    compareAtCents: 27_999,
-    sizes: APPAREL_SIZES([false, false, true, true, true, false]),
-    code: "SS-CRTZ-0288",
-    blurb:
-      "Winter's answer. Baffled through the body, matte shell, the star tab on the sleeve.",
-    details: [
-      "Matte technical shell with quilted baffles",
-      "Full-length zip with storm flap",
-      "Two-way hem adjuster",
-      "Boxy fit, room for a hood underneath",
-    ],
-  },
-  {
-    slug: "essentials-hoodie-cement",
-    name: "Essentials Hoodie",
-    brand: "essentials",
-    shape: "hoodie",
-    colourway: { name: "Cement", fill: "#B9B2A7", accent: "#6E6A63" },
-    priceCents: 10_999,
-    sizes: APPAREL_SIZES([true, true, true, true, true, true]),
-    code: "SS-FOG-0451",
-    blurb:
-      "The quiet one. Cement body, rubberised strip at the chest, drops off the shoulder exactly how it should.",
-    details: [
-      "Cotton-blend heavyweight fleece",
-      "Rubberised logo strip at chest, flocked at back",
-      "Dropped shoulder, oversized fit",
-      "Full size run held in stock",
-    ],
-  },
-  {
-    slug: "air-jordan-1-retro-high-og-black-white",
-    name: "Air Jordan 1 Retro High OG",
-    brand: "jordan",
-    shape: "sneaker",
-    colourway: { name: "Black / White", fill: "#141414", accent: "#FAFAF2" },
-    priceCents: 19_999,
-    sizes: UK_SHOE_SIZES([false, true, true, true, true, false, false]),
-    code: "SS-AJ1-0503",
-    blurb:
-      "Leather upper, the shape that started the resale market. Deadstock, boxed, with the original laces bagged.",
-    details: [
-      "Full-grain leather upper",
-      "Deadstock — never worn, never tried on outside",
-      "Original box and spare laces included",
-      "UK sizing — Jordan 1s run true to size",
-    ],
-  },
-  {
-    slug: "nike-dunk-low-panda",
-    name: "Dunk Low",
-    brand: "nike",
-    shape: "sneaker",
-    colourway: { name: "Panda", fill: "#FAFAF2", accent: "#141414" },
-    priceCents: 12_999,
-    sizes: UK_SHOE_SIZES([true, true, true, false, true, true, false]),
-    code: "SS-DNK-0611",
-    blurb:
-      "The pair everybody asks for. Black and white leather, held in a full size run all year.",
-    details: [
-      "Leather upper with perforated toe",
-      "Deadstock, boxed",
-      "Full size run held in stock",
-      "UK sizing — Dunks run true to size",
-    ],
-    badge: "restock",
-  },
-  {
-    slug: "yeezy-slide-onyx",
-    name: "Yeezy Slide",
-    brand: "yeezy",
-    shape: "slide",
-    colourway: { name: "Onyx", fill: "#2B2A28", accent: "#6B675F" },
-    priceCents: 8999,
-    sizes: UK_SHOE_SIZES([false, true, true, true, true, false, false]),
-    code: "SS-YZY-0722",
-    blurb:
-      "Onyx, sealed, still the easiest thing in the shop to wear every day.",
-    details: [
-      "Injected EVA foam, one-piece",
-      "Deadstock in original packaging",
-      "Yeezy slides run small — size up one",
-      "Soft rubber outsole",
-    ],
-  },
-  {
-    slug: "essentials-tee-bone",
-    name: "Essentials Tee",
-    brand: "essentials",
-    shape: "tee",
-    colourway: { name: "Bone", fill: "#DCD6C8", accent: "#8A8478" },
-    priceCents: 5999,
-    compareAtCents: 7999,
-    sizes: APPAREL_SIZES([true, true, true, true, true, false]),
-    code: "SS-FOG-0466",
-    blurb:
-      "Heavy bone jersey, dropped shoulder, sits under everything else in here.",
-    details: [
-      "Heavyweight cotton jersey",
-      "Dropped shoulder, boxy body",
-      "Rubberised chest strip",
-      "Pre-shrunk",
-    ],
-  },
-  {
-    slug: "labubu-have-a-seat-blind-box",
-    name: "Labubu — Have A Seat Blind Box",
-    brand: "labubu",
-    shape: "figure",
-    colourway: { name: "Sealed", fill: "#F0A8C0", accent: "#4B3B57" },
-    priceCents: 6499,
-    sizes: ONE_SIZE,
-    code: "SS-LAB-0806",
-    blurb:
-      "Sealed single blind box from the Have A Seat series. Case-fresh, never shaken, never swapped.",
-    details: [
-      "One sealed blind box — figure inside is random",
-      "Case-fresh, unweighed and unshaken",
-      "Secret chase odds are set by the manufacturer, not by us",
-      "Ships boxed with protective padding",
-    ],
+    image: "/products/dior-stone-tracksuit.jpg",
     badge: "just-in",
+  },
+  {
+    slug: "moncler-crewneck-tracksuit-grey",
+    name: "Crewneck Tracksuit",
+    category: "tracksuits",
+    brand: "moncler",
+    shape: "tracksuit",
+    colourway: { name: "Grey", fill: "#B4B2AE", accent: "#C1272D" },
+    priceCents: 27_999,
+    sizes: ONE_UNIT(),
+    code: "SS-MNC-0004",
+    blurb:
+      "Moncler crewneck and joggers in grey, tricolour trim at the collar, patch logo at the chest and thigh.",
+    details: [
+      "Crewneck sweatshirt and matching joggers, sold as a set",
+      "Mid-weight cotton fleece",
+      "Tricolour collar trim, woven patch logo at chest and thigh",
+      "New with tags",
+    ],
+    image: "/products/moncler-grey-tracksuit.jpg",
+  },
+  {
+    slug: "moncler-crewneck-tracksuit-black",
+    name: "Crewneck Tracksuit",
+    category: "tracksuits",
+    brand: "moncler",
+    shape: "tracksuit",
+    colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
+    priceCents: 27_999,
+    sizes: ONE_UNIT(),
+    code: "SS-MNC-0005",
+    blurb:
+      "The same crewneck tracksuit in black — tricolour trim at the collar, patch logo at the chest and thigh.",
+    details: [
+      "Crewneck sweatshirt and matching joggers, sold as a set",
+      "Mid-weight cotton fleece",
+      "Tricolour collar trim, woven patch logo at chest and thigh",
+      "New with tags",
+    ],
+    image: "/products/moncler-black-tracksuit.jpg",
   },
 ];
+
+export function getCategory(slug: string): Category | undefined {
+  return CATEGORIES.find((category) => category.slug === slug);
+}
+
+export function getCategoryName(slug: string): string {
+  return getCategory(slug)?.name ?? slug;
+}
 
 export function getBrand(slug: string): Brand | undefined {
   return BRANDS.find((brand) => brand.slug === slug);
@@ -372,22 +232,57 @@ export function getProduct(slug: string): Product | undefined {
   return PRODUCTS.find((product) => product.slug === slug);
 }
 
+export function getProductsByCategory(categorySlug: string): Product[] {
+  return PRODUCTS.filter((product) => product.category === categorySlug);
+}
+
 export function getProductsByBrand(brandSlug: string): Product[] {
   return PRODUCTS.filter((product) => product.brand === brandSlug);
 }
 
-/** Products to show alongside one another — same brand first, then the rest. */
+export function getProductsByCategoryAndBrand(
+  categorySlug: string,
+  brandSlug: string,
+): Product[] {
+  return PRODUCTS.filter(
+    (product) =>
+      product.category === categorySlug && product.brand === brandSlug,
+  );
+}
+
+/** Brands with at least one product in this category — the subcategory row. */
+export function getBrandsInCategory(categorySlug: string): Brand[] {
+  const present = new Set(
+    getProductsByCategory(categorySlug).map((p) => p.brand),
+  );
+
+  return BRANDS.filter((brand) => present.has(brand.slug));
+}
+
+/**
+ * Products to show alongside one another — same brand within the same
+ * category first, then the rest of the category, then everything else.
+ */
 export function getRelatedProducts(product: Product, limit = 4): Product[] {
   const sameBrand = PRODUCTS.filter(
     (candidate) =>
-      candidate.brand === product.brand && candidate.slug !== product.slug,
+      candidate.category === product.category &&
+      candidate.brand === product.brand &&
+      candidate.slug !== product.slug,
+  );
+  const sameCategory = PRODUCTS.filter(
+    (candidate) =>
+      candidate.category === product.category &&
+      candidate.brand !== product.brand &&
+      candidate.slug !== product.slug,
   );
   const others = PRODUCTS.filter(
     (candidate) =>
-      candidate.brand !== product.brand && candidate.slug !== product.slug,
+      candidate.category !== product.category &&
+      candidate.slug !== product.slug,
   );
 
-  return [...sameBrand, ...others].slice(0, limit);
+  return [...sameBrand, ...sameCategory, ...others].slice(0, limit);
 }
 
 export function isSoldOut(product: Product): boolean {

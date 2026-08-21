@@ -7,9 +7,11 @@ import { Splash } from "@/components/splash";
 import { TapeMarquee } from "@/components/tape-marquee";
 import {
   BRANDS,
+  CATEGORIES,
   formatPrice,
   getBrandName,
-  getProductsByBrand,
+  getBrandsInCategory,
+  getProductsByCategoryAndBrand,
   PRODUCTS,
 } from "@/lib/catalog";
 import {
@@ -21,6 +23,18 @@ import {
 } from "@/lib/constants";
 
 const featured = PRODUCTS[0];
+
+/** "A, B and C" — reads straight from the stocked brand list, so the hero
+    line never needs a hand edit when a new brand lands. */
+function formatBrandList(brands: { name: string }[]): string {
+  const names = brands.map((brand) => brand.name);
+
+  if (names.length <= 1) {
+    return names[0] ?? "";
+  }
+
+  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+}
 
 const CHECKS = [
   {
@@ -93,9 +107,8 @@ export default function SecretSourceHome() {
             </h1>
 
             <p className="mt-6 max-w-md text-[var(--ss-smoke)] text-base leading-relaxed sm:text-lg">
-              Trapstar, Syna World, Broken Planet, Corteiz, Jordan and Yeezy —
-              held in hand, checked, and shipped tracked from the UK. No waiting
-              lists, no bot queues, no maybe.
+              {formatBrandList(BRANDS)} — held in hand, checked, and shipped
+              tracked from the UK. No waiting lists, no bot queues, no maybe.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -115,7 +128,7 @@ export default function SecretSourceHome() {
 
             <dl className="mt-10 grid max-w-lg grid-cols-3 gap-px border border-[var(--ss-hairline)] bg-[var(--ss-hairline)]">
               {[
-                { term: "Brands", value: BRANDS.length.toString() },
+                { term: "Brands stocked", value: BRANDS.length.toString() },
                 { term: "Lines in stock", value: PRODUCTS.length.toString() },
                 {
                   term: "Free delivery over",
@@ -187,7 +200,7 @@ export default function SecretSourceHome() {
         items={["Authentic", "Checked", "Sealed", "Shipped", "Tracked"]}
       />
 
-      {/* ── Brands ────────────────────────────────────────────────────── */}
+      {/* ── Shop by category ─────────────────────────────────────────── */}
       <Section>
         <SectionHeading
           action={
@@ -200,43 +213,69 @@ export default function SecretSourceHome() {
           }
           index="01"
           label="What's plugged in"
-          title="The brands on the shelf"
+          title="The shelf, by category"
         />
 
-        <ul className="mt-10 grid gap-px bg-[var(--ss-hairline)] sm:grid-cols-2 lg:grid-cols-3">
-          {BRANDS.map((brand) => {
-            const count = getProductsByBrand(brand.slug).length;
+        <div className="mt-10 grid gap-10">
+          {CATEGORIES.map((category) => {
+            const brandsHere = getBrandsInCategory(category.slug);
 
             return (
-              <li key={brand.slug}>
-                <Link
-                  className="group flex h-full flex-col justify-between gap-6 bg-[var(--ss-black)] px-6 py-8 transition-colors hover:bg-[var(--ss-panel)]"
-                  href={`/collections/${brand.slug}`}
-                >
-                  <span className="flex items-start justify-between gap-4">
-                    <span className="ss-display text-[clamp(1.75rem,3vw,2.5rem)] leading-[0.95] transition-colors group-hover:text-[var(--ss-orange)]">
-                      {brand.name}
+              <div key={category.slug}>
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <Link
+                    className="group flex items-baseline gap-3"
+                    href={`/collections/${category.slug}`}
+                  >
+                    <span className="ss-display text-[clamp(1.75rem,4vw,2.75rem)] leading-none transition-colors group-hover:text-[var(--ss-orange)]">
+                      {category.name}
                     </span>
-                    <span className="ss-num shrink-0 border border-[var(--ss-hairline)] px-2 py-1 text-[0.62rem] text-[var(--ss-smoke)]">
-                      {count.toString().padStart(2, "0")}
+                    <span className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)]">
+                      {category.line}
                     </span>
-                  </span>
-                  <span className="flex items-end justify-between gap-4">
-                    <span className="text-[var(--ss-smoke)] text-sm">
-                      {brand.line}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="ss-stencil -translate-x-2 shrink-0 text-[0.7rem] text-[var(--ss-orange)] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-                    >
-                      Shop →
-                    </span>
-                  </span>
-                </Link>
-              </li>
+                  </Link>
+                  <Link
+                    className="ss-stencil text-[0.62rem] text-[var(--ss-orange)] underline underline-offset-4 hover:text-[var(--ss-orange-hot)]"
+                    href={`/collections/${category.slug}`}
+                  >
+                    Shop all →
+                  </Link>
+                </div>
+
+                {/* Brand subcategories — every brand this category is stocked in. */}
+                <ul className="mt-5 grid gap-px bg-[var(--ss-hairline)] sm:grid-cols-2 lg:grid-cols-4">
+                  {brandsHere.map((brand) => {
+                    const count = getProductsByCategoryAndBrand(
+                      category.slug,
+                      brand.slug,
+                    ).length;
+
+                    return (
+                      <li key={brand.slug}>
+                        <Link
+                          className="group flex h-full flex-col justify-between gap-5 bg-[var(--ss-black)] px-5 py-6 transition-colors hover:bg-[var(--ss-panel)]"
+                          href={`/collections/${category.slug}/${brand.slug}`}
+                        >
+                          <span className="flex items-start justify-between gap-3">
+                            <span className="ss-display text-[clamp(1.25rem,2.2vw,1.6rem)] leading-[0.95] transition-colors group-hover:text-[var(--ss-orange)]">
+                              {brand.name}
+                            </span>
+                            <span className="ss-num shrink-0 border border-[var(--ss-hairline)] px-1.5 py-0.5 text-[0.58rem] text-[var(--ss-smoke)]">
+                              {count.toString().padStart(2, "0")}
+                            </span>
+                          </span>
+                          <span className="text-[var(--ss-smoke)] text-xs">
+                            {brand.line}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </Section>
 
       {/* ── The shelf ─────────────────────────────────────────────────── */}

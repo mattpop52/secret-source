@@ -31,7 +31,12 @@ export function ProductBuyBox({ product }: { product: Product }) {
     <div>
       <div className="flex items-center justify-between gap-4">
         <p className="ss-stencil text-[0.7rem] text-[var(--ss-smoke)]">
-          {product.sizes.length === 1 ? "One size" : "Size"}
+          {/* A single stocked size is still a sized garment ("M", not
+              "One size") unless the label itself says otherwise — a real
+              one-size-fits-all item (a blind box, a cap) sets that label. */}
+          {product.sizes.length === 1 && product.sizes[0].label === "One size"
+            ? "One size"
+            : "Size"}
         </p>
         <a
           className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)] underline underline-offset-4 transition-colors hover:text-[var(--ss-bone)]"

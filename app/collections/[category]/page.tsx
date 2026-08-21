@@ -3,78 +3,52 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import {
-  BRANDS,
-  getBrand,
-  getProductsByBrand,
+  CATEGORIES,
+  getBrandsInCategory,
+  getCategory,
+  getProductsByCategory,
   isSoldOut,
-  PRODUCTS,
-  type Product,
 } from "@/lib/catalog";
 import { SHOP_INSTAGRAM, SHOP_INSTAGRAM_URL } from "@/lib/constants";
 
 export function generateStaticParams() {
-  return [{ slug: "all" }, ...BRANDS.map((brand) => ({ slug: brand.slug }))];
-}
-
-function resolveCollection(slug: string): {
-  title: string;
-  line: string;
-  products: Product[];
-} | null {
-  if (slug === "all") {
-    return {
-      title: "Everything in stock",
-      line: "The whole shelf, in hand and ready to ship.",
-      products: PRODUCTS,
-    };
-  }
-
-  const brand = getBrand(slug);
-
-  if (!brand) {
-    return null;
-  }
-
-  return {
-    title: brand.name,
-    line: brand.line,
-    products: getProductsByBrand(brand.slug),
-  };
+  return CATEGORIES.map((category) => ({ category: category.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ category: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const collection = resolveCollection(slug);
+  const { category: categorySlug } = await params;
+  const category = getCategory(categorySlug);
 
-  if (!collection) {
+  if (!category) {
     return { title: "Not found" };
   }
 
   return {
-    title: collection.title,
-    description: `${collection.title} — ${collection.line} Checked in-house, shipped tracked from the UK.`,
+    title: category.name,
+    description: `${category.name} — ${category.line} Checked in-house, shipped tracked from the UK.`,
   };
 }
 
-export default async function CollectionPage({
+export default async function CategoryPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ category: string }>;
 }) {
-  const { slug } = await params;
-  const collection = resolveCollection(slug);
+  const { category: categorySlug } = await params;
+  const category = getCategory(categorySlug);
 
-  if (!collection) {
+  if (!category) {
     notFound();
   }
 
+  const brandsHere = getBrandsInCategory(categorySlug);
   // In-stock first: a shelf shows what you can actually buy before what you
   // can't, however tempting it is to lead with the piece everyone wants.
-  const products = [...collection.products].sort(
+  const products = [...getProductsByCategory(categorySlug)].sort(
     (a, b) => Number(isSoldOut(a)) - Number(isSoldOut(b)),
   );
   const available = products.filter((product) => !isSoldOut(product)).length;
@@ -98,10 +72,10 @@ export default async function CollectionPage({
             / Collection
           </p>
           <h1 className="ss-display ss-display-shadow mt-4 text-[clamp(2.5rem,9vw,5.5rem)]">
-            {collection.title}
+            {category.name}
           </h1>
           <p className="mt-3 max-w-xl text-[var(--ss-smoke)]">
-            {collection.line}
+            {category.line}
           </p>
           <p className="ss-stencil mt-5 text-[0.62rem] text-[var(--ss-smoke)]">
             {products.length} listed · {available} ready to ship
@@ -109,30 +83,31 @@ export default async function CollectionPage({
         </div>
       </header>
 
+      {/* Brand subcategory row — every brand stocked inside this category. */}
       <nav
-        aria-label="Collections"
+        aria-label="Brands"
         className="border-[var(--ss-hairline)] border-b bg-[var(--ss-pitch)]"
       >
         <ul className="mx-auto flex max-w-[1240px] gap-1 overflow-x-auto px-4 py-3 sm:px-6">
-          {[{ slug: "all", name: "Everything" }, ...BRANDS].map((entry) => {
-            const active = entry.slug === slug;
-
-            return (
-              <li key={entry.slug}>
-                <Link
-                  aria-current={active ? "page" : undefined}
-                  className={`ss-stencil block whitespace-nowrap border px-4 py-2.5 text-[0.62rem] transition-colors ${
-                    active
-                      ? "border-[var(--ss-orange)] bg-[var(--ss-orange)] text-[#120c00]"
-                      : "border-[var(--ss-hairline)] text-[var(--ss-bone)]/70 hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
-                  }`}
-                  href={`/collections/${entry.slug}`}
-                >
-                  {entry.name}
-                </Link>
-              </li>
-            );
-          })}
+          <li>
+            <Link
+              aria-current="page"
+              className="ss-stencil block whitespace-nowrap border border-[var(--ss-orange)] bg-[var(--ss-orange)] px-4 py-2.5 text-[#120c00] text-[0.62rem]"
+              href={`/collections/${category.slug}`}
+            >
+              All {category.name}
+            </Link>
+          </li>
+          {brandsHere.map((brand) => (
+            <li key={brand.slug}>
+              <Link
+                className="ss-stencil block whitespace-nowrap border border-[var(--ss-hairline)] px-4 py-2.5 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
+                href={`/collections/${category.slug}/${brand.slug}`}
+              >
+                {brand.name}
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
 

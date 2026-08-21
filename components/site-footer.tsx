@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRANDS } from "@/lib/catalog";
+import { CATEGORIES } from "@/lib/catalog";
 import {
   DELIVERY_WINDOW,
   RETURNS_WINDOW,
@@ -40,16 +40,24 @@ export function SiteFooter() {
             The shelf
           </h2>
           <ul className="mt-4 space-y-2.5">
-            {BRANDS.map((brand) => (
-              <li key={brand.slug}>
+            {CATEGORIES.map((category) => (
+              <li key={category.slug}>
                 <Link
                   className="text-[var(--ss-smoke)] text-sm underline-offset-4 transition-colors hover:text-[var(--ss-bone)] hover:underline"
-                  href={`/collections/${brand.slug}`}
+                  href={`/collections/${category.slug}`}
                 >
-                  {brand.name}
+                  {category.name}
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                className="text-[var(--ss-smoke)] text-sm underline-offset-4 transition-colors hover:text-[var(--ss-bone)] hover:underline"
+                href="/collections/all"
+              >
+                Everything
+              </Link>
+            </li>
           </ul>
         </nav>
 
