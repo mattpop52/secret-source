@@ -242,8 +242,17 @@ export default function SecretSourceHome() {
                   </Link>
                 </div>
 
-                {/* Brand subcategories — every brand this category is stocked in. */}
-                <ul className="mt-5 grid gap-px bg-[var(--ss-hairline)] sm:grid-cols-2 lg:grid-cols-4">
+                {/*
+                 * Brand subcategories — every brand this category is stocked
+                 * in. The list grows unevenly as photos arrive, so each tile
+                 * carries its own border rather than sharing the hairline-grid
+                 * trick (gap-px over a coloured background): with a variable
+                 * item count against a fixed column count, an incomplete last
+                 * row leaves an empty grid cell with nothing covering it, and
+                 * the container's own background shows through as a stray
+                 * solid box. A border per tile has no such empty-cell case.
+                 */}
+                <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {brandsHere.map((brand) => {
                     const count = getProductsByCategoryAndBrand(
                       category.slug,
@@ -253,7 +262,7 @@ export default function SecretSourceHome() {
                     return (
                       <li key={brand.slug}>
                         <Link
-                          className="group flex h-full flex-col justify-between gap-5 bg-[var(--ss-black)] px-5 py-6 transition-colors hover:bg-[var(--ss-panel)]"
+                          className="group flex h-full flex-col justify-between gap-5 border border-[var(--ss-hairline)] bg-[var(--ss-black)] px-5 py-6 transition-colors hover:border-[var(--ss-orange)] hover:bg-[var(--ss-panel)]"
                           href={`/collections/${category.slug}/${brand.slug}`}
                         >
                           <span className="flex items-start justify-between gap-3">
