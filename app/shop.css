@@ -169,6 +169,12 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
+  /* Each mass's rendered width, used both to size the artwork and to place
+     the drips that leave its points. Change one and the drips follow. */
+  --mass-tl: clamp(160px, 27vw, 420px);
+  --mass-tc: clamp(120px, 21vw, 320px);
+  --mass-tr: clamp(150px, 25vw, 400px);
+
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -237,7 +243,7 @@ html[data-splash="showing"] body {
 .ss-paint-tl {
   top: 0;
   left: 0;
-  width: clamp(160px, 27vw, 420px);
+  width: var(--mass-tl);
   transform-origin: top left;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) both,
@@ -247,7 +253,7 @@ html[data-splash="showing"] body {
 .ss-paint-tr {
   top: 0;
   right: 0;
-  width: clamp(150px, 25vw, 400px);
+  width: var(--mass-tr);
   transform-origin: top right;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.09s both,
@@ -484,10 +490,6 @@ html[data-splash="showing"] body {
    tip, so the stem stretches and the bulb rides down at its end. */
 
 .ss-drips {
-  /* Drip widths are authored for desktop; a phone gets a slimmer set, or the
-     paint swamps the wordmark it is supposed to be running behind. */
-  --drip-scale: 1;
-
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -495,20 +497,56 @@ html[data-splash="showing"] body {
   pointer-events: none;
 }
 
+/*
+ * A drip hangs from a point on a mass: --fx across it, --fy down it, --tw
+ * the paint's width at that point. Each mass has its own aspect ratio, so
+ * --fy resolves against the height that mass actually renders at.
+ */
 .ss-drip {
-  --w: calc(var(--drip-w) * var(--drip-scale));
+  /* Close to the paint width at the point, so the run continues the tip
+     rather than stepping in from it. */
+  --w: clamp(6px, calc(var(--mass) * var(--tw) * 0.62), 34px);
 
   position: absolute;
-  top: -2px;
-  left: var(--drip-x);
   width: var(--w);
   height: var(--drip-run);
+  /* Tucked up inside the mass so the join is hidden behind the paint. */
+  margin-top: -16px;
+}
+
+.ss-drip--tl {
+  --mass: var(--mass-tl);
+  --ar: 0.7;
+
+  top: calc(var(--mass) * var(--ar) * var(--fy));
+  left: calc(var(--mass) * var(--fx) - var(--w) / 2);
+}
+
+.ss-drip--tc {
+  --mass: var(--mass-tc);
+  --ar: 0.649;
+
+  top: calc(var(--mass) * var(--ar) * var(--fy));
+  left: calc(50% - var(--mass) / 2 + var(--mass) * var(--fx) - var(--w) / 2);
+}
+
+.ss-drip--tr {
+  --mass: var(--mass-tr);
+  --ar: 0.8;
+
+  top: calc(var(--mass) * var(--ar) * var(--fy));
+  right: calc(var(--mass) - var(--mass) * var(--fx) - var(--w) / 2);
 }
 
 .ss-drip-stem {
   position: absolute;
   inset: 0;
-  background-color: var(--ss-orange);
+  /* The artwork's paint is lit from above; the run darkens as it thins. */
+  background: linear-gradient(
+    to bottom,
+    var(--paint) 0%,
+    color-mix(in srgb, var(--paint) 88%, #000) 100%
+  );
   border-radius: 0 0 calc(var(--w) / 2) calc(var(--w) / 2);
   transform: scaleY(0);
   transform-origin: top center;
@@ -524,7 +562,7 @@ html[data-splash="showing"] body {
   width: calc(var(--w) * 1.5);
   height: calc(var(--w) * 1.5);
   margin-left: calc(var(--w) * -0.75);
-  background-color: var(--ss-orange);
+  background-color: color-mix(in srgb, var(--paint) 92%, #000);
   border-radius: 50%;
   transform: translateY(calc(var(--w) * -0.75));
   will-change: transform;
@@ -559,8 +597,8 @@ html[data-splash="showing"] body {
 .ss-paint-tc {
   top: 0;
   left: 50%;
-  width: clamp(120px, 21vw, 320px);
-  margin-left: calc(clamp(120px, 21vw, 320px) / -2);
+  width: var(--mass-tc);
+  margin-left: calc(var(--mass-tc) / -2);
   transform-origin: top center;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.13s both,
@@ -580,16 +618,8 @@ html[data-splash="showing"] body {
 }
 
 @media (max-width: 640px) {
-  .ss-drips {
-    --drip-scale: 0.5;
-  }
-
-  /* Fewer runs on a narrow screen — the ones that matter are the long left,
-     right and centre runs, the last of which passes behind the button. */
-  .ss-drip:nth-child(2),
-  .ss-drip:nth-child(6),
-  .ss-drip:nth-child(9),
-  .ss-drip:nth-child(n + 10) {
+  /* One bead per point is plenty on a phone. */
+  .ss-drip--late {
     display: none;
   }
 }
