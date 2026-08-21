@@ -2,20 +2,12 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { PaintDrips } from "./paint-drips";
+import { LiquidPaint } from "./liquid-paint";
 
 const SEEN_KEY = "ss-splash-v1";
 
 /** Long enough for the paint to flood and the curtain to fall clear. */
 const EXIT_MS = 1150;
-
-const CORNERS = [
-  { src: "/brand/paint-tl.png", className: "ss-paint-tl", w: 300, h: 210 },
-  { src: "/brand/paint-tc.png", className: "ss-paint-tc", w: 231, h: 150 },
-  { src: "/brand/paint-tr.png", className: "ss-paint-tr", w: 300, h: 240 },
-  { src: "/brand/paint-bl.png", className: "ss-paint-bl", w: 210, h: 340 },
-  { src: "/brand/paint-br.png", className: "ss-paint-br", w: 340, h: 210 },
-] as const;
 
 /**
  * The landing card: the shop's own banner art rebuilt in layers — tiled
@@ -111,20 +103,7 @@ export function Splash() {
       <div className="ss-splash-ground" />
       <div className="ss-splash-vignette" />
 
-      <PaintDrips />
-
-      {CORNERS.map((corner) => (
-        <Image
-          alt=""
-          aria-hidden="true"
-          className={`ss-paint ${corner.className}`}
-          height={corner.h}
-          key={corner.className}
-          priority
-          src={corner.src}
-          width={corner.w}
-        />
-      ))}
+      <LiquidPaint />
 
       {/* The whole card is the door — a real button, so it is reachable by
           keyboard and announced, rather than a div with a click handler. */}

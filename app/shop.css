@@ -247,7 +247,7 @@ html[data-splash="showing"] body {
   transform-origin: top left;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) both,
-    ss-ooze-tl 7s ease-in-out 1.1s infinite alternate;
+    ss-ooze 9s ease-in-out 1.2s infinite alternate;
 }
 
 .ss-paint-tr {
@@ -257,7 +257,7 @@ html[data-splash="showing"] body {
   transform-origin: top right;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.09s both,
-    ss-ooze-tr 8.5s ease-in-out 1.2s infinite alternate;
+    ss-ooze 10.5s ease-in-out 1.3s infinite alternate;
 }
 
 .ss-paint-bl {
@@ -267,7 +267,7 @@ html[data-splash="showing"] body {
   transform-origin: bottom left;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.18s both,
-    ss-ooze-bl 9.5s ease-in-out 1.3s infinite alternate;
+    ss-ooze 11s ease-in-out 1.4s infinite alternate;
 }
 
 .ss-paint-br {
@@ -277,7 +277,7 @@ html[data-splash="showing"] body {
   transform-origin: bottom right;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.27s both,
-    ss-ooze-br 7.8s ease-in-out 1.4s infinite alternate;
+    ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
 }
 
 /* Pours in from off-frame and settles. */
@@ -292,43 +292,6 @@ html[data-splash="showing"] body {
   to {
     transform: scale(1);
     opacity: 1;
-  }
-}
-
-/* Idle: each mass swells on its own clock, so the four never breathe together. */
-@keyframes ss-ooze-tl {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.035, 1.07);
-  }
-}
-
-@keyframes ss-ooze-tr {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.05, 1.05);
-  }
-}
-
-@keyframes ss-ooze-bl {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.04, 1.06);
-  }
-}
-
-@keyframes ss-ooze-br {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.03, 1.05);
   }
 }
 
@@ -483,115 +446,21 @@ html[data-splash="showing"] body {
   }
 }
 
-/* ── Running paint ────────────────────────────────────────────────────────
-   Drips leave the masses along the top edge and keep going, passing behind
-   the wordmark and the shop button on their way to the bottom. Stem and bulb
-   are animated separately: scaling a single rounded shape would squash its
-   tip, so the stem stretches and the bulb rides down at its end. */
+/* ══ Liquid paint ═══════════════════════════════════════════════════════
+   Every mass is one gooey SVG — silhouette, runs, drops and swell share a
+   filter and a gradient, so all the paint on the page is a single body of
+   liquid. Wrappers here only place and scale each mass; motion lives on
+   the SVG geometry inside. */
 
-.ss-drips {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/*
- * A drip hangs from a point on a mass: --fx across it, --fy down it, --tw
- * the paint's width at that point. Each mass has its own aspect ratio, so
- * --fy resolves against the height that mass actually renders at.
- */
-.ss-drip {
-  /* Close to the paint width at the point, so the run continues the tip
-     rather than stepping in from it. */
-  --w: clamp(6px, calc(var(--mass) * var(--tw) * 0.62), 34px);
-
-  position: absolute;
-  width: var(--w);
-  height: var(--drip-run);
-  /* Tucked up inside the mass so the join is hidden behind the paint. */
-  margin-top: -16px;
-}
-
-.ss-drip--tl {
-  --mass: var(--mass-tl);
-  --ar: 0.7;
-
-  top: calc(var(--mass) * var(--ar) * var(--fy));
-  left: calc(var(--mass) * var(--fx) - var(--w) / 2);
-}
-
-.ss-drip--tc {
-  --mass: var(--mass-tc);
-  --ar: 0.649;
-
-  top: calc(var(--mass) * var(--ar) * var(--fy));
-  left: calc(50% - var(--mass) / 2 + var(--mass) * var(--fx) - var(--w) / 2);
-}
-
-.ss-drip--tr {
-  --mass: var(--mass-tr);
-  --ar: 0.8;
-
-  top: calc(var(--mass) * var(--ar) * var(--fy));
-  right: calc(var(--mass) - var(--mass) * var(--fx) - var(--w) / 2);
-}
-
-.ss-drip-stem {
-  position: absolute;
-  inset: 0;
-  /* The artwork's paint is lit from above; the run darkens as it thins. */
-  background: linear-gradient(
-    to bottom,
-    var(--paint) 0%,
-    color-mix(in srgb, var(--paint) 88%, #000) 100%
-  );
-  border-radius: 0 0 calc(var(--w) / 2) calc(var(--w) / 2);
-  transform: scaleY(0);
-  transform-origin: top center;
-  will-change: transform;
-  animation: ss-drip-run var(--drip-dur) cubic-bezier(0.32, 0, 0.36, 1)
-    var(--drip-delay) both;
-}
-
-.ss-drip-bulb {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: calc(var(--w) * 1.5);
-  height: calc(var(--w) * 1.5);
-  margin-left: calc(var(--w) * -0.75);
-  background-color: color-mix(in srgb, var(--paint) 92%, #000);
-  border-radius: 50%;
-  transform: translateY(calc(var(--w) * -0.75));
-  will-change: transform;
-  animation: ss-drip-bulb var(--drip-dur) cubic-bezier(0.32, 0, 0.36, 1)
-    var(--drip-delay) both;
-}
-
-@keyframes ss-drip-run {
-  from {
-    transform: scaleY(0) scaleX(1.04);
-  }
-  to {
-    /* Thins as it stretches, the way a real run of paint does. */
-    transform: scaleY(1) scaleX(0.86);
-  }
-}
-
-@keyframes ss-drip-bulb {
-  from {
-    transform: translateY(calc(var(--w) * -0.75)) scale(0.78);
-  }
-  to {
-    transform: translateY(calc(var(--drip-run) - var(--w) * 0.75)) scale(1);
-  }
-}
-
-/* The paint masses sit over the drips, so every drip emerges from under one. */
 .ss-paint {
   z-index: 2;
+}
+
+.ss-paint svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 .ss-paint-tc {
@@ -602,9 +471,100 @@ html[data-splash="showing"] body {
   transform-origin: top center;
   animation:
     ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.13s both,
-    ss-ooze-tr 9s ease-in-out 1.25s infinite alternate;
+    ss-ooze 7.5s ease-in-out 1.25s infinite alternate;
 }
 
+/* The paint breathes on the wrapper, where the compositor animates it for
+   free — the filtered goo inside is static, computed once and cached. */
+@keyframes ss-ooze {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.015, 1.04);
+  }
+}
+
+/* A run: the stem stretches out of its tip while a heavier head leads it. */
+.ss-lq-stem {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  will-change: transform;
+  animation: ss-lq-run var(--dur) cubic-bezier(0.32, 0, 0.36, 1) var(--delay)
+    both;
+}
+
+.ss-lq-head {
+  transform-box: fill-box;
+  will-change: transform;
+  animation: ss-lq-fall var(--dur) cubic-bezier(0.32, 0, 0.36, 1) var(--delay)
+    both;
+}
+
+@keyframes ss-lq-run {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ss-lq-fall {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--run));
+  }
+}
+
+/* A drop: gathers at the tip, necks off through the goo, falls, and the
+   next one starts gathering. Runs forever. */
+.ss-lq-drop {
+  transform-box: fill-box;
+  will-change: transform;
+  animation: ss-lq-drop var(--dur) cubic-bezier(0.5, 0, 0.75, 0.4) var(--delay)
+    infinite;
+}
+
+@keyframes ss-lq-drop {
+  0% {
+    transform: translateY(0) scale(0.35);
+    opacity: 1;
+  }
+  26% {
+    transform: translateY(4px) scale(1);
+  }
+  88% {
+    transform: translateY(var(--run)) scale(0.85);
+    opacity: 1;
+  }
+  89%,
+  100% {
+    transform: translateY(var(--run)) scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* After a run has gone, paint keeps gathering at the tip it left from. */
+.ss-lq-bead {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ss-lq-bead var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes ss-lq-bead {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1.25);
+  }
+}
+
+/* Stacking: paint over the drips-free ground, controls over the paint. */
 .ss-splash-backdrop {
   z-index: 3;
 }
@@ -617,33 +577,27 @@ html[data-splash="showing"] body {
   z-index: 5;
 }
 
-@media (max-width: 640px) {
-  /* One bead per point is plenty on a phone. */
-  .ss-drip--late {
-    display: none;
-  }
-}
-
-/* On the way out the drips go with the flood rather than carrying on. */
-.ss-splash[data-state="leaving"] .ss-drips {
-  animation: ss-splash-clear 0.3s ease-in both;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  /* Paint that has already arrived, with nothing in motion. */
-  .ss-drip-stem {
+  .ss-lq-bead {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat the animation it replaces */
+    animation: none !important;
+  }
+
+  .ss-lq-stem {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason */
     animation: none !important;
     transform: scaleY(1);
   }
 
-  .ss-drip-bulb {
+  .ss-lq-head {
     /* biome-ignore lint/complexity/noImportantStyles: same reason */
     animation: none !important;
-    transform: translateY(calc(var(--drip-run) - var(--w) * 0.75));
+    transform: translateY(var(--run));
   }
 
-  .ss-drip-stem {
-    transform: scaleY(1) scaleX(0.86);
+  .ss-lq-drop {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason */
+    animation: none !important;
+    opacity: 0;
   }
 }
