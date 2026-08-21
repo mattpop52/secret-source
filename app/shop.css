@@ -497,9 +497,16 @@ html[data-splash="showing"] body {
 
 .ss-lq-head {
   transform-box: fill-box;
+  transform-origin: 50% 0;
   will-change: transform;
   animation: ss-lq-fall var(--dur) cubic-bezier(0.32, 0, 0.36, 1) var(--delay)
     both;
+}
+
+/* The catchlight on a belly — the one bright mark that sells it as wet. */
+.ss-lq-gloss {
+  fill: #fff8e6;
+  opacity: 0.62;
 }
 
 @keyframes ss-lq-run {

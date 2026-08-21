@@ -26,7 +26,9 @@ import { PAINT_SHAPES } from "@/lib/paint-shapes";
 type Stem = {
   x: number;
   y: number;
-  w: number;
+  /** Width where it leaves the mass, and where it has thinned to. */
+  wTop: number;
+  wBot: number;
   run: number;
   dur: number;
   delay: number;
@@ -53,7 +55,11 @@ const MASSES: Mass[] = [
   {
     key: "tl",
     vh: 1750,
-    stems: [{ x: 27, y: 167, w: 17, run: 1450, dur: 17, delay: 0.4 }],
+    stems: [
+      { x: 27, y: 167, wTop: 26, wBot: 14, run: 1450, dur: 17, delay: 0.4 },
+      { x: 110, y: 71, wTop: 20, wBot: 11, run: 240, dur: 9, delay: 3.2 },
+      { x: 200, y: 54, wTop: 16, wBot: 9, run: 430, dur: 13, delay: 6.4 },
+    ],
     drops: [{ x: 229, y: 105, r: 10, run: 1500, dur: 9, delay: 5 }],
   },
   {
@@ -61,15 +67,19 @@ const MASSES: Mass[] = [
     vh: 1900,
     stems: [
       // The long one — straight down behind the wordmark and the button.
-      { x: 39, y: 105, w: 13, run: 1650, dur: 15, delay: 0.9 },
-      { x: 155, y: 72, w: 14, run: 1050, dur: 19, delay: 4.2 },
+      { x: 39, y: 105, wTop: 22, wBot: 12, run: 1650, dur: 15, delay: 0.9 },
+      { x: 155, y: 72, wTop: 24, wBot: 13, run: 1050, dur: 19, delay: 4.2 },
+      { x: 210, y: 87, wTop: 15, wBot: 8, run: 300, dur: 11, delay: 8 },
     ],
     drops: [{ x: 155, y: 72, r: 8, run: 1500, dur: 10, delay: 26 }],
   },
   {
     key: "tr",
     vh: 1700,
-    stems: [{ x: 239, y: 88, w: 22, run: 1350, dur: 21, delay: 2.2 }],
+    stems: [
+      { x: 239, y: 88, wTop: 30, wBot: 16, run: 1350, dur: 21, delay: 2.2 },
+      { x: 130, y: 48, wTop: 18, wBot: 10, run: 360, dur: 12, delay: 5.5 },
+    ],
     drops: [{ x: 101, y: 55, r: 12, run: 1400, dur: 8.5, delay: 3 }],
   },
   {
@@ -102,6 +112,48 @@ function gradientStops(artHeight: number, viewHeight: number) {
   ];
 }
 
+/*
+ * A run, tapered: wide where it leaves the mass, flaring in over the first
+ * stretch, then near-parallel and thin for the rest — the shape paint
+ * actually makes when it pulls away from a body and drains.
+ *
+ * The path is authored at full length and revealed by scaling it vertically,
+ * so its bottom edge is always the authored bottom edge: the width there
+ * never changes, and the head's neck matches it at every moment of the fall.
+ */
+function stemPath(wTop: number, wBot: number, len: number) {
+  const t = wTop / 2;
+  const b = wBot / 2;
+  const flare = Math.min(len * 0.2, 95);
+
+  return [
+    `M${-t} 0`,
+    `C${-t} ${flare * 0.42} ${-b} ${flare * 0.5} ${-b} ${flare}`,
+    `L${-b} ${len}`,
+    `L${b} ${len}`,
+    `L${b} ${flare}`,
+    `C${b} ${flare * 0.5} ${t} ${flare * 0.42} ${t} 0`,
+    "Z",
+  ].join("");
+}
+
+/*
+ * The head: a hanging drop. A narrow neck the width of the run it leads,
+ * swelling into a round belly — heavier than the thread above it, which is
+ * what makes paint read as falling rather than drawn.
+ */
+function headPath(neck: number, r: number) {
+  const n = neck / 2;
+
+  return [
+    `M${-n} -3`,
+    `C${-n} ${r * 0.55} ${-r} ${r * 0.62} ${-r} ${r * 1.2}`,
+    `A${r} ${r} 0 0 0 ${r} ${r * 1.2}`,
+    `C${r} ${r * 0.62} ${n} ${r * 0.55} ${n} -3`,
+    "Z",
+  ].join("");
+}
+
 function stemStyle(stem: Stem) {
   return {
     "--dur": `${stem.dur}s`,
@@ -111,7 +163,7 @@ function stemStyle(stem: Stem) {
 
 function headStyle(stem: Stem) {
   return {
-    "--run": `${stem.run - stem.w * 0.4}px`,
+    "--run": `${stem.run}px`,
     "--dur": `${stem.dur}s`,
     "--delay": `${stem.delay}s`,
   } as React.CSSProperties;
@@ -193,71 +245,95 @@ function LiquidMass({ mass }: { mass: Mass }) {
             ))}
           </linearGradient>
 
-          {/* A run is a lit cylinder: bright along the light's side. */}
+          {/* A run is a lit cylinder: a dark edge, a hard catchlight where
+              the light lands, then a long fall to a darker edge. */}
           <linearGradient id={stemId} x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0.12" stopColor="#dda039" />
-            <stop offset="0.5" stopColor="#c8892a" />
-            <stop offset="1" stopColor="#9c6c1c" />
+            <stop offset="0" stopColor="#5a3a0c" />
+            <stop offset="0.12" stopColor="#c98b2b" />
+            <stop offset="0.2" stopColor="#ffe3a8" />
+            <stop offset="0.33" stopColor="#cc8b29" />
+            <stop offset="0.62" stopColor="#b0771f" />
+            <stop offset="0.86" stopColor="#7d5211" />
+            <stop offset="1" stopColor="#4a3007" />
           </linearGradient>
 
-          <radialGradient cx="0.35" cy="0.3" id={headId} r="0.8">
-            <stop offset="0" stopColor="#e3aa46" />
-            <stop offset="0.55" stopColor="#c8892a" />
-            <stop offset="1" stopColor="#96671a" />
+          <radialGradient cx="0.34" cy="0.3" id={headId} r="0.78">
+            <stop offset="0" stopColor="#ffd88f" />
+            <stop offset="0.45" stopColor="#cc8b29" />
+            <stop offset="1" stopColor="#6d4810" />
           </radialGradient>
         </defs>
 
-        {/* Layer 1 — the runs, plain, depth baked into their gradients. */}
+        {/* Layer 1 — the runs. Plain, but carrying their own depth: a
+            lit-cylinder ramp across the stem, a radial on the belly, and a
+            specular catchlight where the light lands. */}
         <g>
           {mass.stems.map((stem) => (
-            <g key={`run-${stem.x}-${stem.y}`}>
-              <rect
+            <g
+              key={`run-${stem.x}-${stem.y}`}
+              transform={`translate(${stem.x} ${stem.y})`}
+            >
+              <path
                 className="ss-lq-stem"
+                d={stemPath(stem.wTop, stem.wBot, stem.run)}
                 fill={`url(#${stemId})`}
-                height={stem.run + 18}
-                rx={stem.w / 2}
                 style={stemStyle(stem)}
-                width={stem.w}
-                x={stem.x - stem.w / 2}
-                y={stem.y - 18}
               />
-              <circle
-                className="ss-lq-head"
-                cx={stem.x}
-                cy={stem.y}
+              <g className="ss-lq-head" style={headStyle(stem)}>
+                <path
+                  d={headPath(stem.wBot, stem.wBot * 0.95)}
+                  fill={`url(#${headId})`}
+                />
+                <ellipse
+                  className="ss-lq-gloss"
+                  cx={stem.wBot * -0.3}
+                  cy={stem.wBot * 0.82}
+                  rx={stem.wBot * 0.26}
+                  ry={stem.wBot * 0.4}
+                />
+              </g>
+            </g>
+          ))}
+
+          {mass.drops.map((drop) => (
+            <g
+              className="ss-lq-drop"
+              key={`fall-${drop.x}-${drop.y}`}
+              style={dropStyle(drop)}
+              transform={`translate(${drop.x} ${drop.y})`}
+            >
+              <path
+                d={headPath(drop.r * 0.9, drop.r)}
                 fill={`url(#${headId})`}
-                r={stem.w * 0.72}
-                style={headStyle(stem)}
+              />
+              <ellipse
+                className="ss-lq-gloss"
+                cx={drop.r * -0.32}
+                cy={drop.r * 0.85}
+                rx={drop.r * 0.27}
+                ry={drop.r * 0.42}
               />
             </g>
           ))}
-          {mass.drops.map((drop) => (
-            <circle
-              className="ss-lq-drop"
-              cx={drop.x}
-              cy={drop.y}
-              fill={`url(#${headId})`}
-              key={`fall-${drop.x}-${drop.y}`}
-              r={drop.r}
-              style={dropStyle(drop)}
-            />
-          ))}
+
           {/* Paint keeps gathering at each tip after its run has gone. */}
           {mass.stems.map((stem) => (
-            <circle
-              className="ss-lq-bead"
-              cx={stem.x}
-              cy={stem.y}
-              fill={`url(#${headId})`}
+            <g
               key={`bead-${stem.x}-${stem.y}`}
-              r={stem.w * 0.8}
-              style={
-                {
-                  "--dur": "3.4s",
-                  "--delay": `${stem.delay + stem.dur}s`,
-                } as React.CSSProperties
-              }
-            />
+              transform={`translate(${stem.x} ${stem.y})`}
+            >
+              <path
+                className="ss-lq-bead"
+                d={headPath(stem.wBot * 0.9, stem.wBot * 0.75)}
+                fill={`url(#${headId})`}
+                style={
+                  {
+                    "--dur": "3.4s",
+                    "--delay": `${stem.delay + stem.dur}s`,
+                  } as React.CSSProperties
+                }
+              />
+            </g>
           ))}
         </g>
 
@@ -272,7 +348,7 @@ function LiquidMass({ mass }: { mass: Mass }) {
           {/* A static meniscus at every tip — the wet bulge the runs and
               drops emerge through, fused and lit by the goo. */}
           {[...mass.stems, ...mass.drops].map((tip) => {
-            const rx = "w" in tip ? tip.w * 1.05 : tip.r * 1.3;
+            const rx = "wTop" in tip ? tip.wTop * 0.85 : tip.r * 1.3;
 
             return (
               <ellipse
