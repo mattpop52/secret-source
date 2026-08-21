@@ -71,13 +71,34 @@ FORM: brand-led storefront (home / collection / product / basket), pinned by the
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->`;
 
+/*
+ * Runs before first paint: a visitor who has already been through the
+ * landing card this session should never see it flash up again, and the
+ * page must not be scroll-locked for them either.
+ */
+const SPLASH_SCRIPT = `(function(){
+  try {
+    var d = document.documentElement;
+    d.classList.remove("no-js");
+    if (sessionStorage.getItem("ss-splash-v1") === "1" || location.pathname !== "/") {
+      d.setAttribute("data-splash", "skip");
+    }
+  } catch (e) {}
+})();`;
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB">
+    <html className="no-js" lang="en-GB">
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: must run before first paint to avoid a flash of the landing card
+          dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }}
+        />
+      </head>
       <body
         className={`${displayFont.variable} ${stencilFont.variable} ${bodyFont.variable} min-h-dvh bg-[var(--ss-black)] text-[var(--ss-bone)]`}
         data-ss-root=""

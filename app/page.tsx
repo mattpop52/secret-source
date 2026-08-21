@@ -3,6 +3,7 @@ import { LogoBadge, PlugMark } from "@/components/logo";
 import { ProductCard } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { Section, SectionHeading } from "@/components/section";
+import { Splash } from "@/components/splash";
 import { TapeMarquee } from "@/components/tape-marquee";
 import {
   BRANDS,
@@ -57,6 +58,8 @@ const STEPS = [
 export default function SecretSourceHome() {
   return (
     <>
+      <Splash />
+
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="ss-grain relative overflow-hidden border-[var(--ss-hairline)] border-b">
         <div
