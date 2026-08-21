@@ -456,6 +456,12 @@ html[data-splash="showing"] body {
   z-index: 2;
 }
 
+/* Mass bodies ride above every run, so the corner patches read as one
+   unbroken border and nothing is drawn across them. */
+.ss-paint-body {
+  z-index: 3;
+}
+
 .ss-paint svg {
   display: block;
   width: 100%;
@@ -573,15 +579,15 @@ html[data-splash="showing"] body {
 
 /* Stacking: paint over the drips-free ground, controls over the paint. */
 .ss-splash-backdrop {
-  z-index: 3;
-}
-
-.ss-splash-centre {
   z-index: 4;
 }
 
-.ss-splash-flood {
+.ss-splash-centre {
   z-index: 5;
+}
+
+.ss-splash-flood {
+  z-index: 6;
 }
 
 @media (prefers-reduced-motion: reduce) {

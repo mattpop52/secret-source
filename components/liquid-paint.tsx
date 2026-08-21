@@ -56,7 +56,11 @@ const MASSES: Mass[] = [
     key: "tl",
     vh: 1750,
     stems: [
-      { x: 27, y: 167, wTop: 26, wBot: 14, run: 1450, dur: 17, delay: 0.4 },
+      // Hugs the left edge and runs into the bottom-left pool (bl is solid
+      // to the page edge across its first columns, so it swallows this one).
+      { x: 12, y: 128, wTop: 24, wBot: 13, run: 1450, dur: 17, delay: 0.4 },
+      // The corner point still drips, but stops short of the frame.
+      { x: 27, y: 167, wTop: 22, wBot: 12, run: 140, dur: 8, delay: 1.6 },
       { x: 110, y: 71, wTop: 20, wBot: 11, run: 240, dur: 9, delay: 3.2 },
       { x: 200, y: 54, wTop: 16, wBot: 9, run: 430, dur: 13, delay: 6.4 },
     ],
@@ -77,7 +81,10 @@ const MASSES: Mass[] = [
     key: "tr",
     vh: 1700,
     stems: [
-      { x: 239, y: 88, wTop: 30, wBot: 16, run: 1350, dur: 21, delay: 2.2 },
+      // Shifted off the point to the column where the bottom-right hook is
+      // solid all the way to the page edge, so this run vanishes into the
+      // corner instead of threading down the hollow inside it.
+      { x: 252, y: 86, wTop: 28, wBot: 15, run: 1350, dur: 21, delay: 2.2 },
       { x: 130, y: 48, wTop: 18, wBot: 10, run: 360, dur: 12, delay: 5.5 },
     ],
     drops: [{ x: 101, y: 55, r: 12, run: 1400, dur: 8.5, delay: 3 }],
@@ -183,91 +190,44 @@ function LiquidMass({ mass }: { mass: Mass }) {
   const bodyId = `ss-body-${mass.key}`;
   const stemId = `ss-stem-${mass.key}`;
   const headId = `ss-head-${mass.key}`;
+  const viewBox = `0 0 ${shape.w} ${mass.vh}`;
 
   return (
-    <div className={`ss-paint ss-paint-${mass.key}`}>
-      <svg
-        aria-hidden="true"
-        fill="none"
-        viewBox={`0 0 ${shape.w} ${mass.vh}`}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          {/*
-           * Goo, lit. Clipped to the artwork plus a neck window below it:
-           * blur + lighting over the whole run height is a 5fps mistake.
-           */}
-          <filter
-            filterUnits="userSpaceOnUse"
-            height={shape.h + 108}
-            id={gooId}
-            width={shape.w + 32}
-            x={-16}
-            y={-16}
-          >
-            <feGaussianBlur in="SourceGraphic" result="soft" stdDeviation="5" />
-            <feColorMatrix
-              in="soft"
-              result="goo"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"
-            />
-            <feSpecularLighting
-              in="soft"
-              lightingColor="#ffe2a6"
-              result="spec"
-              specularConstant="0.7"
-              specularExponent="13"
-              surfaceScale="5"
-            >
-              <feDistantLight azimuth="235" elevation="26" />
-            </feSpecularLighting>
-            <feComposite in="spec" in2="goo" operator="in" result="rim" />
-            <feMerge>
-              <feMergeNode in="goo" />
-              <feMergeNode in="rim" />
-            </feMerge>
-          </filter>
+    <>
+      {/*
+       * Layer one: the runs. Every mass's runs sit beneath every mass's
+       * body, so a run that reaches a corner patch disappears into it
+       * rather than crossing the frame the patches draw around the page.
+       * Depth is baked in: a lit-cylinder ramp across the stem, a radial on
+       * the belly, and a catchlight where the light lands.
+       */}
+      <div className={`ss-paint ss-paint-${mass.key}`}>
+        <svg
+          aria-hidden="true"
+          fill="none"
+          viewBox={viewBox}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            {/* A run is a lit cylinder: a dark edge, a hard catchlight where
+                the light lands, then a long fall to a darker edge. */}
+            <linearGradient id={stemId} x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stopColor="#5a3a0c" />
+              <stop offset="0.12" stopColor="#c98b2b" />
+              <stop offset="0.2" stopColor="#ffe3a8" />
+              <stop offset="0.33" stopColor="#cc8b29" />
+              <stop offset="0.62" stopColor="#b0771f" />
+              <stop offset="0.86" stopColor="#7d5211" />
+              <stop offset="1" stopColor="#4a3007" />
+            </linearGradient>
 
-          <linearGradient
-            gradientUnits="userSpaceOnUse"
-            id={bodyId}
-            x1="0"
-            x2="0"
-            y1="0"
-            y2={mass.vh}
-          >
-            {gradientStops(shape.h, mass.vh).map((stop) => (
-              <stop
-                key={stop.offset}
-                offset={stop.offset}
-                stopColor={stop.color}
-              />
-            ))}
-          </linearGradient>
+            <radialGradient cx="0.34" cy="0.3" id={headId} r="0.78">
+              <stop offset="0" stopColor="#ffd88f" />
+              <stop offset="0.45" stopColor="#cc8b29" />
+              <stop offset="1" stopColor="#6d4810" />
+            </radialGradient>
+          </defs>
 
-          {/* A run is a lit cylinder: a dark edge, a hard catchlight where
-              the light lands, then a long fall to a darker edge. */}
-          <linearGradient id={stemId} x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#5a3a0c" />
-            <stop offset="0.12" stopColor="#c98b2b" />
-            <stop offset="0.2" stopColor="#ffe3a8" />
-            <stop offset="0.33" stopColor="#cc8b29" />
-            <stop offset="0.62" stopColor="#b0771f" />
-            <stop offset="0.86" stopColor="#7d5211" />
-            <stop offset="1" stopColor="#4a3007" />
-          </linearGradient>
-
-          <radialGradient cx="0.34" cy="0.3" id={headId} r="0.78">
-            <stop offset="0" stopColor="#ffd88f" />
-            <stop offset="0.45" stopColor="#cc8b29" />
-            <stop offset="1" stopColor="#6d4810" />
-          </radialGradient>
-        </defs>
-
-        {/* Layer 1 — the runs. Plain, but carrying their own depth: a
-            lit-cylinder ramp across the stem, a radial on the belly, and a
-            specular catchlight where the light lands. */}
-        <g>
           {mass.stems.map((stem) => (
             <g
               key={`run-${stem.x}-${stem.y}`}
@@ -335,34 +295,103 @@ function LiquidMass({ mass }: { mass: Mass }) {
               />
             </g>
           ))}
-        </g>
+        </svg>
+      </div>
 
-        {/* Layer 2 — the mass and the first stretch of every run, fused and
-            lit by the goo filter. Painted over layer 1, so necks, beads and
-            the hand-off all happen under liquid. */}
-        <g fill={`url(#${bodyId})`} filter={`url(#${gooId})`}>
-          {shape.paths.map((d) => (
-            <path d={d} key={d.slice(0, 24)} />
-          ))}
-
-          {/* A static meniscus at every tip — the wet bulge the runs and
-              drops emerge through, fused and lit by the goo. */}
-          {[...mass.stems, ...mass.drops].map((tip) => {
-            const rx = "wTop" in tip ? tip.wTop * 0.85 : tip.r * 1.3;
-
-            return (
-              <ellipse
-                cx={tip.x}
-                cy={tip.y}
-                key={`meniscus-${tip.x}-${tip.y}`}
-                rx={rx}
-                ry={rx * 0.75}
+      {/*
+       * Layer two: the body — the silhouette and a meniscus at every tip,
+       * fused and lit by the goo filter. Painted above all runs, so the
+       * corner patches stay an unbroken border around the page.
+       */}
+      <div className={`ss-paint ss-paint-body ss-paint-${mass.key}`}>
+        <svg
+          aria-hidden="true"
+          fill="none"
+          viewBox={viewBox}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            {/*
+             * Goo, lit. Clipped to the artwork plus a neck window below it:
+             * blur + lighting over the whole run height is a 5fps mistake.
+             */}
+            <filter
+              filterUnits="userSpaceOnUse"
+              height={shape.h + 108}
+              id={gooId}
+              width={shape.w + 32}
+              x={-16}
+              y={-16}
+            >
+              <feGaussianBlur
+                in="SourceGraphic"
+                result="soft"
+                stdDeviation="5"
               />
-            );
-          })}
-        </g>
-      </svg>
-    </div>
+              <feColorMatrix
+                in="soft"
+                result="goo"
+                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"
+              />
+              <feSpecularLighting
+                in="soft"
+                lightingColor="#ffe2a6"
+                result="spec"
+                specularConstant="0.7"
+                specularExponent="13"
+                surfaceScale="5"
+              >
+                <feDistantLight azimuth="235" elevation="26" />
+              </feSpecularLighting>
+              <feComposite in="spec" in2="goo" operator="in" result="rim" />
+              <feMerge>
+                <feMergeNode in="goo" />
+                <feMergeNode in="rim" />
+              </feMerge>
+            </filter>
+
+            <linearGradient
+              gradientUnits="userSpaceOnUse"
+              id={bodyId}
+              x1="0"
+              x2="0"
+              y1="0"
+              y2={mass.vh}
+            >
+              {gradientStops(shape.h, mass.vh).map((stop) => (
+                <stop
+                  key={stop.offset}
+                  offset={stop.offset}
+                  stopColor={stop.color}
+                />
+              ))}
+            </linearGradient>
+          </defs>
+
+          <g fill={`url(#${bodyId})`} filter={`url(#${gooId})`}>
+            {shape.paths.map((d) => (
+              <path d={d} key={d.slice(0, 24)} />
+            ))}
+
+            {/* A static meniscus at every tip — the wet bulge the runs and
+                drops emerge through, fused and lit by the goo. */}
+            {[...mass.stems, ...mass.drops].map((tip) => {
+              const rx = "wTop" in tip ? tip.wTop * 0.85 : tip.r * 1.3;
+
+              return (
+                <ellipse
+                  cx={tip.x}
+                  cy={tip.y}
+                  key={`meniscus-${tip.x}-${tip.y}`}
+                  rx={rx}
+                  ry={rx * 0.75}
+                />
+              );
+            })}
+          </g>
+        </svg>
+      </div>
+    </>
   );
 }
 
