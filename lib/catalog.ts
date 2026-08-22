@@ -915,6 +915,27 @@ export const PRODUCTS: Product[] = [
     image: "/products/moncler-wordmark-tracksuit-taupe.jpg",
     badge: "just-in",
   },
+  {
+    slug: "trapstar-shooters-tracksuit-grey-2",
+    name: "London Shooters Tracksuit",
+    category: "tracksuits",
+    brand: "trapstar",
+    shape: "tracksuit",
+    colourway: { name: "Grey", fill: "#AFAFAC", accent: "#B3261E" },
+    priceCents: 13_999,
+    sizes: ONE_UNIT(),
+    code: "SS-TRP-0038",
+    blurb:
+      "A second 'London Shooters' hoodie and joggers in grey — the same red-outlined patch as SS-TRP-0012, a different unit.",
+    details: [
+      "Pullover hood and matching joggers, sold as a set",
+      "Heavyweight brushed-back cotton fleece",
+      "Chenille 'Trapstar London Shooters' patch at chest and left thigh",
+      "New with tags",
+    ],
+    image: "/products/trapstar-shooters-tracksuit-grey-2.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
