@@ -978,6 +978,28 @@ export const PRODUCTS: Product[] = [
     image: "/products/stone-island-crewneck-tracksuit-black.jpg",
     badge: "just-in",
   },
+  {
+    slug: "trapstar-irongate-chevron-tracksuit-black",
+    name: "Irongate Chevron Tracksuit",
+    category: "tracksuits",
+    brand: "trapstar",
+    shape: "tracksuit",
+    colourway: { name: "Black / White", fill: "#141414", accent: "#F2F2F0" },
+    priceCents: 13_999,
+    sizes: ONE_UNIT(),
+    code: "SS-TRP-0041",
+    blurb:
+      "Trapstar hoodie and joggers in black with a bold white chevron across the chest and down the leg, embroidered Irongate 'T' at the chest and thigh.",
+    details: [
+      "Zip-through hood and matching joggers, sold as a set",
+      "Heavyweight brushed-back cotton fleece",
+      "White chevron panel across the chest, sleeve and leg",
+      "Embroidered Irongate 'T' logo at chest and thigh",
+      "New with tags",
+    ],
+    image: "/products/trapstar-irongate-chevron-tracksuit-black.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
