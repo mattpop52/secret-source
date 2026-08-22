@@ -2200,13 +2200,14 @@ export const PRODUCTS: Product[] = [
     sizes: ONE_UNIT(),
     code: "SS-AMR-0095",
     blurb:
-      "AMIRI tee in white, 'AMIRI Arts District' text logo with coordinates printed at the chest.",
+      "AMIRI tee in white, 'AMIRI Arts District' text logo with coordinates printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
-      "'AMIRI Arts District' text logo and coordinates at the left chest",
+      "'AMIRI Arts District' text logo and coordinates printed across the back",
       "New with tags",
     ],
     image: "/products/amiri-arts-district-tee-white.jpg",
+    imageBack: "/products/amiri-arts-district-tee-white-back.jpg",
     badge: "just-in",
   },
   {
@@ -2798,6 +2799,26 @@ export const PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/dior-atelier-paris-tee-white.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "prada-linea-rossa-tee-teal",
+    name: "Linea Rossa Tee",
+    category: "t-shirts",
+    brand: "prada",
+    shape: "tee",
+    colourway: { name: "Teal", fill: "#2A8A9E", accent: "#C1272D" },
+    priceCents: 9_999,
+    sizes: ONE_UNIT(),
+    code: "SS-PRD-0126",
+    blurb:
+      "Prada tee in teal, red-and-black Linea Rossa stripe patch at the chest.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "Linea Rossa stripe patch at the left chest",
+      "New with tags",
+    ],
+    image: "/products/prada-linea-rossa-tee-teal.jpg",
     badge: "just-in",
   },
 ];
