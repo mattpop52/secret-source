@@ -41,7 +41,10 @@ export function ProductMedia({
               hasBack && showBack ? "translateX(-50%)" : "translateX(0%)",
           }}
         >
-          <div className="relative h-full w-full shrink-0">
+          <div
+            className="relative h-full shrink-0"
+            style={{ width: hasBack ? "50%" : "100%" }}
+          >
             <Image
               alt={`${alt} — front`}
               className="h-full w-full object-cover"
@@ -53,7 +56,7 @@ export function ProductMedia({
           </div>
 
           {hasBack && (
-            <div className="relative h-full w-full shrink-0">
+            <div className="relative h-full shrink-0" style={{ width: "50%" }}>
               <Image
                 alt={`${alt} — back`}
                 className="h-full w-full object-cover"
