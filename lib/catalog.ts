@@ -936,6 +936,27 @@ export const PRODUCTS: Product[] = [
     image: "/products/trapstar-shooters-tracksuit-grey-2.jpg",
     badge: "just-in",
   },
+  {
+    slug: "trapstar-shooters-tracksuit-black-2",
+    name: "London Shooters Tracksuit",
+    category: "tracksuits",
+    brand: "trapstar",
+    shape: "tracksuit",
+    colourway: { name: "Black", fill: "#131313", accent: "#7A7D82" },
+    priceCents: 13_999,
+    sizes: ONE_UNIT(),
+    code: "SS-TRP-0039",
+    blurb:
+      "A second 'London Shooters' hoodie and joggers in black — the same grey-monochrome patch as SS-TRP-0027, a different unit.",
+    details: [
+      "Pullover hood and matching joggers, sold as a set",
+      "Heavyweight brushed-back cotton fleece",
+      "Chenille 'Trapstar London Shooters' patch at chest and left thigh",
+      "New with tags",
+    ],
+    image: "/products/trapstar-shooters-tracksuit-black-2.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
