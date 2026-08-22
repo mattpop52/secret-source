@@ -957,6 +957,27 @@ export const PRODUCTS: Product[] = [
     image: "/products/trapstar-shooters-tracksuit-black-2.jpg",
     badge: "just-in",
   },
+  {
+    slug: "stone-island-crewneck-tracksuit-black",
+    name: "Crewneck Compass Tracksuit",
+    category: "tracksuits",
+    brand: "stone-island",
+    shape: "tracksuit",
+    colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
+    priceCents: 22_999,
+    sizes: ONE_UNIT(),
+    code: "SS-STI-0040",
+    blurb:
+      "The crewneck compass tracksuit in black — gold-badge compass patch on the sleeve, repeated on the joggers' cargo pocket.",
+    details: [
+      "Crewneck sweatshirt and matching joggers, sold as a set",
+      "Heavyweight brushed cotton fleece",
+      "Woven compass badge on the left sleeve and joggers' cargo pocket",
+      "New with tags",
+    ],
+    image: "/products/stone-island-crewneck-tracksuit-black.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
