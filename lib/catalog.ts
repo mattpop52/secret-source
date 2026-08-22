@@ -27,7 +27,8 @@ export type GarmentShape =
   | "shorts-set"
   | "sneaker"
   | "slide"
-  | "figure";
+  | "figure"
+  | "bag";
 
 export type Category = {
   slug: string;
@@ -105,6 +106,11 @@ export const CATEGORIES: Category[] = [
     slug: "shoes",
     name: "Shoes",
     line: "One pair, one size, boxed.",
+  },
+  {
+    slug: "bags",
+    name: "Bags",
+    line: "One unit each.",
   },
 ];
 
@@ -1789,6 +1795,28 @@ export const PRODUCTS: Product[] = [
       "New in box",
     ],
     image: "/products/dior-b30-sneaker-black-2.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "dior-oblique-belt-bag-black",
+    name: "Oblique Belt Bag",
+    category: "bags",
+    brand: "dior",
+    shape: "bag",
+    colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
+    priceCents: 24_999,
+    sizes: ONE_UNIT("One size"),
+    code: "SS-DIOR-0077",
+    blurb:
+      "Dior belt bag in black Oblique jacquard, silver hardware, adjustable webbing strap with the woven Dior wordmark.",
+    details: [
+      "Black Oblique jacquard canvas with leather trim",
+      "Front zip pocket, silver-tone zip pulls",
+      "Adjustable webbing strap, woven 'Christian Dior' wordmark",
+      "'DIOR' plate at the front",
+      "New with tags",
+    ],
+    image: "/products/dior-oblique-belt-bag-black.jpg",
     badge: "just-in",
   },
 ];

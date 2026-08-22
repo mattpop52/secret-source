@@ -367,6 +367,46 @@ function Figure({ fill, accent }: ArtProps) {
   );
 }
 
+function Bag({ fill, accent }: ArtProps) {
+  return (
+    <g>
+      {/* Strap, slung diagonally */}
+      <path
+        d="M40 40 Q90 90 76 156"
+        fill="none"
+        stroke={accent}
+        strokeLinecap="round"
+        strokeWidth="16"
+      />
+      {/* Pouch body */}
+      <path
+        d="M46 148 Q46 132 62 130 L138 122 Q158 122 158 144 Q158 170 138 172 L62 178 Q46 178 46 162 Z"
+        fill={fill}
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      {/* Zip line across the top */}
+      <path
+        d="M52 138 Q100 128 152 132"
+        fill="none"
+        stroke={STROKE}
+        strokeWidth="3"
+      />
+      {/* Hardware tab */}
+      <rect
+        fill={accent}
+        height="14"
+        rx="3"
+        stroke={STROKE}
+        strokeWidth="2"
+        width="22"
+        x="128"
+        y="118"
+      />
+    </g>
+  );
+}
+
 const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   hoodie: Hoodie,
   joggers: Joggers,
@@ -378,6 +418,7 @@ const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   sneaker: Sneaker,
   slide: Slide,
   figure: Figure,
+  bag: Bag,
 };
 
 export function GarmentArt({
