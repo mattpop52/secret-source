@@ -71,6 +71,12 @@ export type Product = {
    * Leave undefined and the product renders its vector poster instead.
    */
   image?: string;
+  /**
+   * A second photo of the same piece — the back, when it's been shot. Only
+   * takes effect once `image` (the front) is set. Adds a front/back toggle
+   * to the product's media everywhere it's shown full-size.
+   */
+  imageBack?: string;
   badge?: "just-in" | "restock" | "last-pair";
 };
 
@@ -79,6 +85,11 @@ export const CATEGORIES: Category[] = [
     slug: "tracksuits",
     name: "Tracksuits",
     line: "Hoodie or crewneck, matched bottoms, one unit each.",
+  },
+  {
+    slug: "jumpers",
+    name: "Jumpers",
+    line: "Shot front and back, one unit each.",
   },
 ];
 
