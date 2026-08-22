@@ -894,6 +894,27 @@ export const PRODUCTS: Product[] = [
     image: "/products/essentials-fog-tracksuit-grey.jpg",
     badge: "just-in",
   },
+  {
+    slug: "moncler-wordmark-tracksuit-taupe",
+    name: "Wordmark Tracksuit",
+    category: "tracksuits",
+    brand: "moncler",
+    shape: "tracksuit",
+    colourway: { name: "Taupe", fill: "#8C7E6E", accent: "#5C5044" },
+    priceCents: 26_999,
+    sizes: ONE_UNIT(),
+    code: "SS-MNC-0037",
+    blurb:
+      "The same 'Moncler' wordmark crewneck and joggers as SS-MNC-0023 and SS-MNC-0030, this one in taupe with the logo in gold.",
+    details: [
+      "Crewneck sweatshirt and matching joggers, sold as a set",
+      "Mid-weight cotton fleece",
+      "Printed 'Moncler' wordmark in gold at chest and left leg",
+      "New with tags",
+    ],
+    image: "/products/moncler-wordmark-tracksuit-taupe.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
