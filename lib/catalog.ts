@@ -1064,6 +1064,30 @@ export const PRODUCTS: Product[] = [
     imageBack: "/products/off-white-arrows-hoodie-black-back.jpg",
     badge: "just-in",
   },
+  {
+    slug: "off-white-arrows-hoodie-grey",
+    name: "Arrows Hoodie",
+    category: "jumpers",
+    brand: "off-white",
+    shape: "hoodie",
+    colourway: { name: "Grey / Green", fill: "#C3CAD1", accent: "#3F8F3F" },
+    priceCents: 23_999,
+    sizes: ONE_UNIT(),
+    code: "SS-OFW-0044",
+    blurb:
+      "Off-White pullover hoodie in light grey, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
+    details: [
+      "Pullover hood with drawstring and kangaroo pocket",
+      "Heavyweight cotton fleece",
+      "Green marble-print diagonal arrows down both sleeves",
+      "Viewfinder-style Arrows graphic printed across the back",
+      "Off-White wordmark printed at the left chest",
+      "New with tags",
+    ],
+    image: "/products/off-white-arrows-hoodie-grey.jpg",
+    imageBack: "/products/off-white-arrows-hoodie-grey-back.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
