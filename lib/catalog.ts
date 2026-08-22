@@ -138,6 +138,11 @@ export const BRANDS: Brand[] = [
     name: "Dsquared2",
     line: "The maple leaf, stitched red.",
   },
+  {
+    slug: "off-white",
+    name: "Off-White",
+    line: "Diagonal arrows, industrial graphics.",
+  },
 ];
 
 // A single, one-off unit in stock: the site's own fiction — "everything on
@@ -1009,6 +1014,54 @@ export const PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/trapstar-irongate-chevron-tracksuit-black.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "off-white-arrows-hoodie-cream",
+    name: "Arrows Hoodie",
+    category: "jumpers",
+    brand: "off-white",
+    shape: "hoodie",
+    colourway: { name: "Cream / Green", fill: "#F1ECE0", accent: "#3F8F3F" },
+    priceCents: 24_999,
+    sizes: ONE_UNIT(),
+    code: "SS-OFW-0042",
+    blurb:
+      "Off-White pullover hoodie in cream, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
+    details: [
+      "Pullover hood with drawstring and kangaroo pocket",
+      "Heavyweight cotton fleece",
+      "Green marble-print diagonal arrows down both sleeves",
+      "Viewfinder-style Arrows graphic printed across the back",
+      "Off-White wordmark printed at the left chest",
+      "New with tags",
+    ],
+    image: "/products/off-white-arrows-hoodie-cream.jpg",
+    imageBack: "/products/off-white-arrows-hoodie-cream-back.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "off-white-arrows-hoodie-black",
+    name: "Arrows Hoodie",
+    category: "jumpers",
+    brand: "off-white",
+    shape: "hoodie",
+    colourway: { name: "Black / Green", fill: "#131313", accent: "#3F8F3F" },
+    priceCents: 22_999,
+    sizes: ONE_UNIT(),
+    code: "SS-OFW-0043",
+    blurb:
+      "Off-White pullover hoodie in black, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
+    details: [
+      "Pullover hood with drawstring and kangaroo pocket",
+      "Heavyweight cotton fleece",
+      "Green marble-print diagonal arrows down both sleeves",
+      "Viewfinder-style Arrows graphic printed across the back",
+      "Off-White wordmark printed at the left chest",
+      "New with tags",
+    ],
+    image: "/products/off-white-arrows-hoodie-black.jpg",
+    imageBack: "/products/off-white-arrows-hoodie-black-back.jpg",
     badge: "just-in",
   },
 ];
