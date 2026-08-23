@@ -2821,6 +2821,66 @@ export const PRODUCTS: Product[] = [
     image: "/products/prada-linea-rossa-tee-teal.jpg",
     badge: "just-in",
   },
+  {
+    slug: "dior-cd-icon-tee-black-2",
+    name: "CD Icon Tee",
+    category: "t-shirts",
+    brand: "dior",
+    shape: "tee",
+    colourway: { name: "Black", fill: "#131313", accent: "#131313" },
+    priceCents: 9_999,
+    sizes: ONE_UNIT(),
+    code: "SS-DIOR-0127",
+    blurb:
+      "Dior tee in black, tonal embroidered CD-icon logo at the chest — a second black unit, alongside the one already on the shelf.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "Tonal embroidered CD-icon logo at the left chest",
+      "New with tags",
+    ],
+    image: "/products/dior-cd-icon-tee-black-2.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "amiri-script-logo-tee-white",
+    name: "Script Logo Tee",
+    category: "t-shirts",
+    brand: "amiri",
+    shape: "tee",
+    colourway: { name: "White", fill: "#F2F2ED", accent: "#2E5C7A" },
+    priceCents: 8_999,
+    sizes: ONE_UNIT(),
+    code: "SS-AMR-0128",
+    blurb:
+      "AMIRI tee in white, an ornate cursive 'Amiri' script with a blue floral flourish at the chest.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "Cursive script logo with a blue floral flourish at the chest",
+      "New with tags",
+    ],
+    image: "/products/amiri-script-logo-tee-white.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "amiri-bold-wordmark-tee-black",
+    name: "Bold Wordmark Tee",
+    category: "t-shirts",
+    brand: "amiri",
+    shape: "tee",
+    colourway: { name: "Black", fill: "#131313", accent: "#C9B896" },
+    priceCents: 7_999,
+    sizes: ONE_UNIT(),
+    code: "SS-AMR-0129",
+    blurb:
+      "AMIRI tee in black, a large bold-serif AMIRI wordmark printed in tan across the chest — a heavier typeface than the other Wordmark tees.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "Large bold-serif AMIRI wordmark printed in tan at the chest",
+      "New with tags",
+    ],
+    image: "/products/amiri-bold-wordmark-tee-black.jpg",
+    badge: "just-in",
+  },
 ];
 
 export function getCategory(slug: string): Category | undefined {
