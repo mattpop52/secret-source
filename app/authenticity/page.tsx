@@ -89,9 +89,9 @@ export default function AuthenticityPage() {
 
           <li className="ss-tape flex items-center justify-center bg-[var(--ss-black)] px-7 py-10">
             <span className="ss-display bg-[var(--ss-black)] px-4 py-3 text-center text-2xl leading-tight">
-              Fake in,
+              Not right,
               <br />
-              money back
+              {RETURNS_WINDOW} to send it back
             </span>
           </li>
         </ol>
