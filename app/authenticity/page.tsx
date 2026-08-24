@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PlugMark } from "@/components/logo";
 import { TapeMarquee } from "@/components/tape-marquee";
-import {
-  RETURNS_WINDOW,
-  SHOP_INSTAGRAM,
-  SHOP_INSTAGRAM_URL,
-} from "@/lib/constants";
+import { RETURNS_WINDOW } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Legit check",
@@ -97,51 +92,7 @@ export default function AuthenticityPage() {
         </ol>
       </section>
 
-      <TapeMarquee items={["Every docket checked", "Every piece in hand"]} />
-
-      <section className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <div>
-            <h2 className="ss-display ss-display-shadow text-[clamp(1.75rem,5vw,3rem)]">
-              What the docket number means
-            </h2>
-            <p className="mt-5 text-[var(--ss-smoke)] leading-relaxed">
-              Every listing carries a docket — <code>SS-TRP-0142</code>, for
-              example. It ties the listing to the physical piece on the shelf:
-              its check notes, its photographs and its paperwork. Quote it in a
-              message and you'll get the specific answer about the specific
-              item, not a general one about the style.
-            </p>
-          </div>
-
-          <div className="ss-docket px-7 py-7">
-            <h2 className="ss-stencil text-[0.7rem] text-[var(--ss-orange)]">
-              Still not sure?
-            </h2>
-            <p className="mt-4 text-[var(--ss-smoke)] text-sm leading-relaxed">
-              Ask for close-ups before you buy — stitching, labels, hardware,
-              box, whatever you want to see. Nothing about the check is a
-              secret, which is the point.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                className="ss-stencil bg-[var(--ss-orange)] px-6 py-3.5 text-[#120c00] text-[0.7rem] transition-colors hover:bg-[var(--ss-orange-hot)]"
-                href={SHOP_INSTAGRAM_URL}
-                rel="noreferrer"
-                target="_blank"
-              >
-                DM @{SHOP_INSTAGRAM}
-              </a>
-              <Link
-                className="ss-stencil border border-[var(--ss-hairline-strong)] px-6 py-3.5 text-[0.7rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
-                href="/help"
-              >
-                Delivery &amp; returns
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TapeMarquee items={["Every piece in hand"]} />
     </>
   );
 }
