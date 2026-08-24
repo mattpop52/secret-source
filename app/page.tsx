@@ -25,15 +25,24 @@ import {
 const featured = PRODUCTS[0];
 
 /** "A, B and C" — reads straight from the stocked brand list, so the hero
-    line never needs a hand edit when a new brand lands. */
+    line never needs a hand edit when a new brand lands. Past a handful,
+    a full comma-run stops reading as a pitch and starts reading as an
+    inventory list, so it's capped to a representative run plus a count. */
 function formatBrandList(brands: { name: string }[]): string {
   const names = brands.map((brand) => brand.name);
+  const LIMIT = 6;
 
   if (names.length <= 1) {
     return names[0] ?? "";
   }
 
-  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  if (names.length <= LIMIT) {
+    return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  }
+
+  const shown = names.slice(0, LIMIT);
+  const remaining = names.length - LIMIT;
+  return `${shown.join(", ")} and ${remaining} more brand${remaining === 1 ? "" : "s"}`;
 }
 
 const CHECKS = [

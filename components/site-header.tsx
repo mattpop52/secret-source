@@ -53,7 +53,7 @@ export function SiteHeader() {
         >
           {CATEGORIES.map((category) => (
             <Link
-              className="ss-stencil px-2.5 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)]"
+              className="ss-stencil whitespace-nowrap px-2 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)]"
               href={`/collections/${category.slug}`}
               key={category.slug}
             >
@@ -70,7 +70,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2 lg:ml-4">
           <Link
-            className="ss-stencil hidden px-3 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)] sm:block"
+            className="ss-stencil hidden whitespace-nowrap px-3 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)] sm:block"
             href="/authenticity"
           >
             Legit check
@@ -93,9 +93,19 @@ export function SiteHeader() {
           aria-label="Categories"
           className="border-[var(--ss-hairline)] border-t bg-[var(--ss-pitch)] lg:hidden"
         >
-          <ul className="mx-auto grid max-w-[1240px] grid-cols-2 gap-px bg-[var(--ss-hairline)]">
+          {/*
+           * Per-tile borders rather than the gap-px-over-hairline-background
+           * trick: with a category count that keeps growing (and no
+           * guarantee it lands on an even number), a shared background
+           * showing through the gaps leaves an unfilled grid cell exposed
+           * as a stray solid box whenever the count is odd.
+           */}
+          <ul className="mx-auto grid max-w-[1240px] grid-cols-2 border-t border-l border-[var(--ss-hairline)]">
             {CATEGORIES.map((category) => (
-              <li key={category.slug}>
+              <li
+                className="border-r border-b border-[var(--ss-hairline)]"
+                key={category.slug}
+              >
                 <Link
                   className="ss-stencil block bg-[var(--ss-pitch)] px-4 py-4 text-[0.7rem] transition-colors hover:bg-[var(--ss-panel)] hover:text-[var(--ss-orange)]"
                   href={`/collections/${category.slug}`}
@@ -104,7 +114,7 @@ export function SiteHeader() {
                 </Link>
               </li>
             ))}
-            <li className="col-span-2">
+            <li className="col-span-2 border-r border-b border-[var(--ss-hairline)]">
               <Link
                 className="ss-stencil block bg-[var(--ss-orange)] px-4 py-4 text-[#120c00] text-[0.7rem]"
                 href="/collections/all"
