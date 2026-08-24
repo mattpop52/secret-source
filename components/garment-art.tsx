@@ -407,6 +407,46 @@ function Bag({ fill, accent }: ArtProps) {
   );
 }
 
+function Jeans({ fill, accent }: ArtProps) {
+  return (
+    <g>
+      {/* Straight-leg body, less tapered than the joggers/cargos leg */}
+      <path
+        d="M56 44 H144 L150 96 L142 216 H112 L104 128 L96 216 H66 L58 96 Z"
+        fill={fill}
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      {/* Contrast waistband */}
+      <path d="M56 44 H144 L146 60 H54 Z" fill={accent} />
+      {/* Belt loops */}
+      <rect fill={STROKE} height="10" width="4" x="68" y="44" />
+      <rect fill={STROKE} height="10" width="4" x="128" y="44" />
+      {/* Inseam */}
+      <path
+        d="M104 128 L96 216 M104 128 L112 216"
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      {/* Curved back-pocket stitching */}
+      <path
+        d="M70 78 Q80 88 90 78"
+        fill="none"
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      <path
+        d="M110 78 Q120 88 130 78"
+        fill="none"
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      {/* Button */}
+      <circle cx="100" cy="52" fill={STROKE} r="4" />
+    </g>
+  );
+}
+
 const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   hoodie: Hoodie,
   joggers: Joggers,
@@ -419,6 +459,7 @@ const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   slide: Slide,
   figure: Figure,
   bag: Bag,
+  jeans: Jeans,
 };
 
 export function GarmentArt({

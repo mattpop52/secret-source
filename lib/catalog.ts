@@ -28,7 +28,8 @@ export type GarmentShape =
   | "sneaker"
   | "slide"
   | "figure"
-  | "bag";
+  | "bag"
+  | "jeans";
 
 export type Category = {
   slug: string;
@@ -116,6 +117,11 @@ export const CATEGORIES: Category[] = [
     slug: "t-shirts",
     name: "T-Shirts",
     line: "One unit each.",
+  },
+  {
+    slug: "jeans",
+    name: "Jeans",
+    line: "One pair, one waist size, each.",
   },
 ];
 
@@ -2879,6 +2885,48 @@ export const PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/amiri-bold-wordmark-tee-black.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "amiri-mx1-jeans-light-blue",
+    name: "MX1 Jeans",
+    category: "jeans",
+    brand: "amiri",
+    shape: "jeans",
+    colourway: { name: "Light Blue", fill: "#8FA3B0", accent: "#5A6E7A" },
+    priceCents: 27_999,
+    sizes: ONE_UNIT("W30"),
+    code: "SS-AMR-0130",
+    blurb:
+      "AMIRI MX1 jeans in a light blue wash, skinny fit, distressed rips at the thigh and knee backed with red-and-white plaid patches.",
+    details: [
+      "Skinny fit, five-pocket construction",
+      "Distressed rips at the thigh and knee, plaid patch backing",
+      "Silver-tone button and rivets",
+      "New with tags",
+    ],
+    image: "/products/amiri-mx1-jeans-light-blue.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "amiri-mx1-jeans-black",
+    name: "MX1 Jeans",
+    category: "jeans",
+    brand: "amiri",
+    shape: "jeans",
+    colourway: { name: "Black", fill: "#1A1A1A", accent: "#3A3A3A" },
+    priceCents: 27_999,
+    sizes: ONE_UNIT("W30"),
+    code: "SS-AMR-0131",
+    blurb:
+      "AMIRI MX1 jeans in black, skinny fit, distressed rips at the thigh and knee backed with plaid patches.",
+    details: [
+      "Skinny fit, five-pocket construction",
+      "Distressed rips at the thigh and knee, plaid patch backing",
+      "Silver-tone button and rivets",
+      "New with tags",
+    ],
+    image: "/products/amiri-mx1-jeans-black.jpg",
     badge: "just-in",
   },
 ];
