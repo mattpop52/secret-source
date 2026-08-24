@@ -29,7 +29,8 @@ export type GarmentShape =
   | "slide"
   | "figure"
   | "bag"
-  | "jeans";
+  | "jeans"
+  | "beanie";
 
 export type Category = {
   slug: string;
@@ -122,6 +123,11 @@ export const CATEGORIES: Category[] = [
     slug: "jeans",
     name: "Jeans",
     line: "One pair, one waist size, each.",
+  },
+  {
+    slug: "hats",
+    name: "Hats",
+    line: "One size, one unit each.",
   },
 ];
 
@@ -2927,6 +2933,46 @@ export const PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/amiri-mx1-jeans-black.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "prada-triangle-logo-beanie-grey",
+    name: "Triangle Logo Beanie",
+    category: "hats",
+    brand: "prada",
+    shape: "beanie",
+    colourway: { name: "Grey", fill: "#8A8A85", accent: "#131313" },
+    priceCents: 8_999,
+    sizes: ONE_UNIT("One size"),
+    code: "SS-PRD-0132",
+    blurb:
+      "Prada beanie in grey marl, ribbed knit, enamelled triangle logo patch on the cuff.",
+    details: [
+      "Ribbed knit, turn-up cuff",
+      "Enamelled triangle logo patch at the cuff",
+      "New with tags",
+    ],
+    image: "/products/prada-triangle-logo-beanie-grey.jpg",
+    badge: "just-in",
+  },
+  {
+    slug: "cp-company-goggle-beanie-black",
+    name: "Goggle Beanie",
+    category: "hats",
+    brand: "cp-company",
+    shape: "beanie",
+    colourway: { name: "Black", fill: "#131313", accent: "#1A1A1A" },
+    priceCents: 9_999,
+    sizes: ONE_UNIT("One size"),
+    code: "SS-CP-0133",
+    blurb:
+      "C.P. Company beanie in black, ribbed knit, the signature twin lens goggles fixed to the cuff.",
+    details: [
+      "Ribbed knit, turn-up cuff",
+      "Twin lens goggles fixed to the cuff",
+      "New with tags",
+    ],
+    image: "/products/cp-company-goggle-beanie-black.jpg",
     badge: "just-in",
   },
 ];

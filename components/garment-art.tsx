@@ -447,6 +447,39 @@ function Jeans({ fill, accent }: ArtProps) {
   );
 }
 
+function Beanie({ fill, accent }: ArtProps) {
+  return (
+    <g>
+      {/* Domed crown */}
+      <path
+        d="M50 158 Q46 76 100 66 Q154 76 150 158 Z"
+        fill={fill}
+        stroke={STROKE}
+        strokeWidth="2"
+      />
+      {/* Ribbed cuff */}
+      <rect
+        fill={accent}
+        height="36"
+        rx="4"
+        stroke={STROKE}
+        strokeWidth="2"
+        width="106"
+        x="47"
+        y="150"
+      />
+      {/* Ribbing lines */}
+      <path
+        d="M60 150 V186 M76 150 V186 M92 150 V186 M108 150 V186 M124 150 V186 M140 150 V186"
+        stroke={STROKE}
+        strokeWidth="1.5"
+      />
+      {/* Crown seam */}
+      <path d="M100 66 V150" stroke={STROKE} strokeWidth="1.5" />
+    </g>
+  );
+}
+
 const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   hoodie: Hoodie,
   joggers: Joggers,
@@ -460,6 +493,7 @@ const SHAPES: Record<GarmentShape, (props: ArtProps) => React.JSX.Element> = {
   figure: Figure,
   bag: Bag,
   jeans: Jeans,
+  beanie: Beanie,
 };
 
 export function GarmentArt({
