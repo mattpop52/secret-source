@@ -1,9 +1,8 @@
-const NOTICES = [
-  "Checked in-house before it ships",
-  "Tracked UK delivery 2–4 working days",
-  "Free delivery over £200",
-  "14-day returns",
-];
+"use client";
+
+import { FREE_SHIPPING_THRESHOLD, RETURNS_WINDOW } from "@/lib/constants";
+import { useCurrency } from "./currency-provider";
+import { useLanguage } from "./language-provider";
 
 /**
  * The reference for this shop runs a repeating authenticity banner. Here it
@@ -11,6 +10,16 @@ const NOTICES = [
  * promises running between them.
  */
 export function AnnouncementBar() {
+  const { format } = useCurrency();
+  const { t } = useLanguage();
+
+  const NOTICES = [
+    t("noticeChecked"),
+    t("noticeWorldwideDelivery"),
+    t("noticeFreeDeliveryOver", { amount: format(FREE_SHIPPING_THRESHOLD) }),
+    t("noticeReturns", { returns: RETURNS_WINDOW }),
+  ];
+
   return (
     <div className="border-[var(--ss-hairline)] border-b bg-[var(--ss-pitch)]">
       <div className="ss-tape-thin h-[5px]" />

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CategoryName } from "@/components/category-name";
 import { PlugMark } from "@/components/logo";
+import { Price } from "@/components/price";
 import { ProductBuyBox } from "@/components/product-buy-box";
 import { ProductCard } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { TapeMarquee } from "@/components/tape-marquee";
 import {
   discountPercent,
-  formatPrice,
   getBrandName,
   getCategoryName,
   getProduct,
@@ -90,7 +91,7 @@ export default async function ProductPage({
               className="hover:text-[var(--ss-bone)]"
               href={`/collections/${product.category}`}
             >
-              {categoryName}
+              <CategoryName fallback={categoryName} slug={product.category} />
             </Link>
           </li>
           <li aria-hidden="true">/</li>
@@ -185,11 +186,11 @@ export default async function ProductPage({
 
           <div className="mt-6 flex flex-wrap items-baseline gap-3">
             <span className="ss-num text-3xl">
-              {formatPrice(product.priceCents)}
+              <Price cents={product.priceCents} />
             </span>
             {product.compareAtCents && (
               <span className="ss-num text-[var(--ss-sold)] text-lg line-through">
-                {formatPrice(product.compareAtCents)}
+                <Price cents={product.compareAtCents} />
               </span>
             )}
             <span className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)]">
@@ -207,13 +208,28 @@ export default async function ProductPage({
 
           <ul className="mt-8 grid gap-3 border-[var(--ss-hairline)] border-t pt-8">
             {[
-              `Free tracked delivery over ${formatPrice(FREE_SHIPPING_THRESHOLD)} — otherwise ${formatPrice(STANDARD_SHIPPING)}`,
-              `Packed same day, with you in ${DELIVERY_WINDOW}`,
-              `${RETURNS_WINDOW} to send it back if it isn't right`,
-            ].map((line) => (
-              <li className="flex items-start gap-3 text-sm" key={line}>
+              {
+                key: "delivery-cost",
+                line: (
+                  <>
+                    Free tracked delivery over{" "}
+                    <Price cents={FREE_SHIPPING_THRESHOLD} /> — otherwise{" "}
+                    <Price cents={STANDARD_SHIPPING} />
+                  </>
+                ),
+              },
+              {
+                key: "delivery-window",
+                line: `Packed same day, with you in ${DELIVERY_WINDOW}`,
+              },
+              {
+                key: "returns-window",
+                line: `${RETURNS_WINDOW} to send it back if it isn't right`,
+              },
+            ].map((entry) => (
+              <li className="flex items-start gap-3 text-sm" key={entry.key}>
                 <PlugMark className="mt-0.5 size-4 shrink-0 text-[var(--ss-orange)]" />
-                <span className="text-[var(--ss-smoke)]">{line}</span>
+                <span className="text-[var(--ss-smoke)]">{entry.line}</span>
               </li>
             ))}
           </ul>
@@ -325,7 +341,7 @@ export default async function ProductPage({
           <div className="min-w-0">
             <p className="truncate font-semibold text-sm">{product.name}</p>
             <p className="ss-num text-[var(--ss-orange)] text-sm">
-              {formatPrice(product.priceCents)}
+              <Price cents={product.priceCents} />
             </p>
           </div>
           <a

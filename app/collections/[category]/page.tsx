@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CategoryName } from "@/components/category-name";
 import { ProductCard } from "@/components/product-card";
 import {
   CATEGORIES,
@@ -29,7 +30,7 @@ export async function generateMetadata({
 
   return {
     title: category.name,
-    description: `${category.name} — ${category.line} Checked in-house, shipped tracked from the UK.`,
+    description: `${category.name} — ${category.line} Checked in-house, shipped tracked worldwide.`,
   };
 }
 
@@ -72,7 +73,7 @@ export default async function CategoryPage({
             / Collection
           </p>
           <h1 className="ss-display ss-display-shadow mt-4 text-[clamp(2.5rem,9vw,5.5rem)]">
-            {category.name}
+            <CategoryName fallback={category.name} slug={category.slug} />
           </h1>
           <p className="mt-3 max-w-xl text-[var(--ss-smoke)]">
             {category.line}
@@ -95,7 +96,7 @@ export default async function CategoryPage({
               className="ss-stencil block whitespace-nowrap border border-[var(--ss-orange)] bg-[var(--ss-orange)] px-4 py-2.5 text-[#120c00] text-[0.62rem]"
               href={`/collections/${category.slug}`}
             >
-              All {category.name}
+              All <CategoryName fallback={category.name} slug={category.slug} />
             </Link>
           </li>
           {brandsHere.map((brand) => (

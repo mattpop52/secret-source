@@ -5,10 +5,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CATEGORIES } from "@/lib/catalog";
 import { useCart } from "./cart-provider";
+import { CategoryName } from "./category-name";
+import { useLanguage } from "./language-provider";
 import { LogoBadge } from "./logo";
+import { RegionPicker } from "./region-picker";
 
 export function SiteHeader() {
   const { count, openCart, hydrated } = useCart();
+  const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -22,7 +26,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-4 px-4 sm:px-6">
         <button
           aria-expanded={menuOpen}
-          aria-label="Open menu"
+          aria-label={t("openMenu")}
           className="-ml-2 flex size-10 shrink-0 flex-col items-center justify-center gap-[5px] lg:hidden"
           onClick={() => setMenuOpen((open) => !open)}
           type="button"
@@ -57,30 +61,33 @@ export function SiteHeader() {
               href={`/collections/${category.slug}`}
               key={category.slug}
             >
-              {category.name}
+              <CategoryName fallback={category.name} slug={category.slug} />
             </Link>
           ))}
           <Link
             className="ss-stencil px-2.5 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)]"
             href="/collections/all"
           >
-            Everything
+            {t("everything")}
           </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-4">
+          <div className="hidden sm:block">
+            <RegionPicker variant="compact" />
+          </div>
           <Link
             className="ss-stencil hidden whitespace-nowrap px-3 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)] sm:block"
             href="/authenticity"
           >
-            Legit check
+            {t("legitCheck")}
           </Link>
           <button
             className="ss-stencil flex items-center gap-2 border border-[var(--ss-hairline-strong)] px-4 py-2.5 text-[0.7rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
             onClick={openCart}
             type="button"
           >
-            Basket
+            {t("basket")}
             <span className="ss-num min-w-[1.4rem] bg-[var(--ss-orange)] px-1 text-center text-[#120c00] text-[0.7rem] leading-5">
               {hydrated ? count : 0}
             </span>
@@ -110,7 +117,7 @@ export function SiteHeader() {
                   className="ss-stencil block bg-[var(--ss-pitch)] px-4 py-4 text-[0.7rem] transition-colors hover:bg-[var(--ss-panel)] hover:text-[var(--ss-orange)]"
                   href={`/collections/${category.slug}`}
                 >
-                  {category.name}
+                  <CategoryName fallback={category.name} slug={category.slug} />
                 </Link>
               </li>
             ))}
@@ -119,10 +126,13 @@ export function SiteHeader() {
                 className="ss-stencil block bg-[var(--ss-orange)] px-4 py-4 text-[#120c00] text-[0.7rem]"
                 href="/collections/all"
               >
-                Everything in stock
+                {t("everythingInStock")}
               </Link>
             </li>
           </ul>
+          <div className="border-[var(--ss-hairline)] border-t px-4 py-4">
+            <RegionPicker variant="compact" />
+          </div>
         </nav>
       )}
     </header>

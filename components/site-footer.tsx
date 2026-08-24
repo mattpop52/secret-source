@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/catalog";
 import {
@@ -8,17 +10,22 @@ import {
   SHOP_INSTAGRAM_URL,
   SHOP_TAGLINE,
 } from "@/lib/constants";
+import { CategoryName } from "./category-name";
+import { useLanguage } from "./language-provider";
 import { LogoBadge } from "./logo";
-
-const HELP_LINKS = [
-  { href: "/authenticity", label: "Legit check" },
-  { href: "/help#delivery", label: "Delivery" },
-  { href: "/help#returns", label: "Returns" },
-  { href: "/help#sizing", label: "Sizing" },
-  { href: "/help#contact", label: "Contact" },
-];
+import { RegionPicker } from "./region-picker";
 
 export function SiteFooter() {
+  const { t } = useLanguage();
+
+  const HELP_LINKS = [
+    { href: "/authenticity", label: t("legitCheck") },
+    { href: "/help#delivery", label: t("delivery") },
+    { href: "/help#returns", label: t("returns") },
+    { href: "/help#sizing", label: t("sizing") },
+    { href: "/help#contact", label: t("contact") },
+  ];
+
   return (
     <footer className="mt-24 border-[var(--ss-hairline)] border-t bg-[var(--ss-pitch)]">
       <div className="ss-tape-thin h-[5px]" />
@@ -30,14 +37,13 @@ export function SiteFooter() {
             {SHOP_TAGLINE}
           </p>
           <p className="mt-3 max-w-xs text-[var(--ss-smoke)] text-sm">
-            One plug, checked stock, no waiting list. Everything on the shelf is
-            in hand and ships from the UK.
+            {t("footerBlurb")}
           </p>
         </div>
 
         <nav aria-label="Shop">
           <h2 className="ss-stencil text-[0.7rem] text-[var(--ss-orange)]">
-            The shelf
+            {t("theShelf")}
           </h2>
           <ul className="mt-4 space-y-2.5">
             {CATEGORIES.map((category) => (
@@ -46,7 +52,7 @@ export function SiteFooter() {
                   className="text-[var(--ss-smoke)] text-sm underline-offset-4 transition-colors hover:text-[var(--ss-bone)] hover:underline"
                   href={`/collections/${category.slug}`}
                 >
-                  {category.name}
+                  <CategoryName fallback={category.name} slug={category.slug} />
                 </Link>
               </li>
             ))}
@@ -55,7 +61,7 @@ export function SiteFooter() {
                 className="text-[var(--ss-smoke)] text-sm underline-offset-4 transition-colors hover:text-[var(--ss-bone)] hover:underline"
                 href="/collections/all"
               >
-                Everything
+                {t("everything")}
               </Link>
             </li>
           </ul>
@@ -63,7 +69,7 @@ export function SiteFooter() {
 
         <nav aria-label="Help">
           <h2 className="ss-stencil text-[0.7rem] text-[var(--ss-orange)]">
-            Help
+            {t("help")}
           </h2>
           <ul className="mt-4 space-y-2.5">
             {HELP_LINKS.map((link) => (
@@ -81,11 +87,10 @@ export function SiteFooter() {
 
         <div>
           <h2 className="ss-stencil text-[0.7rem] text-[var(--ss-orange)]">
-            Straight to the plug
+            {t("straightToThePlug")}
           </h2>
           <p className="mt-4 text-[var(--ss-smoke)] text-sm">
-            After something that isn't on the shelf? Ask — most of it can be
-            sourced within a week.
+            {t("afterSomething")}
           </p>
           <a
             className="ss-stencil mt-4 inline-block border border-[var(--ss-hairline-strong)] px-5 py-3 text-[0.7rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
@@ -107,14 +112,21 @@ export function SiteFooter() {
       </div>
 
       <div className="border-[var(--ss-hairline)] border-t">
+        <div className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6">
+          <RegionPicker variant="full" />
+        </div>
+      </div>
+
+      <div className="border-[var(--ss-hairline)] border-t">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-4 py-6 text-[var(--ss-smoke)] text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>
-            © {new Date().getFullYear()} Secret Source. Tracked delivery in{" "}
-            {DELIVERY_WINDOW}. {RETURNS_WINDOW} returns.
+            {t("copyright", {
+              year: new Date().getFullYear(),
+              window: DELIVERY_WINDOW,
+              returns: RETURNS_WINDOW,
+            })}
           </p>
-          <p className="ss-stencil text-[0.62rem]">
-            Cards · Apple Pay · Google Pay — secured by Stripe
-          </p>
+          <p className="ss-stencil text-[0.62rem]">{t("paymentMethods")}</p>
         </div>
       </div>
     </footer>

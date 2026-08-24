@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { CategoryName } from "@/components/category-name";
 import { LogoBadge, PlugMark } from "@/components/logo";
+import { Price } from "@/components/price";
 import { ProductCard } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { Section, SectionHeading } from "@/components/section";
@@ -8,7 +10,6 @@ import { TapeMarquee } from "@/components/tape-marquee";
 import {
   BRANDS,
   CATEGORIES,
-  formatPrice,
   getBrandName,
   getBrandsInCategory,
   getProductsByCategoryAndBrand,
@@ -106,7 +107,7 @@ export default function SecretSourceHome() {
           <div>
             <p className="ss-stencil flex items-center gap-3 text-[0.7rem] text-[var(--ss-orange)]">
               <PlugMark className="size-4" />
-              Secret Source · UK
+              Secret Source · Worldwide
             </p>
 
             <h1 className="ss-display ss-display-shadow mt-5 text-[clamp(3rem,10.5vw,7.5rem)] leading-[0.84]">
@@ -117,7 +118,7 @@ export default function SecretSourceHome() {
 
             <p className="mt-6 max-w-md text-[var(--ss-smoke)] text-base leading-relaxed sm:text-lg">
               {formatBrandList(BRANDS)} — held in hand, checked, and shipped
-              tracked from the UK. No waiting lists, no bot queues, no maybe.
+              tracked worldwide. No waiting lists, no bot queues, no maybe.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -141,7 +142,7 @@ export default function SecretSourceHome() {
                 { term: "Lines in stock", value: PRODUCTS.length.toString() },
                 {
                   term: "Free delivery over",
-                  value: formatPrice(FREE_SHIPPING_THRESHOLD),
+                  value: <Price cents={FREE_SHIPPING_THRESHOLD} />,
                 },
               ].map((stat) => (
                 <div className="bg-[var(--ss-black)] px-4 py-4" key={stat.term}>
@@ -184,11 +185,11 @@ export default function SecretSourceHome() {
                   </h2>
                   <p className="mt-1 flex items-baseline gap-2">
                     <span className="ss-num text-base">
-                      {formatPrice(featured.priceCents)}
+                      <Price cents={featured.priceCents} />
                     </span>
                     {featured.compareAtCents && (
                       <span className="ss-num text-[var(--ss-sold)] text-xs line-through">
-                        {formatPrice(featured.compareAtCents)}
+                        <Price cents={featured.compareAtCents} />
                       </span>
                     )}
                   </p>
@@ -237,7 +238,10 @@ export default function SecretSourceHome() {
                     href={`/collections/${category.slug}`}
                   >
                     <span className="ss-display text-[clamp(1.75rem,4vw,2.75rem)] leading-none transition-colors group-hover:text-[var(--ss-orange)]">
-                      {category.name}
+                      <CategoryName
+                        fallback={category.name}
+                        slug={category.slug}
+                      />
                     </span>
                     <span className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)]">
                       {category.line}

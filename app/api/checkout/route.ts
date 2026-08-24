@@ -3,6 +3,12 @@ import type Stripe from "stripe";
 import { z } from "zod";
 import { getProduct } from "@/lib/catalog";
 import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/constants";
+import {
+  convertFromGbpMinor,
+  DEFAULT_CURRENCY,
+  isCurrencyCode,
+} from "@/lib/currency";
+import { ALLOWED_SHIPPING_COUNTRIES } from "@/lib/shipping-countries";
 import { getStripeClient, isStripeConfigured } from "@/lib/stripe";
 
 const checkoutSchema = z.object({
@@ -16,6 +22,11 @@ const checkoutSchema = z.object({
     )
     .min(1)
     .max(20),
+  // The browser only says which currency the shopper picked — the amount
+  // actually charged is always recomputed below from the GBP catalogue
+  // price using the same static rate table the display uses, never trusted
+  // from the client.
+  currency: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -25,6 +36,12 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid basket" }, { status: 400 });
   }
+
+  const currency =
+    parsed.data.currency && isCurrencyCode(parsed.data.currency)
+      ? parsed.data.currency
+      : DEFAULT_CURRENCY;
+  const stripeCurrency = currency.toLowerCase();
 
   /*
    * Prices come from the catalogue on the server, never from the browser —
@@ -59,8 +76,8 @@ export async function POST(request: Request) {
     lineItems.push({
       quantity: item.quantity,
       price_data: {
-        currency: "gbp",
-        unit_amount: product.priceCents,
+        currency: stripeCurrency,
+        unit_amount: convertFromGbpMinor(product.priceCents, currency),
         product_data: {
           name: product.name,
           description: `${product.colourway.name} · Size ${item.size} · Docket ${product.code}`,
@@ -93,7 +110,9 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      shipping_address_collection: { allowed_countries: ["GB"] },
+      shipping_address_collection: {
+        allowed_countries: [...ALLOWED_SHIPPING_COUNTRIES],
+      },
       shipping_options: [
         {
           shipping_rate_data: {
@@ -102,7 +121,10 @@ export async function POST(request: Request) {
               shippingCents === 0
                 ? "Free tracked delivery"
                 : "Tracked delivery",
-            fixed_amount: { amount: shippingCents, currency: "gbp" },
+            fixed_amount: {
+              amount: convertFromGbpMinor(shippingCents, currency),
+              currency: stripeCurrency,
+            },
             delivery_estimate: {
               minimum: { unit: "business_day", value: 2 },
               maximum: { unit: "business_day", value: 4 },

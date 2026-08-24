@@ -3,14 +3,18 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import type { CartLine } from "./cart-provider";
+import { useCurrency } from "./currency-provider";
 
 /**
  * Hands the basket to the server, which re-prices it against the catalogue
  * and opens a Stripe Checkout session. Prices are never sent from here — the
- * browser only says which product, which size, how many.
+ * browser only says which product, which size, how many, and which currency
+ * the shopper picked; the server converts and charges from its own rate
+ * table, never trusting a client-sent amount.
  */
 export function useCheckout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { currency } = useCurrency();
 
   async function checkout(lines: CartLine[]) {
     if (lines.length === 0 || isSubmitting) {
@@ -29,6 +33,7 @@ export function useCheckout() {
             size: line.size,
             quantity: line.quantity,
           })),
+          currency,
         }),
       });
 

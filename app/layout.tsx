@@ -4,10 +4,17 @@ import { Toaster } from "sonner";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { CartDrawer } from "@/components/cart-drawer";
 import { CartProvider } from "@/components/cart-provider";
+import { CurrencyProvider } from "@/components/currency-provider";
+import { LanguageProvider } from "@/components/language-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { BRANDS } from "@/lib/catalog";
 import { SHOP_NAME, SHOP_TAGLINE } from "@/lib/constants";
 import "./globals.css";
+
+const META_BRAND_LIST = `${BRANDS.slice(0, 3)
+  .map((brand) => brand.name)
+  .join(", ")} and ${BRANDS.length - 3} more brands`;
 import "./shop.css";
 
 /*
@@ -43,16 +50,14 @@ export const metadata: Metadata = {
     default: `${SHOP_NAME} — ${SHOP_TAGLINE}`,
     template: `%s — ${SHOP_NAME}`,
   },
-  description:
-    "Trapstar, Syna World, Broken Planet, Corteiz, Jordan and Yeezy, held in hand and checked before it ships. Tracked UK delivery, 14-day returns.",
+  description: `${META_BRAND_LIST}, held in hand and checked before it ships. Tracked worldwide delivery, 14-day returns.`,
   icons: {
     icon: "/brand/logo-badge-256.png",
     apple: "/brand/logo-badge-256.png",
   },
   openGraph: {
     title: `${SHOP_NAME} — ${SHOP_TAGLINE}`,
-    description:
-      "The plug's shelf: Trapstar, Syna World, Broken Planet, Corteiz, Jordan, Yeezy. Checked, boxed, tracked.",
+    description: `The plug's shelf: ${META_BRAND_LIST}. Checked, boxed, tracked.`,
     images: ["/brand/logo-badge.png"],
   },
 };
@@ -110,13 +115,17 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }}
         />
 
-        <CartProvider>
-          <AnnouncementBar />
-          <SiteHeader />
-          <main>{children}</main>
-          <SiteFooter />
-          <CartDrawer />
-        </CartProvider>
+        <LanguageProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <AnnouncementBar />
+              <SiteHeader />
+              <main>{children}</main>
+              <SiteFooter />
+              <CartDrawer />
+            </CartProvider>
+          </CurrencyProvider>
+        </LanguageProvider>
 
         <Toaster position="top-center" theme="dark" />
       </body>

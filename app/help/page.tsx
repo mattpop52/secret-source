@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { formatPrice } from "@/lib/catalog";
+import { Price } from "@/components/price";
 import {
   DELIVERY_WINDOW,
   FREE_SHIPPING_THRESHOLD,
@@ -28,12 +28,17 @@ const SECTIONS = [
       },
       {
         question: "What does delivery cost?",
-        answer: `${formatPrice(STANDARD_SHIPPING)} tracked, and free once your basket passes ${formatPrice(FREE_SHIPPING_THRESHOLD)}.`,
+        answer: (
+          <>
+            <Price cents={STANDARD_SHIPPING} /> tracked, and free once your
+            basket passes <Price cents={FREE_SHIPPING_THRESHOLD} />.
+          </>
+        ),
       },
       {
-        question: "Do you ship outside the UK?",
+        question: "Do you ship worldwide?",
         answer:
-          "Checkout is set up for UK addresses. If you're elsewhere, message first and postage can be quoted before you pay.",
+          "Yes — checkout takes addresses worldwide, with tracked delivery wherever you are. Everything ships from the UK.",
       },
     ],
   },

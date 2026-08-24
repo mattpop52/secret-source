@@ -6,7 +6,7 @@ import { isSoldOut, PRODUCTS } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Everything in stock",
   description:
-    "Everything in stock — the whole shelf, in hand and ready to ship. Checked in-house, shipped tracked from the UK.",
+    "Everything in stock — the whole shelf, in hand and ready to ship. Checked in-house, shipped tracked worldwide.",
 };
 
 export default function EverythingCollectionPage() {

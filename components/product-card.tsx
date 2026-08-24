@@ -1,17 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import {
   discountPercent,
-  formatPrice,
   getBrandName,
   isSoldOut,
   type Product,
 } from "@/lib/catalog";
+import { useCurrency } from "./currency-provider";
+import { useLanguage } from "./language-provider";
 import { ProductMedia } from "./product-media";
 
-const BADGE_COPY: Record<NonNullable<Product["badge"]>, string> = {
-  "just-in": "Just in",
-  restock: "Restocked",
-  "last-pair": "Last one",
+const BADGE_KEYS: Record<
+  NonNullable<Product["badge"]>,
+  "badgeJustIn" | "badgeRestock" | "badgeLastPair"
+> = {
+  "just-in": "badgeJustIn",
+  restock: "badgeRestock",
+  "last-pair": "badgeLastPair",
 };
 
 export function ProductCard({
@@ -23,6 +29,8 @@ export function ProductCard({
 }) {
   const discount = discountPercent(product);
   const soldOut = isSoldOut(product);
+  const { format } = useCurrency();
+  const { t } = useLanguage();
 
   return (
     <Link
@@ -36,7 +44,7 @@ export function ProductCard({
 
         {product.badge && !soldOut && (
           <span className="ss-stencil absolute top-3 left-3 bg-[var(--ss-orange)] px-2 py-1 text-[#120c00] text-[0.55rem]">
-            {BADGE_COPY[product.badge]}
+            {t(BADGE_KEYS[product.badge])}
           </span>
         )}
 
@@ -48,7 +56,7 @@ export function ProductCard({
 
         {soldOut && (
           <span className="ss-stencil absolute inset-x-0 bottom-0 bg-[var(--ss-black)]/85 py-2 text-center text-[0.62rem] text-[var(--ss-smoke)]">
-            Sold out — restock listed
+            {t("soldOutRestockListed")}
           </span>
         )}
       </div>
@@ -65,12 +73,10 @@ export function ProductCard({
         </p>
 
         <p className="mt-2 flex items-baseline gap-2">
-          <span className="ss-num text-base">
-            {formatPrice(product.priceCents)}
-          </span>
+          <span className="ss-num text-base">{format(product.priceCents)}</span>
           {product.compareAtCents && (
             <span className="ss-num text-[var(--ss-sold)] text-xs line-through">
-              {formatPrice(product.compareAtCents)}
+              {format(product.compareAtCents)}
             </span>
           )}
         </p>

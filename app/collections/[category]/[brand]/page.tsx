@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CategoryName } from "@/components/category-name";
 import { ProductCard } from "@/components/product-card";
 import {
   CATEGORIES,
@@ -36,7 +37,7 @@ export async function generateMetadata({
 
   return {
     title: `${brand.name} ${category.name}`,
-    description: `${brand.name} ${category.name.toLowerCase()} — ${brand.line} Checked in-house, shipped tracked from the UK.`,
+    description: `${brand.name} ${category.name.toLowerCase()} — ${brand.line} Checked in-house, shipped tracked worldwide.`,
   };
 }
 
@@ -80,7 +81,7 @@ export default async function CategoryBrandPage({
               className="hover:underline"
               href={`/collections/${category.slug}`}
             >
-              {category.name}
+              <CategoryName fallback={category.name} slug={category.slug} />
             </Link>{" "}
             / {brand.name}
           </p>
@@ -104,7 +105,7 @@ export default async function CategoryBrandPage({
               className="ss-stencil block whitespace-nowrap border border-[var(--ss-hairline)] px-4 py-2.5 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
               href={`/collections/${category.slug}`}
             >
-              All {category.name}
+              All <CategoryName fallback={category.name} slug={category.slug} />
             </Link>
           </li>
           {brandsHere.map((entry) => {

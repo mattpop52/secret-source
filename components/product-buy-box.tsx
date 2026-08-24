@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { formatPrice, isSoldOut, type Product } from "@/lib/catalog";
+import { isSoldOut, type Product } from "@/lib/catalog";
 import { useCart } from "./cart-provider";
+import { useCurrency } from "./currency-provider";
+import { useLanguage } from "./language-provider";
 import { QuantityStepper } from "./quantity-stepper";
 import { useCheckout } from "./use-checkout";
 
@@ -17,6 +19,8 @@ export function ProductBuyBox({ product }: { product: Product }) {
   const [needsSize, setNeedsSize] = useState(false);
   const { add } = useCart();
   const { checkout, isSubmitting } = useCheckout();
+  const { format } = useCurrency();
+  const { t } = useLanguage();
 
   function requireSize() {
     if (size) {
@@ -35,14 +39,14 @@ export function ProductBuyBox({ product }: { product: Product }) {
               "One size") unless the label itself says otherwise — a real
               one-size-fits-all item (a blind box, a cap) sets that label. */}
           {product.sizes.length === 1 && product.sizes[0].label === "One size"
-            ? "One size"
-            : "Size"}
+            ? t("oneSize")
+            : t("size")}
         </p>
         <a
           className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)] underline underline-offset-4 transition-colors hover:text-[var(--ss-bone)]"
           href="/help#sizing"
         >
-          Sizing help
+          {t("sizingHelp")}
         </a>
       </div>
 
@@ -90,18 +94,17 @@ export function ProductBuyBox({ product }: { product: Product }) {
 
       {needsSize && (
         <p className="ss-stencil mt-3 text-[0.62rem] text-[var(--destructive)]">
-          Pick a size first
+          {t("pickASizeFirst")}
         </p>
       )}
 
       {soldOut ? (
         <div className="mt-7 border border-[var(--ss-hairline-strong)] px-5 py-5">
           <p className="ss-stencil text-[0.7rem] text-[var(--ss-orange)]">
-            Sold out
+            {t("soldOut")}
           </p>
           <p className="mt-2 text-[var(--ss-smoke)] text-sm">
-            This one's gone. Message the shop and you'll be told the moment the
-            size lands again.
+            {t("thisOnesGone")}
           </p>
         </div>
       ) : (
@@ -113,7 +116,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
               value={quantity}
             />
             <p className="ss-num text-[var(--ss-smoke)] text-sm">
-              {formatPrice(product.priceCents * quantity)} total
+              {t("lineTotal", { price: format(product.priceCents * quantity) })}
             </p>
           </div>
 
@@ -129,7 +132,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
               }}
               type="button"
             >
-              Add to basket
+              {t("addToBasket")}
             </button>
 
             <button
@@ -144,7 +147,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
               }}
               type="button"
             >
-              {isSubmitting ? "Opening checkout…" : "Buy it now"}
+              {isSubmitting ? t("openingCheckout") : t("buyItNow")}
             </button>
           </div>
         </>

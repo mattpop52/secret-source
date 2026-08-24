@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { formatPrice, getBrandName } from "@/lib/catalog";
+import { getBrandName } from "@/lib/catalog";
 import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/constants";
 import { useCart } from "./cart-provider";
+import { useCurrency } from "./currency-provider";
+import { useLanguage } from "./language-provider";
 import { ProductMedia } from "./product-media";
 import { QuantityStepper } from "./quantity-stepper";
 import { useCheckout } from "./use-checkout";
@@ -13,6 +15,8 @@ export function CartDrawer() {
   const { lines, isOpen, closeCart, setQuantity, remove, subtotal, count } =
     useCart();
   const { checkout, isSubmitting } = useCheckout();
+  const { format } = useCurrency();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!isOpen) {
@@ -64,7 +68,7 @@ export function CartDrawer() {
 
         <header className="flex items-center justify-between border-[var(--ss-hairline)] border-b px-5 py-4">
           <h2 className="ss-stencil text-sm">
-            Basket{" "}
+            {t("basket")}{" "}
             <span className="text-[var(--ss-orange)]">
               [{count.toString().padStart(2, "0")}]
             </span>
@@ -75,16 +79,15 @@ export function CartDrawer() {
             tabIndex={isOpen ? 0 : -1}
             type="button"
           >
-            Close ✕
+            {t("close")} ✕
           </button>
         </header>
 
         {lines.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
-            <p className="ss-display text-3xl">Nothing in here yet</p>
+            <p className="ss-display text-3xl">{t("nothingHereYet")}</p>
             <p className="text-[var(--ss-smoke)] text-sm">
-              Everything in the shop is one of one on the shelf. When it's gone,
-              it's gone.
+              {t("everythingOneOfOne")}
             </p>
             <Link
               className="ss-stencil mt-2 bg-[var(--ss-orange)] px-6 py-3 text-[#120c00] text-[0.7rem] transition-colors hover:bg-[var(--ss-orange-hot)]"
@@ -92,7 +95,7 @@ export function CartDrawer() {
               onClick={closeCart}
               tabIndex={isOpen ? 0 : -1}
             >
-              Shop the shelf
+              {t("shopTheShelf")}
             </Link>
           </div>
         ) : (
@@ -137,7 +140,7 @@ export function CartDrawer() {
                         value={line.quantity}
                       />
                       <span className="ss-num text-sm">
-                        {formatPrice(line.lineTotal)}
+                        {format(line.lineTotal)}
                       </span>
                     </div>
 
@@ -147,7 +150,7 @@ export function CartDrawer() {
                       tabIndex={isOpen ? 0 : -1}
                       type="button"
                     >
-                      Remove
+                      {t("remove")}
                     </button>
                   </div>
                 </li>
@@ -157,15 +160,18 @@ export function CartDrawer() {
             <footer className="border-[var(--ss-hairline)] border-t p-5">
               <div className="flex items-baseline justify-between">
                 <span className="ss-stencil text-[0.7rem] text-[var(--ss-smoke)]">
-                  Subtotal
+                  {t("subtotal")}
                 </span>
-                <span className="ss-num text-xl">{formatPrice(subtotal)}</span>
+                <span className="ss-num text-xl">{format(subtotal)}</span>
               </div>
 
               <p className="mt-2 text-[var(--ss-smoke)] text-xs">
                 {shortfall > 0
-                  ? `${formatPrice(shortfall)} more for free tracked delivery — otherwise ${formatPrice(STANDARD_SHIPPING)}.`
-                  : "Free tracked delivery unlocked."}
+                  ? t("moreForFreeDelivery", {
+                      amount: format(shortfall),
+                      shipping: format(STANDARD_SHIPPING),
+                    })
+                  : t("freeDeliveryUnlocked")}
               </p>
 
               <button
@@ -175,7 +181,7 @@ export function CartDrawer() {
                 tabIndex={isOpen ? 0 : -1}
                 type="button"
               >
-                {isSubmitting ? "Opening checkout…" : "Checkout"}
+                {isSubmitting ? t("openingCheckout") : t("checkout")}
               </button>
 
               <Link
@@ -184,7 +190,7 @@ export function CartDrawer() {
                 onClick={closeCart}
                 tabIndex={isOpen ? 0 : -1}
               >
-                View full basket
+                {t("viewFullBasket")}
               </Link>
             </footer>
           </>
