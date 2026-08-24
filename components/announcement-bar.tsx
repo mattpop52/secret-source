@@ -1,5 +1,4 @@
 const NOTICES = [
-  "100% authentic or your money back",
   "Checked in-house before it ships",
   "Tracked UK delivery 2–4 working days",
   "Free delivery over £200",
