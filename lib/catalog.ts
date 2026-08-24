@@ -6,13 +6,14 @@
  * brands are subcategories inside a category — the same brand can sit in
  * more than one category once other categories exist.
  *
- * Every product below is real stock, photographed in hand. What's still
- * placeholder: `priceCents` (market-rate estimates, not the real ticket
- * price) and each item's `sizes` (real resale stock is one unit, one size —
- * the exact size is guessed at "M" pending the actual tag). Swap both for
- * confirmed numbers before taking orders; nothing else about these five
- * needs replacing. Prices are the single source of truth for Stripe: the
- * checkout route reads them from here on the server, never from the browser.
+ * Every product below is real stock, photographed in hand. `priceCents` is
+ * still placeholder — a market-rate estimate, not the real ticket price —
+ * and needs swapping for a confirmed number before taking orders. Sizing
+ * follows two conventions: tracksuits, jumpers, short sets, coats and
+ * t-shirts carry a full S–XL run (`SIZE_RUN`); shoes, jeans, bags and hats
+ * are stocked in whatever single real size the tag reads (`ONE_UNIT`).
+ * Prices are the single source of truth for Stripe: the checkout route
+ * reads them from here on the server, never from the browser.
  * ─────────────────────────────────────────────────────────────────────────
  */
 
@@ -218,10 +219,20 @@ export const BRANDS: Brand[] = [
   },
 ];
 
-// A single, one-off unit in stock: the site's own fiction — "everything on
-// the shelf is one of one" — matches how resale stock actually moves. Swap
-// the label for the size on the real tag once it's been checked.
+// A single, one-off unit in stock, for stock that only ever comes in one
+// real size — shoes (by UK size), jeans (by waist), and one-size items like
+// bags and beanies. Swap the label for the size on the real tag once it's
+// been checked.
 const ONE_UNIT = (label = "M"): SizeOption[] => [{ label, inStock: true }];
+
+// A full size run, for tracksuits, jumpers, short sets, coats and t-shirts —
+// stocked across S–XL rather than as a single resale unit.
+const SIZE_RUN = (): SizeOption[] => [
+  { label: "S", inStock: true },
+  { label: "M", inStock: true },
+  { label: "L", inStock: true },
+  { label: "XL", inStock: true },
+];
 
 export const PRODUCTS: Product[] = [
   {
@@ -232,7 +243,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B7B7B4", accent: "#45443F" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TNF-0001",
     blurb:
       "Drew Peak hoodie and matching joggers in heather grey, embroidered half-dome chest logo, tags still on.",
@@ -253,7 +264,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
     priceCents: 17_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-FOG-0002",
     blurb:
       "Fear of God Essentials hoodie and sweatpants in triple black — flocked wordmark across the back, repeated on the left leg.",
@@ -274,7 +285,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#C9BFA9", accent: "#EFE9DC" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0003",
     blurb:
       "Dior hoodie and joggers in stone, CD-icon hardware at the chest and left thigh, tonal drawcords throughout.",
@@ -295,7 +306,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#C1272D" },
     priceCents: 27_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MNC-0004",
     blurb:
       "Moncler crewneck and joggers in grey, tricolour trim at the collar, patch logo at the chest and thigh.",
@@ -315,7 +326,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
     priceCents: 27_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MNC-0005",
     blurb:
       "The same crewneck tracksuit in black — tricolour trim at the collar, patch logo at the chest and thigh.",
@@ -335,7 +346,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#B7B4AE", accent: "#141414" },
     priceCents: 24_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0006",
     blurb:
       "Stone Island hoodie and joggers in grey marl, the woven compass badge on the left sleeve.",
@@ -356,7 +367,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#D8D2C6" },
     priceCents: 15_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-BOSS-0007",
     blurb:
       "BOSS hoodie and joggers in black, raised chenille wordmark at the chest, printed wordmark at the left leg.",
@@ -377,7 +388,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Navy", fill: "#1B2027", accent: "#0F1216" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0008",
     blurb:
       "The CD Icon tracksuit in tonal navy — same hardware badge at chest and thigh as the stone colourway, blacked out to match.",
@@ -398,7 +409,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#F4F1E8" },
     priceCents: 21_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DT-0009",
     blurb:
       "Denim Tears hoodie and joggers in black, the cotton wreath appliquéd across the chest, sleeve and both legs.",
@@ -419,7 +430,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
     priceCents: 17_999,
-    sizes: ONE_UNIT("L"),
+    sizes: SIZE_RUN(),
     code: "SS-FOG-0010",
     blurb:
       "A second Essentials hoodie and sweatpants in triple black — same set as SS-FOG-0002, a different unit, tags still on both pieces.",
@@ -444,7 +455,7 @@ export const PRODUCTS: Product[] = [
       accent: "#141414",
     },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0011",
     blurb:
       "Trapstar hoodie and joggers in grey with a black-and-white chevron split down the sleeve and leg, embroidered Irongate 'T' at the chest.",
@@ -466,7 +477,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#AFAFAC", accent: "#B3261E" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0012",
     blurb:
       "Trapstar hoodie and joggers in grey, the 'London Shooters' chenille panther patch across the chest, repeated at the thigh.",
@@ -487,7 +498,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#F4F1E8" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0013",
     blurb:
       "Polo Ralph Lauren zip-through hoodie and joggers in black, the embroidered pony small and quiet at the chest and thigh.",
@@ -508,7 +519,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3E7BD1" },
     priceCents: 14_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0014",
     blurb:
       "Trapstar hoodie and joggers in black, chenille 'Trapstar' script at the chest over a mirrored 'It's A Secret' zip strap, lightning-bolt embroidery running down the sleeve and leg.",
@@ -529,7 +540,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TNF-0015",
     blurb:
       "The Drew Peak hoodie and joggers in black, embroidered half-dome chest logo, tags still on.",
@@ -550,7 +561,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#D9D0BE", accent: "#1B2A4A" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0016",
     blurb:
       "The same zip-through hoodie and joggers as SS-RL-0013, this one in stone, embroidered pony small and quiet at the chest and thigh.",
@@ -571,7 +582,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#D9D0BE", accent: "#141414" },
     priceCents: 29_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0017",
     blurb:
       "Dior crewneck and joggers in stone, the 'Christian Dior Atelier Paris — Avenue Montaigne' script printed across the chest and repeated at the thigh.",
@@ -592,7 +603,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#C4C1BA", accent: "#141414" },
     priceCents: 19_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0018",
     blurb:
       "C.P. Company crewneck and joggers in grey marl, the signature lens badge on the sleeve and on the joggers' cargo pocket.",
@@ -613,7 +624,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 19_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0019",
     blurb:
       "The same lens-badge crewneck and joggers as SS-CP-0018, this one in black.",
@@ -634,7 +645,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#B7B4AE", accent: "#141414" },
     priceCents: 22_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0020",
     blurb:
       "A crewneck take on the Stone Island compass — grey marl sweatshirt and matching joggers, the badge patched to the left sleeve.",
@@ -655,7 +666,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0021",
     blurb:
       "The CD Icon tracksuit in triple black — the ring hardware badge at chest and thigh blacked out to match, tonal on tonal throughout.",
@@ -676,7 +687,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey Monochrome", fill: "#AFAFAC", accent: "#3A3A3A" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0022",
     blurb:
       "The 'London Shooters' panther patch again, this run in monochrome grey and black rather than the red-accented original.",
@@ -697,7 +708,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#D9D0BE", accent: "#141414" },
     priceCents: 26_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MNC-0023",
     blurb:
       "Moncler crewneck and joggers in stone, the 'Moncler' wordmark printed large across the chest and repeated down the left leg.",
@@ -718,7 +729,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#F4F1E8" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0024",
     blurb:
       "Polo Ralph Lauren pullover hoodie and joggers in black, the 'Polo Ralph Lauren' wordmark embroidered across the chest, pony at the cuff and thigh.",
@@ -739,7 +750,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#E23A21" },
     priceCents: 24_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0025",
     blurb:
       "AMIRI hoodie and joggers in black, the multicolour paint-drip 'Amiri' print at the chest and thigh, splatter scattered across the cuffs and hem.",
@@ -760,7 +771,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#D8D2C6" },
     priceCents: 15_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-BOSS-0026",
     blurb:
       "The same chenille-logo hoodie and joggers as SS-BOSS-0007, this one in navy.",
@@ -781,7 +792,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#7A7D82" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0027",
     blurb:
       "The 'London Shooters' panther patch on black — a third run of the same graphic, alongside the red-accented original and the grey monochrome.",
@@ -802,7 +813,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B7B4AE", accent: "#1B2A4A" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0028",
     blurb:
       "The same 'Polo Ralph Lauren' wordmark pullover and joggers as SS-RL-0024, this one in heather grey.",
@@ -823,7 +834,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B7B4AE", accent: "#B3261E" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DSQ-0029",
     blurb:
       "Dsquared2 crewneck and joggers in heather grey, the red maple leaf embroidered above the 'dsquared2' wordmark at chest and thigh.",
@@ -844,7 +855,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#0F1830" },
     priceCents: 26_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MNC-0030",
     blurb:
       "The same 'Moncler' wordmark crewneck and joggers as SS-MNC-0023, this one in navy.",
@@ -865,7 +876,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3E7BD1" },
     priceCents: 14_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0031",
     blurb:
       "Trapstar hoodie and joggers in black, the 'Trapstar' block letters embroidered in yellow, pink, blue and green over a mirrored 'It's A Secret' — a different run of the it's-a-secret graphic from the lightning-bolt version already on the shelf.",
@@ -886,7 +897,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 29_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0032",
     blurb:
       "The same 'Christian Dior Atelier Paris' script crewneck and joggers as SS-DIOR-0017, this one in black.",
@@ -907,7 +918,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 24_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0033",
     blurb:
       "The same hooded compass tracksuit as SS-STI-0006, this one in black.",
@@ -928,7 +939,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Khaki", fill: "#6B6B5A", accent: "#4A4A3E" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0034",
     blurb:
       "The CD Icon tracksuit in khaki — the ring hardware badge at chest and thigh in a tonal finish to match.",
@@ -949,7 +960,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black / Red", fill: "#131313", accent: "#B3261E" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0035",
     blurb:
       "The 'London Shooters' panther patch on black with its red outline kept, rather than the grey-monochrome run already on the shelf.",
@@ -970,7 +981,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B9B6AF", accent: "#141414" },
     priceCents: 17_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-FOG-0036",
     blurb:
       "The same Essentials hoodie and sweatpants as the black units already on the shelf, this one in heather grey.",
@@ -991,7 +1002,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Taupe", fill: "#8C7E6E", accent: "#5C5044" },
     priceCents: 26_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MNC-0037",
     blurb:
       "The same 'Moncler' wordmark crewneck and joggers as SS-MNC-0023 and SS-MNC-0030, this one in taupe with the logo in gold.",
@@ -1012,7 +1023,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#AFAFAC", accent: "#B3261E" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0038",
     blurb:
       "A second 'London Shooters' hoodie and joggers in grey — the same red-outlined patch as SS-TRP-0012, a different unit.",
@@ -1033,7 +1044,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#7A7D82" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0039",
     blurb:
       "A second 'London Shooters' hoodie and joggers in black — the same grey-monochrome patch as SS-TRP-0027, a different unit.",
@@ -1054,7 +1065,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 22_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0040",
     blurb:
       "The crewneck compass tracksuit in black — gold-badge compass patch on the sleeve, repeated on the joggers' cargo pocket.",
@@ -1075,7 +1086,7 @@ export const PRODUCTS: Product[] = [
     shape: "tracksuit",
     colourway: { name: "Black / White", fill: "#141414", accent: "#F2F2F0" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-TRP-0041",
     blurb:
       "Trapstar hoodie and joggers in black with a bold white chevron across the chest and down the leg, embroidered Irongate 'T' at the chest and thigh.",
@@ -1097,7 +1108,7 @@ export const PRODUCTS: Product[] = [
     shape: "hoodie",
     colourway: { name: "Cream / Green", fill: "#F1ECE0", accent: "#3F8F3F" },
     priceCents: 24_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0042",
     blurb:
       "Off-White pullover hoodie in cream, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
@@ -1121,7 +1132,7 @@ export const PRODUCTS: Product[] = [
     shape: "hoodie",
     colourway: { name: "Black / Green", fill: "#131313", accent: "#3F8F3F" },
     priceCents: 22_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0043",
     blurb:
       "Off-White pullover hoodie in black, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
@@ -1145,7 +1156,7 @@ export const PRODUCTS: Product[] = [
     shape: "hoodie",
     colourway: { name: "Grey / Green", fill: "#C3CAD1", accent: "#3F8F3F" },
     priceCents: 23_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0044",
     blurb:
       "Off-White pullover hoodie in light grey, green marble-print diagonal arrows down each sleeve and a camcorder-viewfinder Arrows graphic filling the back.",
@@ -1169,7 +1180,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#EFEFEA", accent: "#131313" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0045",
     blurb:
       "C.P. Company tee and cargo shorts, white top with the lens badge at the sleeve, black shorts with a matching badge on the cargo pocket.",
@@ -1190,7 +1201,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0046",
     blurb:
       "Dior tee and shorts in black, distressed 'Christian Dior Couture' print across the chest, repeated small on the shorts.",
@@ -1211,7 +1222,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#141414" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0047",
     blurb:
       "Stone Island tee and shorts in grey marl, woven compass badge on the sleeve and repeated on the shorts pocket.",
@@ -1232,7 +1243,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0048",
     blurb:
       "Polo Ralph Lauren tee and shorts, white top with black shorts, embroidered pony at the chest and thigh.",
@@ -1253,7 +1264,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0049",
     blurb:
       "Dior tee and shorts in black, distressed 'Christian Dior Couture' print across the chest, repeated small on the shorts.",
@@ -1274,7 +1285,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#131313" },
     priceCents: 17_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0050",
     blurb:
       "Dior tee and shorts in black, tonal embroidered CD-icon logo at the chest, repeated on the shorts — a different graphic from the Christian Dior Couture print set.",
@@ -1295,7 +1306,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Beige", fill: "#C9B896", accent: "#131313" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0051",
     blurb:
       "C.P. Company tee and cargo shorts in beige, lens badge at the sleeve, matching badge on the cargo pocket.",
@@ -1316,7 +1327,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Taupe", fill: "#B8A88E", accent: "#3A322A" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0052",
     blurb:
       "Dior tee and shorts in taupe, distressed 'Christian Dior Couture' print across the chest, repeated small on the shorts.",
@@ -1337,7 +1348,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Powder Blue", fill: "#C7D3DC", accent: "#3A4A55" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0053",
     blurb:
       "Dior tee and shorts in powder blue, distressed 'Christian Dior Couture' print across the chest, repeated small on the shorts.",
@@ -1358,7 +1369,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Beige", fill: "#C9B896", accent: "#141414" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0054",
     blurb:
       "Stone Island tee and shorts in beige, woven compass badge on the sleeve and repeated on the shorts pocket.",
@@ -1379,7 +1390,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 17_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0055",
     blurb:
       "Dior tee in white with matching black shorts, metallic silver embroidered CD-icon logo at the chest, repeated on the shorts.",
@@ -1400,7 +1411,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0056",
     blurb:
       "C.P. Company tee and cargo shorts in black, lens badge at the sleeve, matching badge on the cargo pocket.",
@@ -1421,7 +1432,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0057",
     blurb:
       "Stone Island tee and shorts in black, woven compass badge on the sleeve and repeated on the shorts pocket.",
@@ -1442,7 +1453,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 11_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0058",
     blurb:
       "Stone Island tee in white with matching black shorts, woven compass badge on the sleeve and shorts pocket.",
@@ -1463,7 +1474,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RL-0059",
     blurb:
       "Polo Ralph Lauren tee and shorts, both in black, embroidered red pony at the chest and thigh.",
@@ -1484,7 +1495,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 18_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0060",
     blurb:
       "Dior tee in white with matching black shorts, distressed 'Christian Dior Couture' print across the chest, repeated small on the shorts.",
@@ -1505,7 +1516,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#131313" },
     priceCents: 13_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CP-0061",
     blurb:
       "C.P. Company tee and cargo shorts in grey marl, lens badge at the sleeve, matching badge on the cargo pocket.",
@@ -1526,7 +1537,7 @@ export const PRODUCTS: Product[] = [
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-BOSS-0062",
     blurb:
       "BOSS tee in white with matching black shorts, paint-splatter 'BOSS' print across the chest, repeated small on the shorts.",
@@ -1547,7 +1558,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 34_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0063",
     blurb:
       "Stone Island hooded parka in black, twin flap chest pockets over two zip pockets at the hem, woven compass badge on the sleeve.",
@@ -1568,7 +1579,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#2A2A2A" },
     priceCents: 39_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-MK-0064",
     blurb:
       "Moose Knuckles parka in black, fur-trimmed hood, snap-and-zip front, woven moose badge on the sleeve.",
@@ -1589,7 +1600,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Sage", fill: "#A9AD98", accent: "#6E7261" },
     priceCents: 29_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0065",
     blurb:
       "Stone Island hooded puffer in sage, crinkle-finish nylon, single chest pocket, woven compass badge on the sleeve.",
@@ -1611,7 +1622,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Olive", fill: "#6B6248", accent: "#3F3A2A" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0066",
     blurb:
       "Stone Island hooded puffer in olive, twin snap-flap pockets at the hem, woven compass badge on the sleeve.",
@@ -1632,7 +1643,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0067",
     blurb:
       "Stone Island hooded puffer in black, twin snap-flap pockets at the hem, woven compass badge on the sleeve.",
@@ -1653,7 +1664,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#8A6D3B" },
     priceCents: 44_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CG-0068",
     blurb:
       "Canada Goose parka in black, full-length cut, fur-trimmed hood, four flap pockets, woven Arctic Program disc badge on the sleeve.",
@@ -1676,7 +1687,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Red", fill: "#B5222A", accent: "#131313" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CG-0069",
     blurb:
       "Canada Goose bomber jacket in red, fur-trimmed hood, ribbed cuffs and hem, woven Arctic Program disc badge on the sleeve.",
@@ -1698,7 +1709,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Blue", fill: "#1E3F8F", accent: "#131313" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CG-0070",
     blurb:
       "Canada Goose bomber jacket in royal blue, fur-trimmed hood, ribbed cuffs and hem, woven Arctic Program disc badge on the sleeve.",
@@ -1720,7 +1731,7 @@ export const PRODUCTS: Product[] = [
     shape: "puffer",
     colourway: { name: "Grey", fill: "#4A4A4A", accent: "#131313" },
     priceCents: 32_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-CG-0071",
     blurb:
       "Canada Goose bomber jacket in grey, fur-trimmed hood, ribbed cuffs and hem, woven Arctic Program disc badge on the sleeve.",
@@ -1869,7 +1880,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Tan", fill: "#C9A876", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0078",
     blurb: "Prada tee in tan, enamelled triangle logo at the chest.",
     details: [
@@ -1888,7 +1899,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0079",
     blurb:
       "AMIRI tee in white, an arched AMIRI wordmark over a hand-and-crystal-ball graphic at the chest, plain AMIRI wordmark printed across the back.",
@@ -1910,7 +1921,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RHD-0080",
     blurb:
       "Rhude tee in black, printed crest patch with the Rhude wordmark at the chest.",
@@ -1930,7 +1941,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#F2F2ED" },
     priceCents: 4_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-BOSS-0081",
     blurb: "BOSS tee in navy, printed BOSS wordmark across the chest.",
     details: [
@@ -1949,7 +1960,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#C1272D" },
     priceCents: 10_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0082",
     blurb:
       "Dior tee in white, a repeated multicolour DIOR wordmark stripe down the chest, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed across the back.",
@@ -1971,7 +1982,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0083",
     blurb: "Dior tee in black, tonal embroidered CD-icon logo at the chest.",
     details: [
@@ -1990,7 +2001,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White / Grey", fill: "#F2F2ED", accent: "#8A8A85" },
     priceCents: 14_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0084",
     blurb:
       "Off-White tee in white, KAWS Companion graphic on the back with the Arrows logo and diagonal stripes — sold and shot for the back print.",
@@ -2011,7 +2022,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black / White", fill: "#131313", accent: "#F2F2ED" },
     priceCents: 14_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0085",
     blurb:
       "Off-White tee in black, KAWS Companion graphic on the back with the Arrows logo and diagonal stripes — sold and shot for the back print.",
@@ -2032,7 +2043,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#C1272D" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0086",
     blurb:
       "Prada tee in navy, red-and-black Linea Rossa stripe patch at the chest.",
@@ -2052,7 +2063,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#8A8A85" },
     priceCents: 10_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0087",
     blurb:
       "Prada tee in black, metallic 'Prada Milano' text logo with the crest graphic at the chest.",
@@ -2072,7 +2083,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E8A488" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0088",
     blurb:
       "AMIRI tee in black, arched AMIRI wordmark over the MA monogram with a gradient stripe, printed across the back — sold and shot for the back print.",
@@ -2092,7 +2103,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Grey", fill: "#6B6B6B", accent: "#C1272D" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0089",
     blurb:
       "Prada tee in grey, red-and-black Linea Rossa stripe patch at the chest.",
@@ -2112,7 +2123,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E8C547" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0090",
     blurb: "AMIRI tee in black, AMIRI wordmark printed in yellow at the chest.",
     details: [
@@ -2131,7 +2142,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Grey", fill: "#8A8A85", accent: "#F2F2ED" },
     priceCents: 4_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-BOSS-0091",
     blurb: "BOSS tee in grey marl, printed BOSS wordmark across the chest.",
     details: [
@@ -2150,7 +2161,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-LOE-0092",
     blurb:
       "Loewe tee in black, leather Anagram patch pocket at the chest with a woven Loewe label.",
@@ -2170,7 +2181,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black / White", fill: "#131313", accent: "#F2F2ED" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0093",
     blurb: "AMIRI tee in black, AMIRI wordmark printed in white at the chest.",
     details: [
@@ -2189,7 +2200,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E8C547" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-GD-0094",
     blurb:
       "Gallery Dept. tee in black, 'DÉPT. de la GALERIE' printed in yellow across the chest.",
@@ -2209,7 +2220,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0095",
     blurb:
       "AMIRI tee in white, 'AMIRI Arts District' text logo with coordinates printed across the back.",
@@ -2230,7 +2241,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Beige", fill: "#C9B896", accent: "#131313" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0096",
     blurb:
       "AMIRI tee in beige, an arched AMIRI wordmark over a hand-and-crystal-ball graphic at the chest.",
@@ -2250,7 +2261,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Grey", fill: "#6B6B6B", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0097",
     blurb: "Prada tee in grey, enamelled triangle logo at the chest.",
     details: [
@@ -2269,7 +2280,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#7A7F5A" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0098",
     blurb:
       "Stone Island tee in black, large printed compass roundel across the chest — a bigger print than the woven sleeve badge used elsewhere on the shelf.",
@@ -2289,7 +2300,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0099",
     blurb: "Prada tee in black, enamelled triangle logo at the chest.",
     details: [
@@ -2308,7 +2319,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
     priceCents: 10_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0100",
     blurb:
       "Dior tee in black, a repeated multicolour DIOR wordmark stripe down the chest.",
@@ -2328,7 +2339,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#7A2E33" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-STI-0101",
     blurb:
       "Stone Island tee in white, large printed compass roundel across the chest in maroon.",
@@ -2348,7 +2359,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0102",
     blurb: "AMIRI tee in white, AMIRI wordmark printed in black at the chest.",
     details: [
@@ -2367,7 +2378,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E8C547" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0103",
     blurb:
       "AMIRI tee in black, a glittered AMIRI wordmark over a hand raising a cocktail glass, printed across the back.",
@@ -2387,7 +2398,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#F2F2ED" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0104",
     blurb:
       "Dior tee in black, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed at the chest.",
@@ -2407,7 +2418,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0105",
     blurb:
       "AMIRI tee in white, an arched AMIRI wordmark over a hand-and-crystal-ball graphic at the chest.",
@@ -2427,7 +2438,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#1B2A4A" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PA-0106",
     blurb:
       "Palm Angels tee in white, the double-star Palm Angels logo printed down the side in navy.",
@@ -2447,7 +2458,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#8A8A85" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0107",
     blurb: "AMIRI tee in white, the MA monogram printed in grey at the chest.",
     details: [
@@ -2466,7 +2477,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#7A7F5A" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0108",
     blurb:
       "AMIRI tee in white, the AMIRI wordmark printed with a tonal camo-gradient fill across the chest.",
@@ -2486,7 +2497,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#F2F2ED" },
     priceCents: 12_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0109",
     blurb:
       "Off-White tee in black, an ornate bandana-style crest graphic printed across the back — sold and shot for the back print.",
@@ -2506,7 +2517,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#C1272D" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0110",
     blurb:
       "Prada tee in white, red-and-black Linea Rossa stripe patch at the chest.",
@@ -2526,7 +2537,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Pink", fill: "#C99B96", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0111",
     blurb: "Prada tee in dusty pink, enamelled triangle logo at the chest.",
     details: [
@@ -2545,7 +2556,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Blue", fill: "#3A6E8F", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0112",
     blurb: "Prada tee in steel blue, enamelled triangle logo at the chest.",
     details: [
@@ -2564,7 +2575,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Tan", fill: "#C9A876", accent: "#C1272D" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0113",
     blurb:
       "Prada tee in tan, red-and-black Linea Rossa stripe patch at the chest.",
@@ -2584,7 +2595,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#8A8A85" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0114",
     blurb: "AMIRI tee in black, the MA monogram printed in grey at the chest.",
     details: [
@@ -2603,7 +2614,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E23A21" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DSQ-0115",
     blurb:
       "Dsquared2 tee in black, paint-splatter 'Dsquared2 Icon' print across the chest — the first Dsquared2 t-shirt on the shelf.",
@@ -2623,7 +2634,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#E8A488" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0116",
     blurb:
       "AMIRI tee in black, the AMIRI wordmark over an MA monogram gradient stripe at the chest — a front-chest layout, distinct from the full-back Stripe Wordmark Tee.",
@@ -2643,7 +2654,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0117",
     blurb: "Prada tee in navy, enamelled triangle logo at the chest.",
     details: [
@@ -2662,7 +2673,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#E23A21" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DSQ-0118",
     blurb:
       "Dsquared2 tee in white, paint-splatter 'Dsquared2 Icon' print across the chest, alongside the existing black.",
@@ -2682,7 +2693,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 10_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0119",
     blurb:
       "Off-White tee in white, a small KAWS-style skull icon with the Off-White wordmark at the chest — a different, smaller graphic from the full-back Companion and Bandana Crest tees.",
@@ -2702,7 +2713,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#8A8A85" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0120",
     blurb:
       "Dior tee in white, metallic silver CD-icon logo at the chest, alongside the existing tonal black.",
@@ -2722,7 +2733,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
     priceCents: 8_499,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-RHD-0121",
     blurb:
       "Rhude tee in black, a large heraldic crest — the Rhude wordmark over a lion-and-shield emblem — printed across the back, a bigger graphic than the existing chest-patch Crest Tee.",
@@ -2742,7 +2753,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#8A8A85" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0122",
     blurb:
       "AMIRI tee in black, the AMIRI wordmark printed large across the back — a bigger, back-only take on the chest-logo Wordmark Tee.",
@@ -2762,7 +2773,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0123",
     blurb: "Prada tee in white, enamelled triangle logo at the chest.",
     details: [
@@ -2781,7 +2792,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#F2F2ED" },
     priceCents: 10_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-OFW-0124",
     blurb:
       "Off-White tee in black, a small KAWS-style skull icon with the Off-White wordmark at the chest, alongside the existing white.",
@@ -2801,7 +2812,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0125",
     blurb:
       "Dior tee in white, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed at the chest, alongside the existing black.",
@@ -2821,7 +2832,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Teal", fill: "#2A8A9E", accent: "#C1272D" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-PRD-0126",
     blurb:
       "Prada tee in teal, red-and-black Linea Rossa stripe patch at the chest.",
@@ -2841,7 +2852,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#131313" },
     priceCents: 9_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-DIOR-0127",
     blurb:
       "Dior tee in black, tonal embroidered CD-icon logo at the chest — a second black unit, alongside the one already on the shelf.",
@@ -2861,7 +2872,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "White", fill: "#F2F2ED", accent: "#2E5C7A" },
     priceCents: 8_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0128",
     blurb:
       "AMIRI tee in white, an ornate cursive 'Amiri' script with a blue floral flourish at the chest.",
@@ -2881,7 +2892,7 @@ export const PRODUCTS: Product[] = [
     shape: "tee",
     colourway: { name: "Black", fill: "#131313", accent: "#C9B896" },
     priceCents: 7_999,
-    sizes: ONE_UNIT(),
+    sizes: SIZE_RUN(),
     code: "SS-AMR-0129",
     blurb:
       "AMIRI tee in black, a large bold-serif AMIRI wordmark printed in tan across the chest — a heavier typeface than the other Wordmark tees.",

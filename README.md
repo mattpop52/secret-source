@@ -47,8 +47,9 @@ still placeholder pending confirmation, both flagged at the top of
 `lib/catalog.ts`:
 
 - **`priceCents`** — market-rate estimates, not the real ticket price.
-- **`sizes`** — real resale stock is one unit, one size; the exact size is
-  guessed at `"M"` pending a read of the actual tag.
+- **`sizes`** — tracksuits, jumpers, short sets, coats and t-shirts carry a
+  full S–XL run; shoes, jeans, bags and hats are stocked in whatever single
+  real size the tag reads.
 
 ## Before it takes real orders
 
