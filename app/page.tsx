@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { CategoryName } from "@/components/category-name";
 import { LogoBadge, PlugMark } from "@/components/logo";
 import { Price } from "@/components/price";
@@ -229,6 +230,16 @@ export default function SecretSourceHome() {
         <div className="mt-10 grid gap-10">
           {CATEGORIES.map((category) => {
             const brandsHere = getBrandsInCategory(category.slug);
+            // Brand counts per category range from 1 to a dozen-plus. A
+            // fixed 4-column desktop grid stretches a 1- or 2-brand row
+            // across the full 1240px container, leaving most of it visibly
+            // empty — reads fine stacked on a narrow phone screen, but on a
+            // wide one it looks like the section broke. Below the fold-out
+            // count, the row instead sizes to its own content (fixed-width
+            // tiles, not stretched columns) so it sits compactly rather
+            // than spanning a mostly-empty row.
+            const desktopCols = Math.min(brandsHere.length, 4);
+            const desktopRowIsFull = desktopCols === 4;
 
             return (
               <div key={category.slug}>
@@ -265,7 +276,18 @@ export default function SecretSourceHome() {
                  * the container's own background shows through as a stray
                  * solid box. A border per tile has no such empty-cell case.
                  */}
-                <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <ul
+                  className={`mt-5 grid gap-3 sm:grid-cols-2 ${
+                    desktopRowIsFull
+                      ? "lg:grid-cols-4"
+                      : "lg:inline-grid lg:grid-cols-[repeat(var(--cat-cols),260px)]"
+                  }`}
+                  style={
+                    desktopRowIsFull
+                      ? undefined
+                      : ({ "--cat-cols": desktopCols } as CSSProperties)
+                  }
+                >
                   {brandsHere.map((brand) => {
                     const count = getProductsByCategoryAndBrand(
                       category.slug,
