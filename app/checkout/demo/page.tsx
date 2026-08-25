@@ -41,12 +41,6 @@ export default function CheckoutDemoPage() {
             Redeploy. The checkout button then opens a live Stripe session,
             priced from the catalogue on the server.
           </li>
-          <li className="flex gap-3">
-            <span className="ss-num text-[var(--ss-orange)]">03</span>
-            Replace the placeholder stock in{" "}
-            <code className="text-[var(--ss-bone)]">lib/catalog.ts</code> with
-            real products, prices and photography.
-          </li>
         </ol>
       </div>
 

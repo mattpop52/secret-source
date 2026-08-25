@@ -97,7 +97,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html className="no-js" lang="en-GB">
+    <html className="no-js" lang="en-GB" suppressHydrationWarning>
       <head>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: must run before first paint to avoid a flash of the landing card

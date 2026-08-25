@@ -111,10 +111,18 @@ const MASSES: Mass[] = [
 function gradientStops(artHeight: number, viewHeight: number) {
   const at = (y: number) => Math.min(1, y / viewHeight);
 
-  return [
-    { offset: 0, color: "#d69733" },
+  // On a mass whose artwork fills its whole viewBox (bl, br: artHeight ===
+  // viewHeight), both computed stops clamp to the same point as the fixed
+  // final stop below — drop those before they collide with it, rather than
+  // rendering (and keying) two stops at an identical offset.
+  const ramp = [
     { offset: at(artHeight * 0.55), color: "#c8892a" },
     { offset: at(artHeight * 1.8), color: "#b47b22" },
+  ].filter((stop) => stop.offset < 1);
+
+  return [
+    { offset: 0, color: "#d69733" },
+    ...ramp,
     { offset: 1, color: "#996a1b" },
   ];
 }
@@ -369,20 +377,25 @@ function LiquidMass({ mass }: { mass: Mass }) {
           </defs>
 
           <g fill={`url(#${bodyId})`} filter={`url(#${gooId})`}>
-            {shape.paths.map((d) => (
-              <path d={d} key={d.slice(0, 24)} />
+            {shape.paths.map((d, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: paths is a fixed authored array, never reordered or filtered
+              <path d={d} key={index} />
             ))}
 
             {/* A static meniscus at every tip — the wet bulge the runs and
-                drops emerge through, fused and lit by the goo. */}
-            {[...mass.stems, ...mass.drops].map((tip) => {
+                drops emerge through, fused and lit by the goo. A drop can
+                legitimately share its stem's exact tip (the bead hanging
+                off that run's own end), so the two lists' indices — not
+                their coordinates — keep every key unique. */}
+            {[...mass.stems, ...mass.drops].map((tip, index) => {
               const rx = "wTop" in tip ? tip.wTop * 0.85 : tip.r * 1.3;
 
               return (
                 <ellipse
                   cx={tip.x}
                   cy={tip.y}
-                  key={`meniscus-${tip.x}-${tip.y}`}
+                  // biome-ignore lint/suspicious/noArrayIndexKey: stems/drops are fixed authored arrays, never reordered or filtered
+                  key={index}
                   rx={rx}
                   ry={rx * 0.75}
                 />
