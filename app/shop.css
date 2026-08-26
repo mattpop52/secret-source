@@ -225,13 +225,11 @@ html[data-splash="showing"] body {
 
 /* ── The pour ─────────────────────────────────────────────────────────── */
 
-/* Gloss paint running the full height of the card, rebuilt from the
-   reference clip: a solid mass across the top and thin ink strands that
-   string out of it and run all the way down behind the wordmark to the
-   bottom edge. The whole pour is rendered as one filtered body so it reads
-   as continuous liquid rather than separate icicles; the filtered geometry
-   itself never moves — only the clip-path reveal that windows it does, on
-   the compositor. */
+/* Paint running the full height of the card: a bank across the top with an
+   uneven festooned edge, and runs of every gauge stringing out of it and
+   hanging down behind the wordmark, the longest clearing the bottom edge.
+   The artwork itself never moves — only the clip-path windowing it does, so
+   the shapes rasterise once and each frame just re-clips. */
 .ss-pour {
   position: absolute;
   inset: 0;
@@ -247,29 +245,23 @@ html[data-splash="showing"] body {
   height: 100%;
 }
 
-/* Each reveal rect grows down from the same fixed top edge, so it uncovers
-   more of the static artwork beneath rather than moving anything.
-
-   The two-phase profile is measured off the reference clip, not guessed:
-   there the ink barely advances for the first ~45% of its run, then floods
-   down fast and settles. So this creeps for most of the first stretch on
-   an ease-in, then runs out to full length on a hard deceleration. */
-.ss-pour-run-reveal,
-.ss-pour-band-reveal {
+/* Every window grows down from a fixed top edge, uncovering more of the
+   static artwork rather than moving any of it. */
+.ss-pour-mass,
+.ss-pour-run {
   transform-box: fill-box;
   transform-origin: 50% 0%;
   will-change: transform;
 }
 
-/* The solid mass lands first and quickly — in the reference it is already
-   across the top before any string has formed. It also has to finish
-   before the strands start, or a strand's own rectangular reveal window
-   would uncover a tab of the still-hidden band beside it. */
-.ss-pour-band-reveal {
-  animation: ss-pour-band-in 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) 0.1s both;
+/* The mass floods across first. It has to finish before any run starts, or
+   a run's own rectangular window would uncover a tab of still-hidden mass
+   beside it. */
+.ss-pour-mass {
+  animation: ss-pour-mass-in 1.15s cubic-bezier(0.3, 0.62, 0.28, 1) 0.15s both;
 }
 
-@keyframes ss-pour-band-in {
+@keyframes ss-pour-mass-in {
   from {
     transform: scaleY(0);
   }
@@ -278,43 +270,54 @@ html[data-splash="showing"] body {
   }
 }
 
-.ss-pour-run-reveal {
-  animation: ss-pour-reveal var(--dur, 8.4s) var(--delay, 0s) both;
+/* A run strings out quickly as the bead breaks away, then the paint's own
+   weight fights its viscosity and it creeps the last stretch — hence the
+   fast entry and very long settle. */
+.ss-pour-run {
+  animation: ss-pour-run-in var(--dur, 4s) cubic-bezier(0.24, 0.58, 0.2, 1)
+    var(--delay, 0s) both;
 }
 
-/* Rides the same descending front as its strand's rect, on the same
-   timing, so the reveal's leading edge is this circle's arc — a growing
-   strand ends in a round tip instead of a square cut. */
-.ss-pour-run-tip {
+@keyframes ss-pour-run-in {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Rides the same descending front as its run's window, on the same timing,
+   so the reveal's leading edge is this circle's arc — a growing run ends in
+   a round tip instead of a square cut. */
+.ss-pour-tip {
   will-change: transform;
-  animation: ss-pour-tip var(--dur, 8.4s) var(--delay, 0s) both;
+  animation: ss-pour-tip-in var(--dur, 4s) cubic-bezier(0.24, 0.58, 0.2, 1)
+    var(--delay, 0s) both;
 }
 
-@keyframes ss-pour-tip {
-  0% {
+@keyframes ss-pour-tip-in {
+  from {
     transform: translateY(0);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.3);
   }
-  58% {
-    transform: translateY(calc(var(--travel, 0px) * 0.3));
-    animation-timing-function: cubic-bezier(0.22, 0.62, 0.3, 1);
-  }
-  100% {
+  to {
     transform: translateY(var(--travel, 0px));
   }
 }
 
-@keyframes ss-pour-reveal {
-  0% {
-    transform: scaleY(0);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.3);
+/* Loose droplets simply appear, the way one does when it snaps off. */
+.ss-pour-fleck {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ss-pour-fleck-in 0.28s ease-out var(--delay, 0s) both;
+}
+
+@keyframes ss-pour-fleck-in {
+  from {
+    transform: scale(0);
   }
-  58% {
-    transform: scaleY(0.3);
-    animation-timing-function: cubic-bezier(0.22, 0.62, 0.3, 1);
-  }
-  100% {
-    transform: scaleY(1);
+  to {
+    transform: scale(1);
   }
 }
 
@@ -453,16 +456,17 @@ html[data-splash="showing"] body {
   }
 
   /* The paint holds its fully settled shape instead of pouring in. */
-  .ss-pour-run-reveal,
-  .ss-pour-band-reveal {
+  .ss-pour-mass,
+  .ss-pour-run,
+  .ss-pour-fleck {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
     animation: none !important;
     transform: scaleY(1);
   }
 
-  /* Each tip circle parks at the end of its own strand's travel, so the
-     settled silhouette matches the animated one exactly. */
-  .ss-pour-run-tip {
+  /* Each tip circle parks at the end of its own run's travel, so the settled
+     silhouette matches the animated one exactly. */
+  .ss-pour-tip {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
     animation: none !important;
     transform: translateY(var(--travel, 0px));
