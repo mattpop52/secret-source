@@ -305,6 +305,25 @@ html[data-splash="showing"] body {
   }
 }
 
+/* Paint gathering in the bottom corners rises behind a level front, the way
+   standing liquid does. */
+.ss-pour-pool {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: ss-pour-pool-in 1.9s cubic-bezier(0.26, 0.6, 0.24, 1)
+    var(--delay, 0s) both;
+}
+
+@keyframes ss-pour-pool-in {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
 /* Loose droplets simply appear, the way one does when it snaps off. */
 .ss-pour-fleck {
   transform-box: fill-box;
@@ -458,6 +477,7 @@ html[data-splash="showing"] body {
   /* The paint holds its fully settled shape instead of pouring in. */
   .ss-pour-mass,
   .ss-pour-run,
+  .ss-pour-pool,
   .ss-pour-fleck {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
     animation: none !important;
