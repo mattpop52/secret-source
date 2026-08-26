@@ -1857,7 +1857,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "bag",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 24_999,
+    priceCents: 45_999,
     sizes: ONE_UNIT("One size"),
     code: "SS-DIOR-0077",
     blurb:
