@@ -169,12 +169,6 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
-  /* Each mass's rendered width, used both to size the artwork and to place
-     the drips that leave its points. Change one and the drips follow. */
-  --mass-tl: clamp(160px, 27vw, 420px);
-  --mass-tc: clamp(120px, 21vw, 320px);
-  --mass-tr: clamp(150px, 25vw, 400px);
-
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -229,69 +223,98 @@ html[data-splash="showing"] body {
   );
 }
 
-/* ── The paint ────────────────────────────────────────────────────────── */
+/* ── The pour ─────────────────────────────────────────────────────────── */
 
-.ss-paint {
+/* Gloss paint running the full height of the card, rebuilt from the
+   reference clip: a solid mass across the top and thin ink strands that
+   string out of it and run all the way down behind the wordmark to the
+   bottom edge. The whole pour is rendered as one filtered body so it reads
+   as continuous liquid rather than separate icicles; the filtered geometry
+   itself never moves — only the clip-path reveal that windows it does, on
+   the compositor. */
+.ss-pour {
   position: absolute;
-  height: auto;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
   pointer-events: none;
-  /* Each mass is anchored to its own corner, so scaling grows the drips
-     inward — the same move as paint actually running. */
+  transform-origin: top center;
+}
+
+.ss-pour svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Each reveal rect grows down from the same fixed top edge, so it uncovers
+   more of the static artwork beneath rather than moving anything.
+
+   The two-phase profile is measured off the reference clip, not guessed:
+   there the ink barely advances for the first ~45% of its run, then floods
+   down fast and settles. So this creeps for most of the first stretch on
+   an ease-in, then runs out to full length on a hard deceleration. */
+.ss-pour-run-reveal,
+.ss-pour-band-reveal {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
   will-change: transform;
 }
 
-.ss-paint-tl {
-  top: 0;
-  left: 0;
-  width: var(--mass-tl);
-  transform-origin: top left;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) both,
-    ss-ooze 9s ease-in-out 1.2s infinite alternate;
+/* The solid mass lands first and quickly — in the reference it is already
+   across the top before any string has formed. It also has to finish
+   before the strands start, or a strand's own rectangular reveal window
+   would uncover a tab of the still-hidden band beside it. */
+.ss-pour-band-reveal {
+  animation: ss-pour-band-in 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) 0.1s both;
 }
 
-.ss-paint-tr {
-  top: 0;
-  right: 0;
-  width: var(--mass-tr);
-  transform-origin: top right;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.09s both,
-    ss-ooze 10.5s ease-in-out 1.3s infinite alternate;
-}
-
-.ss-paint-bl {
-  bottom: 0;
-  left: 0;
-  width: clamp(120px, 20vw, 300px);
-  transform-origin: bottom left;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.18s both,
-    ss-ooze 11s ease-in-out 1.4s infinite alternate;
-}
-
-.ss-paint-br {
-  right: 0;
-  bottom: 0;
-  width: clamp(180px, 30vw, 460px);
-  transform-origin: bottom right;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.27s both,
-    ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
-}
-
-/* Pours in from off-frame and settles. */
-@keyframes ss-paint-in {
+@keyframes ss-pour-band-in {
   from {
-    transform: scale(1.45);
-    opacity: 0;
-  }
-  60% {
-    opacity: 1;
+    transform: scaleY(0);
   }
   to {
-    transform: scale(1);
-    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.ss-pour-run-reveal {
+  animation: ss-pour-reveal var(--dur, 8.4s) var(--delay, 0s) both;
+}
+
+/* Rides the same descending front as its strand's rect, on the same
+   timing, so the reveal's leading edge is this circle's arc — a growing
+   strand ends in a round tip instead of a square cut. */
+.ss-pour-run-tip {
+  will-change: transform;
+  animation: ss-pour-tip var(--dur, 8.4s) var(--delay, 0s) both;
+}
+
+@keyframes ss-pour-tip {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.3);
+  }
+  58% {
+    transform: translateY(calc(var(--travel, 0px) * 0.3));
+    animation-timing-function: cubic-bezier(0.22, 0.62, 0.3, 1);
+  }
+  100% {
+    transform: translateY(var(--travel, 0px));
+  }
+}
+
+@keyframes ss-pour-reveal {
+  0% {
+    transform: scaleY(0);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.3);
+  }
+  58% {
+    transform: scaleY(0.3);
+    animation-timing-function: cubic-bezier(0.22, 0.62, 0.3, 1);
+  }
+  100% {
+    transform: scaleY(1);
   }
 }
 
@@ -369,15 +392,17 @@ html[data-splash="showing"] body {
   pointer-events: none;
 }
 
-/* Phase one: the paint swells past the frame and the flood comes up under it,
-   so corners and flood become one sheet of orange. */
-.ss-splash[data-state="leaving"] .ss-paint {
-  animation: ss-paint-flood 0.52s cubic-bezier(0.5, 0, 0.9, 0.4) both;
+/* Phase one: the pour surges the rest of the way down the card and the
+   flood comes up under it, so strands and flood become one sheet of
+   orange. The pour already spans the full height, so this is a short
+   shove rather than the long stretch the top-edge band used to need. */
+.ss-splash[data-state="leaving"] .ss-pour {
+  animation: ss-pour-flood 0.52s cubic-bezier(0.5, 0, 0.9, 0.4) both;
 }
 
-@keyframes ss-paint-flood {
+@keyframes ss-pour-flood {
   to {
-    transform: scale(4.2);
+    transform: scaleY(1.5);
   }
 }
 
@@ -421,18 +446,33 @@ html[data-splash="showing"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-splash-ground,
-  .ss-paint,
   .ss-splash-wordmark,
   .ss-splash-enter {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
     animation: none !important;
   }
 
+  /* The paint holds its fully settled shape instead of pouring in. */
+  .ss-pour-run-reveal,
+  .ss-pour-band-reveal {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
+    animation: none !important;
+    transform: scaleY(1);
+  }
+
+  /* Each tip circle parks at the end of its own strand's travel, so the
+     settled silhouette matches the animated one exactly. */
+  .ss-pour-run-tip {
+    /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
+    animation: none !important;
+    transform: translateY(var(--travel, 0px));
+  }
+
   .ss-splash[data-state="leaving"] {
     animation: ss-splash-fade 0.25s linear both;
   }
 
-  .ss-splash[data-state="leaving"] .ss-paint,
+  .ss-splash[data-state="leaving"] .ss-pour,
   .ss-splash[data-state="leaving"] .ss-splash-flood,
   .ss-splash[data-state="leaving"] .ss-splash-centre {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
@@ -443,137 +483,6 @@ html[data-splash="showing"] body {
     to {
       opacity: 0;
     }
-  }
-}
-
-/* ══ Liquid paint ═══════════════════════════════════════════════════════
-   Every mass is one gooey SVG — silhouette, runs, drops and swell share a
-   filter and a gradient, so all the paint on the page is a single body of
-   liquid. Wrappers here only place and scale each mass; motion lives on
-   the SVG geometry inside. */
-
-.ss-paint {
-  z-index: 2;
-}
-
-/* Mass bodies ride above every run, so the corner patches read as one
-   unbroken border and nothing is drawn across them. */
-.ss-paint-body {
-  z-index: 3;
-}
-
-.ss-paint svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.ss-paint-tc {
-  top: 0;
-  left: 50%;
-  width: var(--mass-tc);
-  margin-left: calc(var(--mass-tc) / -2);
-  transform-origin: top center;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.13s both,
-    ss-ooze 7.5s ease-in-out 1.25s infinite alternate;
-}
-
-/* The paint breathes on the wrapper, where the compositor animates it for
-   free — the filtered goo inside is static, computed once and cached. */
-@keyframes ss-ooze {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.015, 1.04);
-  }
-}
-
-/* A run: the stem stretches out of its tip while a heavier head leads it. */
-.ss-lq-stem {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  transform: scaleY(0);
-  will-change: transform;
-  animation: ss-lq-run var(--dur) cubic-bezier(0.32, 0, 0.36, 1) var(--delay)
-    both;
-}
-
-.ss-lq-head {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  will-change: transform;
-  animation: ss-lq-fall var(--dur) cubic-bezier(0.32, 0, 0.36, 1) var(--delay)
-    both;
-}
-
-/* The catchlight on a belly — the one bright mark that sells it as wet. */
-.ss-lq-gloss {
-  fill: #fff8e6;
-  opacity: 0.62;
-}
-
-@keyframes ss-lq-run {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-@keyframes ss-lq-fall {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(var(--run));
-  }
-}
-
-/* A drop: gathers at the tip, necks off through the goo, falls, and the
-   next one starts gathering. Runs forever. */
-.ss-lq-drop {
-  transform-box: fill-box;
-  will-change: transform;
-  animation: ss-lq-drop var(--dur) cubic-bezier(0.5, 0, 0.75, 0.4) var(--delay)
-    infinite;
-}
-
-@keyframes ss-lq-drop {
-  0% {
-    transform: translateY(0) scale(0.35);
-    opacity: 1;
-  }
-  26% {
-    transform: translateY(4px) scale(1);
-  }
-  88% {
-    transform: translateY(var(--run)) scale(0.85);
-    opacity: 1;
-  }
-  89%,
-  100% {
-    transform: translateY(var(--run)) scale(0.85);
-    opacity: 0;
-  }
-}
-
-/* After a run has gone, paint keeps gathering at the tip it left from. */
-.ss-lq-bead {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ss-lq-bead var(--dur) ease-in-out var(--delay) infinite alternate;
-}
-
-@keyframes ss-lq-bead {
-  from {
-    transform: scale(0.9);
-  }
-  to {
-    transform: scale(1.25);
   }
 }
 
@@ -588,29 +497,4 @@ html[data-splash="showing"] body {
 
 .ss-splash-flood {
   z-index: 6;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ss-lq-bead {
-    /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat the animation it replaces */
-    animation: none !important;
-  }
-
-  .ss-lq-stem {
-    /* biome-ignore lint/complexity/noImportantStyles: same reason */
-    animation: none !important;
-    transform: scaleY(1);
-  }
-
-  .ss-lq-head {
-    /* biome-ignore lint/complexity/noImportantStyles: same reason */
-    animation: none !important;
-    transform: translateY(var(--run));
-  }
-
-  .ss-lq-drop {
-    /* biome-ignore lint/complexity/noImportantStyles: same reason */
-    animation: none !important;
-    opacity: 0;
-  }
 }
