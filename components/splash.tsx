@@ -9,14 +9,16 @@ const SEEN_KEY = "ss-splash-v1";
 const EXIT_MS = 1150;
 
 /**
- * The landing card: tiled monogram ground behind a single rendered image —
- * the caramel pour, wordmark and "Enter the shop" button all baked into one
- * picture rather than built from live shapes. On a phone-shaped viewport it
- * fills edge to edge (its own aspect ratio is close enough to a phone's that
- * the crop is unnoticeable); on anything wider it sits centred at its own
- * aspect ratio, so the tiled ground shows through at the sides instead of
- * stretching or cropping the picture. Shown once per session, then the
- * screen floods and falls away to reveal the shop already sitting under it.
+ * The landing card: tiled monogram ground behind the rendered pour, with the
+ * real wordmark laid over it. The picture came back with the lettering garbled
+ * into it, so that band is shaded out in the JPEG and the logo is drawn back on
+ * as its own layer, off the original artwork — which also keeps it sharp on a
+ * high-density screen instead of sharing the photograph's resolution. On a
+ * phone-shaped viewport the pair fills the screen edge to edge (the picture's
+ * aspect ratio is close enough to a phone's that the crop is unnoticeable); on
+ * anything wider they sit centred at their own aspect ratio, so the tiled
+ * ground shows through at the sides. Shown once per session, then the screen
+ * floods and falls away to reveal the shop already sitting under it.
  */
 export function Splash() {
   const [phase, setPhase] = useState<"in" | "leaving" | "gone">("in");
@@ -106,14 +108,29 @@ export function Splash() {
       <div className="ss-splash-vignette" />
 
       <div className="ss-splash-centre">
-        <Image
-          alt="Secret Source — your plug for all drip necessities. Enter the shop."
-          className="ss-splash-pour"
-          height={1525}
-          priority
-          src="/brand/splash-pour.jpg"
-          width={704}
-        />
+        <div className="ss-splash-plate">
+          {/* Decorative: the pour, the tiled ground and the drawn-in button are
+              scenery. Everything it says is said by the wordmark's alt text and
+              the button's label below. */}
+          <Image
+            alt=""
+            className="ss-splash-pour"
+            height={1525}
+            priority
+            src="/brand/splash-pour.jpg"
+            width={704}
+          />
+          {/* The real logo, off the original artwork, over the shaded-out band
+              where the rendered picture had it garbled. */}
+          <Image
+            alt="Secret Source — your plug for all drip necessities"
+            className="ss-splash-mark"
+            height={1017}
+            priority
+            src="/brand/splash-wordmark.png"
+            width={1600}
+          />
+        </div>
       </div>
 
       {/* The whole card is the door — a real button, so it is reachable by

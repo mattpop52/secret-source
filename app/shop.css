@@ -225,43 +225,61 @@ html[data-splash="showing"] body {
 
 /* ── Centre ───────────────────────────────────────────────────────────── */
 
-/* No padding here: on a phone-shaped viewport the picture inside is
-   position: absolute; inset: 0, and inset resolves against this element's
-   padding edge — any padding here would leave a bare, unfillable margin
-   around it instead of a true full-bleed image. */
 .ss-splash-centre {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* Below roughly tablet width, the picture's own aspect ratio (704:1525) is
-   close enough to a phone's that filling the screen edge to edge crops only
-   a sliver off the sides — the same treatment as any full-bleed hero image.
-   From tablet width up, that same crop would hide most of the picture (a
-   portrait image covering a landscape screen), so it switches to sitting at
-   its own size instead, centred over the tiled ground. */
+/* The picture and the wordmark sitting on it have to stay in register at every
+   viewport, so both are placed inside a plate pinned to the picture's own
+   aspect ratio rather than against the card. Below roughly tablet width the
+   plate is grown until it covers the card, spilling over whichever axis is
+   short — the picture's ratio is close enough to a phone's that only a sliver
+   is lost. From tablet width up that same crop would hide most of a portrait
+   picture on a landscape screen, so it sits at its own size over the tiled
+   ground instead. 46.164vh is 704/1525 of the viewport height: the width at
+   which the plate is exactly tall enough to cover.
+
+   Centred with auto margins rather than a translate, because the entrance
+   animation sets transform and would overwrite it; auto margins go negative
+   when the plate is wider than the card, so it stays centred as it overflows. */
+.ss-splash-plate {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  aspect-ratio: 704 / 1525;
+  width: max(100%, 46.164vh);
+  animation: ss-splash-word 1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.28s both;
+}
+
+/* The three terms are the same cap as before, expressed as widths so the
+   aspect ratio derives the height: 90vw, 88vh, and 880px tall. */
+@media (min-width: 768px) {
+  .ss-splash-plate {
+    width: min(90vw, 40.62vh, 406px);
+  }
+}
+
 .ss-splash-pour {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  animation: ss-splash-word 1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.28s both;
 }
 
-@media (min-width: 768px) {
-  .ss-splash-pour {
-    position: static;
-    inset: auto;
-    width: auto;
-    height: min(88vh, 880px);
-    max-width: 90vw;
-    object-fit: contain;
-  }
+/* The lettering is not left to the picture: the pour was rendered with the
+   wordmark garbled into it, so that band is shaded out in the JPEG and the
+   real logo — lifted off the original artwork — is laid back over it here, at
+   its own resolution rather than the picture's. These offsets are where the
+   wordmark sits within the 704x1525 plate, so the two stay locked together
+   however the plate is scaled. */
+.ss-splash-mark {
+  position: absolute;
+  left: 21.165%;
+  top: 35.869%;
+  width: 57.386%;
+  height: auto;
 }
 
 @keyframes ss-splash-word {
@@ -334,7 +352,7 @@ html[data-splash="showing"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-splash-ground,
-  .ss-splash-pour {
+  .ss-splash-plate {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
     animation: none !important;
   }
