@@ -379,12 +379,12 @@ html[data-splash="showing"] body {
   position: relative;
   background: linear-gradient(
     180deg,
-    #f2c66f 0%,
-    #e5ac48 32%,
-    #dc9f42 68%,
-    #c68430 100%
+    #ebaa76 0%,
+    #dd8d50 32%,
+    #d4844a 68%,
+    #be6d38 100%
   );
-  color: #241403;
+  color: #221005;
   padding: 1.05rem 2.6rem;
   font-size: 0.8rem;
   cursor: pointer;
@@ -410,10 +410,10 @@ html[data-splash="showing"] body {
   border-radius: 30% 30% 50% 50% / 8% 8% 44% 44%;
   background: linear-gradient(
     90deg,
-    #a05d20 0%,
-    #e8b258 30%,
-    #dc9f42 62%,
-    #a86224 100%
+    #9a5026 0%,
+    #e1975f 30%,
+    #d4844a 62%,
+    #a1552b 100%
   );
 }
 
@@ -447,7 +447,7 @@ html[data-splash="showing"] body {
   inset: -2px;
   /* The pour's own body colour, not the brand orange: the flood comes up
      behind the drips and any difference between them reads as two paints. */
-  background-color: #e5ac48;
+  background-color: #dd8d50;
   opacity: 0;
   pointer-events: none;
 }

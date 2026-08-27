@@ -71,20 +71,20 @@ const REF_W = 1440;
  * turning under and away from the light; the top eases back into the body.
  */
 const LIP: { at: number; fill: string }[] = [
-  { at: 1, fill: "#2c1600" },
-  { at: 0.93, fill: "#5d3f11" },
-  { at: 0.86, fill: "#896629" },
-  { at: 0.79, fill: "#ad853b" },
-  { at: 0.71, fill: "#c89c4b" },
-  { at: 0.64, fill: "#deae56" },
-  { at: 0.57, fill: "#e7b55d" },
-  { at: 0.5, fill: "#f1be65" },
-  { at: 0.43, fill: "#f4bd5f" },
-  { at: 0.36, fill: "#edb34f" },
-  { at: 0.29, fill: "#eab04b" },
-  { at: 0.21, fill: "#e6ac47" },
-  { at: 0.14, fill: "#e3a945" },
-  { at: 0.07, fill: "#e2a844" },
+  { at: 1, fill: "#2a1102" },
+  { at: 0.93, fill: "#593115" },
+  { at: 0.86, fill: "#84532e" },
+  { at: 0.79, fill: "#a76e41" },
+  { at: 0.71, fill: "#c28351" },
+  { at: 0.64, fill: "#d7925d" },
+  { at: 0.57, fill: "#e09a64" },
+  { at: 0.5, fill: "#eaa36c" },
+  { at: 0.43, fill: "#eda066" },
+  { at: 0.36, fill: "#e59457" },
+  { at: 0.29, fill: "#e29153" },
+  { at: 0.21, fill: "#de8d4f" },
+  { at: 0.14, fill: "#db8a4d" },
+  { at: 0.07, fill: "#da894c" },
 ];
 
 /**
@@ -132,16 +132,16 @@ const FLOOR_DELAY = 1.9;
  * this one is brightest right at the crest and deepens inward.
  */
 const CREST: { at: number; fill: string }[] = [
-  { at: 0, fill: "#7a4a12" },
-  { at: 0.06, fill: "#a87433" },
-  { at: 0.13, fill: "#cf9f4e" },
-  { at: 0.21, fill: "#eabd68" },
-  { at: 0.3, fill: "#f6cd76" },
-  { at: 0.39, fill: "#f2c163" },
-  { at: 0.49, fill: "#e8b152" },
-  { at: 0.6, fill: "#dda247" },
-  { at: 0.72, fill: "#cd9039" },
-  { at: 0.85, fill: "#b87b2c" },
+  { at: 0, fill: "#753c17" },
+  { at: 0.06, fill: "#a26339" },
+  { at: 0.13, fill: "#c98654" },
+  { at: 0.21, fill: "#e3a26f" },
+  { at: 0.3, fill: "#f0b17c" },
+  { at: 0.39, fill: "#eba36a" },
+  { at: 0.49, fill: "#e0945a" },
+  { at: 0.6, fill: "#d6874e" },
+  { at: 0.72, fill: "#c67740" },
+  { at: 0.85, fill: "#b16533" },
 ];
 
 /** How deep that crest roll is, in reference pixels. */
@@ -524,10 +524,10 @@ export function PaintPour() {
             y1={-0.07 * height}
             y2={geometry.mass}
           >
-            <stop offset="0" stopColor="#bd8130" />
-            <stop offset="0.22" stopColor="#dda447" />
-            <stop offset="0.5" stopColor="#e5ac48" />
-            <stop offset="1" stopColor="#e2a845" />
+            <stop offset="0" stopColor="#b66a37" />
+            <stop offset="0.22" stopColor="#d6884e" />
+            <stop offset="0.5" stopColor="#dd8d50" />
+            <stop offset="1" stopColor="#da8a4d" />
           </linearGradient>
 
           {/* The floor deepens downwards, away from the light coming over its
@@ -541,10 +541,10 @@ export function PaintPour() {
             y1={geometry.floorTop}
             y2={height + 20}
           >
-            <stop offset="0" stopColor="#c9873a" />
-            <stop offset="0.35" stopColor="#b4732a" />
-            <stop offset="0.72" stopColor="#9a5c1c" />
-            <stop offset="1" stopColor="#7f4713" />
+            <stop offset="0" stopColor="#c27341" />
+            <stop offset="0.35" stopColor="#ad6131" />
+            <stop offset="0.72" stopColor="#944d22" />
+            <stop offset="1" stopColor="#7a3c18" />
           </linearGradient>
 
           {/* A broad, soft lift across the bank, off-centre. A poured sheet
@@ -558,11 +558,11 @@ export function PaintPour() {
             y1="0"
             y2="0"
           >
-            <stop offset="0" stopColor="#fff4de" stopOpacity="0.02" />
-            <stop offset="0.24" stopColor="#fff4de" stopOpacity="0.09" />
-            <stop offset="0.5" stopColor="#ffeec8" stopOpacity="0.03" />
-            <stop offset="0.74" stopColor="#6b3d0c" stopOpacity="0.07" />
-            <stop offset="1" stopColor="#5c340a" stopOpacity="0.15" />
+            <stop offset="0" stopColor="#fdede0" stopOpacity="0.02" />
+            <stop offset="0.24" stopColor="#fdede0" stopOpacity="0.09" />
+            <stop offset="0.5" stopColor="#fce1cb" stopOpacity="0.03" />
+            <stop offset="0.74" stopColor="#663111" stopOpacity="0.07" />
+            <stop offset="1" stopColor="#582a0e" stopOpacity="0.15" />
           </linearGradient>
 
           {/* Paint deepens as it runs away from the light. Laid over each drip
@@ -576,8 +576,8 @@ export function PaintPour() {
             y1={geometry.mass}
             y2={height}
           >
-            <stop offset="0" stopColor="#4a2a08" stopOpacity="0" />
-            <stop offset="1" stopColor="#3d2206" stopOpacity="0.26" />
+            <stop offset="0" stopColor="#47220b" stopOpacity="0" />
+            <stop offset="1" stopColor="#3a1b09" stopOpacity="0.26" />
           </linearGradient>
 
           {/* One cross-section ramp per drip, spanning that drip's own column
@@ -595,15 +595,15 @@ export function PaintPour() {
               y1="0"
               y2="0"
             >
-              <stop offset="0" stopColor="#9c5a1c" />
-              <stop offset="0.09" stopColor="#c88433" />
-              <stop offset="0.19" stopColor="#eec27c" />
-              <stop offset="0.27" stopColor="#fbe6bb" />
-              <stop offset="0.37" stopColor="#eebc6f" />
-              <stop offset="0.5" stopColor="#e2a751" />
-              <stop offset="0.69" stopColor="#d59340" />
-              <stop offset="0.87" stopColor="#b2702a" />
-              <stop offset="1" stopColor="#8f501a" />
+              <stop offset="0" stopColor="#964c22" />
+              <stop offset="0.09" stopColor="#c16f3a" />
+              <stop offset="0.19" stopColor="#e8ad82" />
+              <stop offset="0.27" stopColor="#f8d8be" />
+              <stop offset="0.37" stopColor="#e8a575" />
+              <stop offset="0.5" stopColor="#db8e58" />
+              <stop offset="0.69" stopColor="#ce7d47" />
+              <stop offset="0.87" stopColor="#ab5f31" />
+              <stop offset="1" stopColor="#894520" />
             </linearGradient>
           ))}
 
@@ -622,9 +622,9 @@ export function PaintPour() {
               y1={item.blendTop}
               y2={item.blendEnd}
             >
-              <stop offset="0" stopColor="#e5aa50" />
-              <stop offset="0.45" stopColor="#e5aa50" />
-              <stop offset="1" stopColor="#e3a74c" stopOpacity="0" />
+              <stop offset="0" stopColor="#de9057" />
+              <stop offset="0.45" stopColor="#de9057" />
+              <stop offset="1" stopColor="#db8c54" stopOpacity="0" />
             </linearGradient>
           ))}
 
@@ -654,13 +654,13 @@ export function PaintPour() {
               key={i}
               r={item.beadR}
             >
-              <stop offset="0" stopColor="#fff7e8" />
-              <stop offset="0.17" stopColor="#f6d59d" />
-              <stop offset="0.42" stopColor="#e4ab55" />
-              <stop offset="0.68" stopColor="#cf8d3a" />
-              <stop offset="0.9" stopColor="#a86124" />
-              <stop offset="0.97" stopColor="#8d4f18" stopOpacity="0.85" />
-              <stop offset="1" stopColor="#7c4413" stopOpacity="0" />
+              <stop offset="0" stopColor="#fef2e9" />
+              <stop offset="0.17" stopColor="#f2c4a1" />
+              <stop offset="0.42" stopColor="#dd925c" />
+              <stop offset="0.68" stopColor="#c87741" />
+              <stop offset="0.9" stopColor="#a1552b" />
+              <stop offset="0.97" stopColor="#87441e" stopOpacity="0.85" />
+              <stop offset="1" stopColor="#773a18" stopOpacity="0" />
             </radialGradient>
           ))}
         </defs>
