@@ -454,7 +454,7 @@ export const PRODUCTS: Product[] = [
       fill: "#AFAFAC",
       accent: "#141414",
     },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0011",
     blurb:
@@ -476,7 +476,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#AFAFAC", accent: "#B3261E" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0012",
     blurb:
@@ -518,7 +518,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3E7BD1" },
-    priceCents: 14_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0014",
     blurb:
@@ -686,7 +686,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Grey Monochrome", fill: "#AFAFAC", accent: "#3A3A3A" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0022",
     blurb:
@@ -791,7 +791,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#7A7D82" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0027",
     blurb:
@@ -875,7 +875,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3E7BD1" },
-    priceCents: 14_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0031",
     blurb:
@@ -959,7 +959,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black / Red", fill: "#131313", accent: "#B3261E" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0035",
     blurb:
@@ -1022,7 +1022,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#AFAFAC", accent: "#B3261E" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0038",
     blurb:
@@ -1043,7 +1043,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#7A7D82" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0039",
     blurb:
@@ -1085,7 +1085,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black / White", fill: "#141414", accent: "#F2F2F0" },
-    priceCents: 13_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0041",
     blurb:
