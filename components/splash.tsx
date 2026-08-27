@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { LiquidPaint } from "./liquid-paint";
 
 const SEEN_KEY = "ss-splash-v1";
 
@@ -9,9 +10,11 @@ const SEEN_KEY = "ss-splash-v1";
 const EXIT_MS = 1150;
 
 /**
- * The landing card: tiled monogram ground and the wordmark. Shown once per
- * session, then the screen floods and falls away to reveal the shop already
- * sitting underneath it.
+ * The landing card: the shop's banner art rebuilt in layers — tiled monogram
+ * ground, wordmark, and the four corner paint masses pulled out of the
+ * original artwork so the paint itself can move. Shown once per session,
+ * then the paint floods the screen and falls away to reveal the shop
+ * already sitting underneath it.
  */
 export function Splash() {
   const [phase, setPhase] = useState<"in" | "leaving" | "gone">("in");
@@ -99,6 +102,8 @@ export function Splash() {
     <div className="ss-splash" data-state={phase}>
       <div className="ss-splash-ground" />
       <div className="ss-splash-vignette" />
+
+      <LiquidPaint />
 
       {/* The whole card is the door — a real button, so it is reachable by
           keyboard and announced, rather than a div with a click handler. */}
