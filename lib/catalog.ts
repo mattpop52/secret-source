@@ -242,7 +242,7 @@ export const PRODUCTS: Product[] = [
     brand: "the-north-face",
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B7B7B4", accent: "#45443F" },
-    priceCents: 12_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TNF-0001",
     blurb:
@@ -305,7 +305,7 @@ export const PRODUCTS: Product[] = [
     brand: "moncler",
     shape: "tracksuit",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#C1272D" },
-    priceCents: 27_999,
+    priceCents: 25_999,
     sizes: SIZE_RUN(),
     code: "SS-MNC-0004",
     blurb:
@@ -325,7 +325,7 @@ export const PRODUCTS: Product[] = [
     brand: "moncler",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
-    priceCents: 27_999,
+    priceCents: 25_999,
     sizes: SIZE_RUN(),
     code: "SS-MNC-0005",
     blurb:
@@ -345,7 +345,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#B7B4AE", accent: "#141414" },
-    priceCents: 24_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-STI-0006",
     blurb:
@@ -539,7 +539,7 @@ export const PRODUCTS: Product[] = [
     brand: "the-north-face",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
-    priceCents: 12_999,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TNF-0015",
     blurb:
@@ -581,7 +581,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#D9D0BE", accent: "#141414" },
-    priceCents: 29_999,
+    priceCents: 32_999,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0017",
     blurb:
@@ -602,7 +602,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#C4C1BA", accent: "#141414" },
-    priceCents: 19_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-CP-0018",
     blurb:
@@ -623,7 +623,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 19_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-CP-0019",
     blurb:
@@ -644,7 +644,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "tracksuit",
     colourway: { name: "Grey Marl", fill: "#B7B4AE", accent: "#141414" },
-    priceCents: 22_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-STI-0020",
     blurb:
@@ -707,7 +707,7 @@ export const PRODUCTS: Product[] = [
     brand: "moncler",
     shape: "tracksuit",
     colourway: { name: "Stone", fill: "#D9D0BE", accent: "#141414" },
-    priceCents: 26_999,
+    priceCents: 25_999,
     sizes: SIZE_RUN(),
     code: "SS-MNC-0023",
     blurb:
@@ -749,7 +749,7 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#E23A21" },
-    priceCents: 24_999,
+    priceCents: 25_000,
     sizes: SIZE_RUN(),
     code: "SS-AMR-0025",
     blurb:
@@ -854,7 +854,7 @@ export const PRODUCTS: Product[] = [
     brand: "moncler",
     shape: "tracksuit",
     colourway: { name: "Navy", fill: "#1B2A4A", accent: "#0F1830" },
-    priceCents: 26_999,
+    priceCents: 25_999,
     sizes: SIZE_RUN(),
     code: "SS-MNC-0030",
     blurb:
@@ -896,7 +896,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 29_999,
+    priceCents: 32_999,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0032",
     blurb:
@@ -917,7 +917,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 24_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-STI-0033",
     blurb:
@@ -1001,7 +1001,7 @@ export const PRODUCTS: Product[] = [
     brand: "moncler",
     shape: "tracksuit",
     colourway: { name: "Taupe", fill: "#8C7E6E", accent: "#5C5044" },
-    priceCents: 26_999,
+    priceCents: 25_999,
     sizes: SIZE_RUN(),
     code: "SS-MNC-0037",
     blurb:
@@ -1064,7 +1064,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 22_999,
+    priceCents: 15_999,
     sizes: SIZE_RUN(),
     code: "SS-STI-0040",
     blurb:
