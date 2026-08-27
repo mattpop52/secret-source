@@ -120,28 +120,33 @@ export function Splash() {
             src="/brand/splash-pour.jpg"
             width={704}
           />
-          {/* Light running down the caramel, clipped to it by a mask cut from
-              the picture, and the hanging drop cut out of it so it can fall off
-              the bottom of the screen. Both sit over the photograph, under the
-              logo. */}
+          {/* Light running down the caramel, clipped to it by a mask cut
+              from the picture. Sits over the photograph, under the logo. */}
           <div className="ss-splash-sheen">
             <div className="ss-splash-sheen-band" />
           </div>
 
-          <Image
-            alt=""
-            className="ss-splash-drop"
-            height={226}
-            src="/brand/splash-drop.png"
-            width={144}
-          />
-          <Image
-            alt=""
-            className="ss-splash-drop ss-splash-drop-late"
-            height={226}
-            src="/brand/splash-drop.png"
-            width={144}
-          />
+          {/* One connected body in two pieces from the same pixels: the
+              column stretches from its anchored top, the drop rides its far
+              end on the same clock, and their overlap shares the column's
+              constant cross-section — so the run lengthens as one movement
+              with no visible join. */}
+          <div className="ss-splash-taffy">
+            <Image
+              alt=""
+              height={152}
+              src="/brand/splash-column.png"
+              width={160}
+            />
+          </div>
+          <div className="ss-splash-fall">
+            <Image
+              alt=""
+              height={280}
+              src="/brand/splash-drop.png"
+              width={160}
+            />
+          </div>
 
           {/* The real logo, off the original artwork, over the shaded-out band
               where the rendered picture had it garbled. */}

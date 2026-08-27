@@ -323,38 +323,64 @@ html[data-splash="showing"] body {
   }
 }
 
-/* The drop hanging seven eighths of the way down the photograph is cut out as
-   its own picture and laid back exactly over itself, so nothing shows until it
-   is asked to move. Then it falls clear off the bottom of the screen, and the
-   one still painted into the photograph reads as the next one already forming.
-   Placed in the plate's coordinates — the cut-out spans 282..426 across and
-   starts 1148 down, of 704 by 1525 — so it stays registered at every viewport,
-   and 46vh of fall clears the bottom of the screen from wherever it lands. */
-.ss-splash-drop {
+/* ── The pour, lengthening ────────────────────────────────────────────── */
+
+/* The lower run of caramel — the column under the pill and the drop at its
+   end — is cut from the photograph and laid back exactly over itself as one
+   connected body in two pieces: the column, and the drop carrying a run of
+   column as its neck. The column stretches from its anchored top; the drop
+   rides its far end. Both run on the same clock and easing, and the drop's
+   travel equals the column's added length — 152 plate-px of column gaining
+   6x is 912, which is 325.714% of the drop piece's 280 plate-px height — so the
+   two never part: the whole run lengthens as one movement until it has
+   poured off the bottom of the screen. Where the pieces overlap they share
+   the column's constant cross-section, cut from the same pixels, so no join
+   shows at rest or in motion. All positions are in the plate's coordinates
+   (the cut spans 276..436 across of 704) so registration holds everywhere. */
+.ss-splash-taffy {
   position: absolute;
-  left: 40.057%;
-  top: 75.279%;
-  width: 20.455%;
-  height: auto;
+  left: 39.205%;
+  top: 66.557%;
+  width: 22.727%;
+  transform-origin: 50% 0;
   pointer-events: none;
-  transform-origin: 50% 30%;
-  animation: ss-drop-fall 3s cubic-bezier(0.42, 0, 0.85, 0.6) infinite;
+  animation: ss-taffy-stretch 8s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
 }
 
-/* Half a cycle behind the first, so one is nearly always in the air. */
-.ss-splash-drop-late {
-  animation-delay: -1.5s;
+.ss-splash-fall {
+  position: absolute;
+  left: 39.205%;
+  top: 72.131%;
+  width: 22.727%;
+  pointer-events: none;
+  animation: ss-taffy-fall 8s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
 }
 
-/* It hangs a moment before it goes, then accelerates and draws out as it
-   falls, the way a drop this heavy does once it lets go. */
-@keyframes ss-drop-fall {
-  0%,
-  26% {
-    transform: translate3d(0, 0, 0) scale(1, 1);
+.ss-splash-taffy img,
+.ss-splash-fall img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 7x carries the column's end past the bottom of the screen on every
+   reasonable viewport; the card clips the overhang. One shot, held: caramel
+   that has reached the floor does not climb back up. */
+@keyframes ss-taffy-stretch {
+  from {
+    transform: scaleY(1);
   }
-  100% {
-    transform: translate3d(0, 46vh, 0) scale(0.86, 1.28);
+  to {
+    transform: scaleY(7);
+  }
+}
+
+@keyframes ss-taffy-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 325.714%, 0);
   }
 }
 
@@ -430,7 +456,8 @@ html[data-splash="showing"] body {
   .ss-splash-ground,
   .ss-splash-plate,
   .ss-splash-sheen-band,
-  .ss-splash-drop {
+  .ss-splash-taffy,
+  .ss-splash-fall {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
     animation: none !important;
   }
