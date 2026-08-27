@@ -169,9 +169,13 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
-  /* Rendered width of the two stretching top corners. */
+  /* Rendered width of all four corners — the top two named for the
+     stretching photographs, the bottom two for the static pools their
+     growth needs to leave clear (see ss-paint-grow-tl/tr below). */
   --mass-tl: clamp(160px, 27.1vw, 420px);
   --mass-tr: clamp(130px, 21.6vw, 340px);
+  --mass-bl: clamp(120px, 19.3vw, 300px);
+  --mass-br: clamp(150px, 24vw, 380px);
 
   position: fixed;
   inset: 0;
@@ -431,7 +435,7 @@ html[data-splash="showing"] body {
   top: auto;
   bottom: 0;
   left: 0;
-  width: clamp(120px, 19.3vw, 300px);
+  width: var(--mass-bl);
   transform-origin: bottom left;
   animation: ss-ooze 11s ease-in-out 1.4s infinite alternate;
 }
@@ -440,7 +444,7 @@ html[data-splash="showing"] body {
   top: auto;
   bottom: 0;
   right: 0;
-  width: clamp(150px, 24vw, 380px);
+  width: var(--mass-br);
   transform-origin: bottom right;
   animation: ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
 }
@@ -478,17 +482,24 @@ html[data-splash="showing"] body {
    current rendered width (see .ss-paint-tl/.ss-paint-tr above); growing
    to a viewport-height figure — not a fixed multiple of that rest height
    — is what keeps the reach "about halfway down the page" regardless of
-   how wide or narrow the corner itself is rendering. Runs once and holds,
-   the same shape as the splash's caramel pour lengthening. */
+   how wide or narrow the corner itself is rendering. That target is capped
+   short of halfway wherever the pool sharing its edge (tl with bl, tr with
+   br) would otherwise be tall enough to reach up and meet it — the bottom
+   pools scale with viewport width the same as the top corners do, so on a
+   wide, short window their own height can be a real fraction of the
+   screen. Runs once and holds, the same shape as the splash's caramel
+   pour lengthening. */
 @keyframes ss-paint-grow-tl {
   to {
-    height: 50vh;
+    /* The 56px margin covers the pool's own ooze breathing (up to ~2.2%
+       taller at its peak) on top of a plain visual gap. */
+    height: min(50vh, calc(100vh - (var(--mass-bl) * 330 / 194) - 56px));
   }
 }
 
 @keyframes ss-paint-grow-tr {
   to {
-    height: 50vh;
+    height: min(50vh, calc(100vh - (var(--mass-br) * 117 / 241) - 56px));
   }
 }
 
