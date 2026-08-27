@@ -371,18 +371,54 @@ html[data-splash="showing"] body {
   }
 }
 
+/* A slab of the same caramel, with the label knocked out of it: lit along the
+   top edge, turning under at the bottom, and shedding one drip off the right
+   the way a poured shape does. The corner radii are deliberately unequal —
+   paint does not set to a rectangle. */
 .ss-splash-enter {
-  background-color: var(--ss-orange);
-  color: #120c00;
-  padding: 1rem 2.5rem;
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    #f2c66f 0%,
+    #e5ac48 32%,
+    #dc9f42 68%,
+    #c68430 100%
+  );
+  color: #241403;
+  padding: 1.05rem 2.6rem;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  border-radius: 17px 23px 15px 21px / 21px 15px 23px 17px;
+  box-shadow:
+    inset 0 3px 0 rgb(255 244 219 / 70%),
+    inset 0 -3px 0 rgb(122 66 14 / 40%),
+    0 10px 20px rgb(0 0 0 / 45%);
+  transition: filter 0.2s ease;
   animation: ss-splash-cta 0.7s ease 0.85s both;
 }
 
+/* The drip. Sits under the slab's own bottom edge, so it reads as paint that
+   has run off it rather than a tab stuck on. */
+.ss-splash-enter::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 17%;
+  width: 13px;
+  height: 30px;
+  margin-top: -4px;
+  border-radius: 30% 30% 50% 50% / 8% 8% 44% 44%;
+  background: linear-gradient(
+    90deg,
+    #a05d20 0%,
+    #e8b258 30%,
+    #dc9f42 62%,
+    #a86224 100%
+  );
+}
+
 .ss-splash-enter:hover {
-  background-color: var(--ss-orange-hot);
+  filter: brightness(1.08);
 }
 
 @keyframes ss-splash-cta {
@@ -409,7 +445,9 @@ html[data-splash="showing"] body {
 .ss-splash-flood {
   position: absolute;
   inset: -2px;
-  background-color: var(--ss-orange);
+  /* The pour's own body colour, not the brand orange: the flood comes up
+     behind the drips and any difference between them reads as two paints. */
+  background-color: #e5ac48;
   opacity: 0;
   pointer-events: none;
 }

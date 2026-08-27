@@ -71,19 +71,28 @@ const REF_W = 1440;
  * turning under and away from the light; the top eases back into the body.
  */
 const LIP: { at: number; fill: string }[] = [
-  { at: 1, fill: "#a96700" },
-  { at: 0.91, fill: "#c67c00" },
-  { at: 0.82, fill: "#e59a00" },
-  { at: 0.71, fill: "#ffbe52" },
-  { at: 0.6, fill: "#ffcd6d" },
-  { at: 0.48, fill: "#ffc147" },
-  { at: 0.36, fill: "#fdb223" },
-  { at: 0.24, fill: "#f8a80e" },
-  { at: 0.12, fill: "#f5a507" },
+  { at: 1, fill: "#2c1600" },
+  { at: 0.93, fill: "#5d3f11" },
+  { at: 0.86, fill: "#896629" },
+  { at: 0.79, fill: "#ad853b" },
+  { at: 0.71, fill: "#c89c4b" },
+  { at: 0.64, fill: "#deae56" },
+  { at: 0.57, fill: "#e7b55d" },
+  { at: 0.5, fill: "#f1be65" },
+  { at: 0.43, fill: "#f4bd5f" },
+  { at: 0.36, fill: "#edb34f" },
+  { at: 0.29, fill: "#eab04b" },
+  { at: 0.21, fill: "#e6ac47" },
+  { at: 0.14, fill: "#e3a945" },
+  { at: 0.07, fill: "#e2a844" },
 ];
 
-/** How deep that roll is, in reference pixels. */
-const LIP_DEPTH = 13;
+/**
+ * How deep that roll is, in reference pixels. Thick: the paint reads as a
+ * heavy pour, and the whole tonal run from the hot core to the shadow under
+ * the lip has to fit inside it.
+ */
+const LIP_DEPTH = 30;
 
 /**
  * How far below the bank's sag the throat over a drip necks down to, in
@@ -91,18 +100,31 @@ const LIP_DEPTH = 13;
  * notch in the edge, shallow enough to stay above where the bank's reveal
  * front stops.
  */
-const THROAT_DROP = 40;
+const THROAT_DROP = 34;
 
 /**
- * Paint gathered in the bottom corners, as it would after running the sides of
- * the card. Two shapes, deliberately unequal, each a smooth meniscus falling
- * away from the edge it climbs.
+ * The paint that has reached the floor, as depths across the card. One mass
+ * rather than a wedge in each corner: the drips run into it, so it has to be
+ * continuous or the heavy one lands on nothing. Mounded where it has gathered
+ * against the sides, with a low rise under the heavy drip where that one is
+ * still feeding it.
  */
-const POOLS: { side: -1 | 1; climbf: number; reachf: number; delay: number }[] =
-  [
-    { side: -1, climbf: 0.845, reachf: 0.3, delay: 1.8 },
-    { side: 1, climbf: 0.885, reachf: 0.215, delay: 2.35 },
-  ];
+const FLOOR: [number, number][] = [
+  [-0.06, 0.9],
+  [0.045, 0.845],
+  [0.185, 0.883],
+  [0.33, 0.936],
+  [0.5, 0.907],
+  [0.598, 0.931],
+  [0.638, 0.902],
+  [0.685, 0.929],
+  [0.825, 0.864],
+  [0.945, 0.84],
+  [1.06, 0.888],
+];
+
+/** When the floor starts filling, in seconds. */
+const FLOOR_DELAY = 1.9;
 
 /**
  * The ramp down a pool's crest. The bank's edge turns under and away from the
@@ -110,15 +132,20 @@ const POOLS: { side: -1 | 1; climbf: number; reachf: number; delay: number }[] =
  * this one is brightest right at the crest and deepens inward.
  */
 const CREST: { at: number; fill: string }[] = [
-  { at: 0, fill: "#ffe4a8" },
-  { at: 0.14, fill: "#ffd076" },
-  { at: 0.3, fill: "#febd3e" },
-  { at: 0.5, fill: "#f9ac14" },
-  { at: 0.74, fill: "#f2a104" },
+  { at: 0, fill: "#7a4a12" },
+  { at: 0.06, fill: "#a87433" },
+  { at: 0.13, fill: "#cf9f4e" },
+  { at: 0.21, fill: "#eabd68" },
+  { at: 0.3, fill: "#f6cd76" },
+  { at: 0.39, fill: "#f2c163" },
+  { at: 0.49, fill: "#e8b152" },
+  { at: 0.6, fill: "#dda247" },
+  { at: 0.72, fill: "#cd9039" },
+  { at: 0.85, fill: "#b87b2c" },
 ];
 
 /** How deep that crest roll is, in reference pixels. */
-const CREST_DEPTH = 11;
+const CREST_DEPTH = 22;
 
 /** The bank has to land before a drip's window can start uncovering it. */
 const DRIP_START = 1.05;
@@ -150,40 +177,50 @@ type Drip = {
 const DRIPS: Drip[] = [
   {
     xf: 0.115,
-    half: 13,
-    beadK: 2.05,
+    half: 16,
+    beadK: 2.0,
     endf: 0.36,
-    sagf: 0.15,
+    sagf: 0.214,
     lean: 5,
     delay: 0,
     dur: 3.4,
   },
   {
     xf: 0.335,
-    half: 9,
-    beadK: 2.4,
+    half: 11,
+    beadK: 2.3,
     endf: 0.76,
-    sagf: 0.132,
+    sagf: 0.203,
     lean: -4,
     delay: 0.55,
     dur: 4.4,
   },
   {
+    xf: 0.762,
+    half: 8,
+    beadK: 2.55,
+    endf: 0.43,
+    sagf: 0.19,
+    lean: 3,
+    delay: 1.35,
+    dur: 3.1,
+  },
+  {
     xf: 0.638,
-    half: 17,
-    beadK: 1.95,
+    half: 21,
+    beadK: 1.9,
     endf: 1.07,
-    sagf: 0.164,
+    sagf: 0.224,
     lean: 7,
     delay: 0.24,
     dur: 5.2,
   },
   {
     xf: 0.876,
-    half: 10,
-    beadK: 2.3,
+    half: 13,
+    beadK: 2.2,
     endf: 0.82,
-    sagf: 0.141,
+    sagf: 0.209,
     lean: -6,
     delay: 0.86,
     dur: 4.7,
@@ -191,19 +228,24 @@ const DRIPS: Drip[] = [
 ];
 
 /**
- * The bank's lower edge, as depths at positions across the card. The drips'
- * own sag values are spliced in at their x, so the edge dips to meet each one
- * instead of a drip appearing to hang off a straight run of paint.
+ * The bank's lower edge, as depths at the high points between the drips.
+ *
+ * Traced off the reference rather than guessed, and it runs the opposite way
+ * to how it looks: the rounded shapes read as lobes hanging down, but the edge
+ * is in fact highest midway between two drips and descends steadily into each
+ * one. The paint is being pulled towards wherever it is running off. Built the
+ * other way up — lobes hanging below the points beside each drip — the curve
+ * has to climb back out of every cusp and comes out as a row of spikes.
  */
 const RIDGE: [number, number][] = [
-  [-0.05, 0.078],
-  [0.03, 0.062],
-  [0.22, 0.07],
-  [0.45, 0.058],
-  [0.545, 0.093],
-  [0.74, 0.066],
-  [0.965, 0.083],
-  [1.05, 0.071],
+  [-0.07, 0.192],
+  [0.015, 0.184],
+  [0.225, 0.166],
+  [0.425, 0.163],
+  [0.5, 0.172],
+  [0.775, 0.168],
+  [0.945, 0.148],
+  [1.07, 0.186],
 ];
 
 /**
@@ -213,6 +255,41 @@ const RIDGE: [number, number][] = [
  */
 function gaugeScale(width: number) {
   return Math.min(1.12, Math.max(0.6, 0.4 + (width / REF_W) * 0.62));
+}
+
+/** How many samples the bank's and floor's edges are drawn through. */
+const EDGE_SAMPLES = 84;
+
+/** How far either side of a drip the bank is drawn down towards it, in width. */
+const PULL_SPAN = 0.115;
+
+/** Raised cosine: 1 at the centre, 0 at the edge, flat tangents at both. */
+function bump(t: number) {
+  return 0.5 * (1 + Math.cos(Math.PI * t));
+}
+
+/**
+ * A depth profile read at any x, interpolated with the same raised cosine so
+ * the run between two control points leaves and arrives flat instead of as a
+ * straight line with a corner at each end.
+ */
+function profileAt(profile: [number, number][], xf: number) {
+  if (xf <= profile[0][0]) {
+    return profile[0][1];
+  }
+  for (let i = 0; i < profile.length - 1; i += 1) {
+    const [x0, y0] = profile[i];
+    const [x1, y1] = profile[i + 1];
+    if (xf <= x1) {
+      const t = (xf - x0) / (x1 - x0);
+      return y0 + (y1 - y0) * (1 - bump(t));
+    }
+  }
+  return profile[profile.length - 1][1];
+}
+
+function ridgeAt(xf: number) {
+  return profileAt(RIDGE, xf);
 }
 
 /**
@@ -303,7 +380,7 @@ export function PaintPour() {
     // Where the bank's reveal stops. Every funnel closes above this, so
     // nothing hangs below the front when it lands — otherwise all four drips
     // would appear at once, cut off level with each other.
-    const mass = 0.235 * height;
+    const mass = 0.285 * height;
     // Two clip regions that only touch antialias to about half coverage each
     // along the shared edge, and half over half composites to three quarters,
     // not one, which shows as a hairline. Overlap them instead.
@@ -354,80 +431,62 @@ export function PaintPour() {
       };
     });
 
-    // The bank's edge: the fixed profile, with a throat cut into it over each
-    // drip. Four nodes each — the edge lifts a little just before it dives,
-    // then necks down to the column's own width and back out.
-    const throats = drips.map((item) => ({
-      x: item.x,
-      span: item.throatHalf * 7,
-    }));
+    // The bank's edge, sampled densely from a smooth profile rather than
+    // authored as a handful of nodes. Sparse nodes leave dead-straight runs
+    // between them and the edge comes out as a row of tents; sampling a
+    // function and drawing through every sample keeps it curved everywhere.
+    const edge: [number, number][] = [];
+    for (let i = 0; i <= EDGE_SAMPLES; i += 1) {
+      const xf = -0.06 + (1.12 * i) / EDGE_SAMPLES;
+      let yf = ridgeAt(xf);
 
-    const nodes: [number, number][] = [
-      // A profile node landing inside a throat's span fights it: the curve has
-      // to climb back to the profile's shallow depth and dive again within a
-      // few pixels, which comes out as a spike between the sags. Narrow cards
-      // are where they collide, since the throats keep their pixel width while
-      // the profile compresses.
-      ...RIDGE.map(([xf, yf]): [number, number] => [
-        xf * width,
-        yf * height,
-      ]).filter(([x]) =>
-        throats.every((t) => Math.abs(x - t.x) > t.span * 1.2),
-      ),
-      ...drips.flatMap((item): [number, number][] => [
-        [item.x - item.throatHalf * 7, item.sag - 16 * scale],
-        [item.x - item.throatHalf, item.throat],
-        [item.x + item.throatHalf, item.throat],
-        [item.x + item.throatHalf * 7, item.sag - 16 * scale],
-      ]),
-    ].sort((a, b) => a[0] - b[0]);
+      for (const item of drips) {
+        const dx = Math.abs(xf - item.drip.xf);
+        // The broad pull: paint drawn towards wherever it is running off.
+        if (dx < PULL_SPAN) {
+          yf += (item.drip.sagf - ridgeAt(item.drip.xf)) * bump(dx / PULL_SPAN);
+        }
+        // The cusp itself, narrow, on top of that pull.
+        const cuspSpan = (item.throatHalf * 3.4) / width;
+        if (dx < cuspSpan) {
+          yf += ((item.throat - item.sag) / height) * bump(dx / cuspSpan);
+        }
+      }
+
+      edge.push([xf * width, yf * height]);
+    }
 
     const bank = [
-      throughPoints(nodes),
-      `L ${nodes[nodes.length - 1][0]} ${-TOP_PAD}`,
-      `L ${nodes[0][0]} ${-TOP_PAD}`,
+      throughPoints(edge),
+      `L ${edge[edge.length - 1][0]} ${-TOP_PAD}`,
+      `L ${edge[0][0]} ${-TOP_PAD}`,
       "Z",
     ].join(" ");
 
     const lipDepth = -LIP_DEPTH * scale;
     const crestDepth = CREST_DEPTH * scale;
 
-    const pools = POOLS.map((pool) => {
-      // Mirrored by measuring x from whichever edge the pool climbs, so one
-      // description serves both corners.
-      const edge = pool.side < 0 ? -24 : width + 24;
-      const at = (f: number) => (pool.side < 0 ? f * width : width - f * width);
-      const climb = pool.climbf * height;
-      const floor = height + 24;
-      const r = pool.reachf;
-
-      const fall = floor - climb;
-
-      return {
-        pool,
-        climb,
-        top: climb - crestDepth - 8,
-        // Shallow on purpose. The crest carries a rolled band the same way the
-        // bank's lip does, and that band is laid down by offsetting copies
-        // vertically — on a steep edge a vertical offset exposes almost
-        // nothing, so a pool that climbs fast and reaches barely at all comes
-        // out as a flat wedge with a hard diagonal cut.
-        path: [
-          `M ${edge} ${climb}`,
-          `C ${at(r * 0.2)} ${climb - fall * 0.05} ${at(r * 0.38)} ${climb + fall * 0.12} ${at(r * 0.55)} ${climb + fall * 0.34}`,
-          `C ${at(r * 0.72)} ${climb + fall * 0.56} ${at(r * 0.87)} ${climb + fall * 0.8} ${at(r)} ${floor}`,
-          `L ${edge} ${floor}`,
-          "Z",
-        ].join(" "),
-      };
-    });
+    // The floor: the same dense sampling, so both edges are equally smooth.
+    const crest: [number, number][] = [];
+    for (let i = 0; i <= EDGE_SAMPLES; i += 1) {
+      const xf = -0.06 + (1.12 * i) / EDGE_SAMPLES;
+      crest.push([xf * width, profileAt(FLOOR, xf) * height]);
+    }
+    const floor = [
+      throughPoints(crest),
+      `L ${crest[crest.length - 1][0]} ${height + 40}`,
+      `L ${crest[0][0]} ${height + 40}`,
+      "Z",
+    ].join(" ");
+    const floorTop = Math.min(...crest.map(([, y]) => y)) - crestDepth - 8;
 
     return {
       mass,
       seam,
       drips,
       bank,
-      pools,
+      floor,
+      floorTop,
       lipDepth,
       crestDepth,
       lip: LIP.map((step) => ({ ...step, dy: lipDepth * (1 - step.at) })),
@@ -465,33 +524,28 @@ export function PaintPour() {
             y1={-0.07 * height}
             y2={geometry.mass}
           >
-            <stop offset="0" stopColor="#ffd469" />
-            <stop offset="0.3" stopColor="#fbab0a" />
-            <stop offset="0.72" stopColor="#f4a406" />
-            <stop offset="1" stopColor="#eda200" />
+            <stop offset="0" stopColor="#bd8130" />
+            <stop offset="0.22" stopColor="#dda447" />
+            <stop offset="0.5" stopColor="#e5ac48" />
+            <stop offset="1" stopColor="#e2a845" />
           </linearGradient>
 
-          {/* A pool deepens downwards, away from the light coming over its
+          {/* The floor deepens downwards, away from the light coming over its
               crest — the opposite of the bank, which is brightest at its top
-              because that is the face turned towards the light. Anchored to
-              each pool's own crest rather than to the card, so the shallower
-              corner is not handed the deep end of the ramp. */}
-          {geometry.pools.map((item, i) => (
-            <linearGradient
-              gradientUnits="userSpaceOnUse"
-              id={`${poolId}${i}`}
-              // biome-ignore lint/suspicious/noArrayIndexKey: fixed, ordered constant
-              key={i}
-              x1="0"
-              x2="0"
-              y1={item.climb}
-              y2={height + 20}
-            >
-              <stop offset="0" stopColor="#f2a104" />
-              <stop offset="0.4" stopColor="#e08f00" />
-              <stop offset="1" stopColor="#bd7800" />
-            </linearGradient>
-          ))}
+              because that is the face turned towards the light. */}
+          <linearGradient
+            gradientUnits="userSpaceOnUse"
+            id={poolId}
+            x1="0"
+            x2="0"
+            y1={geometry.floorTop}
+            y2={height + 20}
+          >
+            <stop offset="0" stopColor="#c9873a" />
+            <stop offset="0.35" stopColor="#b4732a" />
+            <stop offset="0.72" stopColor="#9a5c1c" />
+            <stop offset="1" stopColor="#7f4713" />
+          </linearGradient>
 
           {/* A broad, soft lift across the bank, off-centre. A poured sheet
               is not one value edge to edge; without something this wide and
@@ -504,11 +558,11 @@ export function PaintPour() {
             y1="0"
             y2="0"
           >
-            <stop offset="0" stopColor="#fff0c8" stopOpacity="0" />
-            <stop offset="0.26" stopColor="#fff0c8" stopOpacity="0.13" />
-            <stop offset="0.52" stopColor="#ffe9b4" stopOpacity="0.05" />
-            <stop offset="0.78" stopColor="#8a5400" stopOpacity="0.07" />
-            <stop offset="1" stopColor="#7d4c00" stopOpacity="0.13" />
+            <stop offset="0" stopColor="#fff4de" stopOpacity="0.02" />
+            <stop offset="0.24" stopColor="#fff4de" stopOpacity="0.09" />
+            <stop offset="0.5" stopColor="#ffeec8" stopOpacity="0.03" />
+            <stop offset="0.74" stopColor="#6b3d0c" stopOpacity="0.07" />
+            <stop offset="1" stopColor="#5c340a" stopOpacity="0.15" />
           </linearGradient>
 
           {/* Paint deepens as it runs away from the light. Laid over each drip
@@ -522,8 +576,8 @@ export function PaintPour() {
             y1={geometry.mass}
             y2={height}
           >
-            <stop offset="0" stopColor="#5a3200" stopOpacity="0" />
-            <stop offset="1" stopColor="#4a2900" stopOpacity="0.22" />
+            <stop offset="0" stopColor="#4a2a08" stopOpacity="0" />
+            <stop offset="1" stopColor="#3d2206" stopOpacity="0.26" />
           </linearGradient>
 
           {/* One cross-section ramp per drip, spanning that drip's own column
@@ -541,15 +595,15 @@ export function PaintPour() {
               y1="0"
               y2="0"
             >
-              <stop offset="0" stopColor="#a06400" />
-              <stop offset="0.08" stopColor="#d78a00" />
-              <stop offset="0.18" stopColor="#f8c05a" />
-              <stop offset="0.26" stopColor="#ffe3a4" />
-              <stop offset="0.35" stopColor="#f9bd51" />
-              <stop offset="0.48" stopColor="#f3a20a" />
-              <stop offset="0.68" stopColor="#e79400" />
-              <stop offset="0.86" stopColor="#bf7800" />
-              <stop offset="1" stopColor="#9d6206" />
+              <stop offset="0" stopColor="#9c5a1c" />
+              <stop offset="0.09" stopColor="#c88433" />
+              <stop offset="0.19" stopColor="#eec27c" />
+              <stop offset="0.27" stopColor="#fbe6bb" />
+              <stop offset="0.37" stopColor="#eebc6f" />
+              <stop offset="0.5" stopColor="#e2a751" />
+              <stop offset="0.69" stopColor="#d59340" />
+              <stop offset="0.87" stopColor="#b2702a" />
+              <stop offset="1" stopColor="#8f501a" />
             </linearGradient>
           ))}
 
@@ -568,9 +622,9 @@ export function PaintPour() {
               y1={item.blendTop}
               y2={item.blendEnd}
             >
-              <stop offset="0" stopColor="#f3a305" />
-              <stop offset="0.45" stopColor="#f3a305" />
-              <stop offset="1" stopColor="#f2a104" stopOpacity="0" />
+              <stop offset="0" stopColor="#e5aa50" />
+              <stop offset="0.45" stopColor="#e5aa50" />
+              <stop offset="1" stopColor="#e3a74c" stopOpacity="0" />
             </linearGradient>
           ))}
 
@@ -600,13 +654,13 @@ export function PaintPour() {
               key={i}
               r={item.beadR}
             >
-              <stop offset="0" stopColor="#fff3d4" />
-              <stop offset="0.18" stopColor="#ffd071" />
-              <stop offset="0.42" stopColor="#f7a913" />
-              <stop offset="0.68" stopColor="#e39100" />
-              <stop offset="0.9" stopColor="#b87200" />
-              <stop offset="0.97" stopColor="#a06400" stopOpacity="0.85" />
-              <stop offset="1" stopColor="#965d00" stopOpacity="0" />
+              <stop offset="0" stopColor="#fff7e8" />
+              <stop offset="0.17" stopColor="#f6d59d" />
+              <stop offset="0.42" stopColor="#e4ab55" />
+              <stop offset="0.68" stopColor="#cf8d3a" />
+              <stop offset="0.9" stopColor="#a86124" />
+              <stop offset="0.97" stopColor="#8d4f18" stopOpacity="0.85" />
+              <stop offset="1" stopColor="#7c4413" stopOpacity="0" />
             </radialGradient>
           ))}
         </defs>
@@ -660,23 +714,17 @@ export function PaintPour() {
             </Fragment>
           ))}
 
-          {/* A pool fills from the bottom up behind a level front, which is
-              what standing liquid does, so a plain rect anchored to the floor
+          {/* The floor fills from the bottom up behind a level front, which is
+              what standing liquid does, so a plain rect anchored to the bottom
               is the honest reveal for it. */}
-          {geometry.pools.map((item, i) => (
-            <rect
-              className="ss-pour-pool"
-              height={height + 40 - item.top}
-              // biome-ignore lint/suspicious/noArrayIndexKey: fixed, ordered constant
-              key={i}
-              style={
-                { "--delay": `${item.pool.delay}s` } as React.CSSProperties
-              }
-              width={width + 60}
-              x={-30}
-              y={item.top}
-            />
-          ))}
+          <rect
+            className="ss-pour-pool"
+            height={height + 40 - geometry.floorTop}
+            style={{ "--delay": `${FLOOR_DELAY}s` } as React.CSSProperties}
+            width={width + 60}
+            x={-30}
+            y={geometry.floorTop}
+          />
         </clipPath>
 
         {/* Clip outside, artwork inside: nothing here ever changes, so it
@@ -730,22 +778,18 @@ export function PaintPour() {
             </Fragment>
           ))}
 
-          {/* The corners, rolled the same way but downwards: a pool's crest is
-              the face turned towards the light, so the band sits along the top
-              of it rather than under the bottom. */}
-          {geometry.pools.map((item, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: fixed, ordered constant
-            <Fragment key={i}>
-              {geometry.crest.map((step) => (
-                <g key={step.fill} transform={`translate(0 ${step.dy})`}>
-                  <path d={item.path} fill={step.fill} />
-                </g>
-              ))}
-              <g transform={`translate(0 ${geometry.crestDepth})`}>
-                <path d={item.path} fill={`url(#${poolId}${i})`} />
-              </g>
-            </Fragment>
+          {/* The floor, rolled the same way as the bank but downwards: its
+              crest is the face turned towards the light, so the hot band sits
+              along the top of it rather than under the bottom. Over the drips,
+              so the heavy one runs into it rather than in front of it. */}
+          {geometry.crest.map((step) => (
+            <g key={step.fill} transform={`translate(0 ${step.dy})`}>
+              <path d={geometry.floor} fill={step.fill} />
+            </g>
           ))}
+          <g transform={`translate(0 ${geometry.crestDepth})`}>
+            <path d={geometry.floor} fill={`url(#${poolId})`} />
+          </g>
         </g>
       </svg>
     </div>
