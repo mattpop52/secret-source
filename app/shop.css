@@ -282,6 +282,178 @@ html[data-splash="showing"] body {
   height: auto;
 }
 
+/* ── The pour, running ────────────────────────────────────────────────── */
+
+/* The pour is a photograph, so it is made to flow rather than redrawn: bands
+   of light travel down it, clipped to the caramel by a mask cut from the
+   picture itself. Only a transform animates, so the whole thing stays on the
+   compositor — the filter-driven attempt at this ran at four frames a second. */
+.ss-splash-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: url("/brand/splash-pour-mask.png") 0 0 / 100% 100% no-repeat;
+  mask: url("/brand/splash-pour-mask.png") 0 0 / 100% 100% no-repeat;
+}
+
+/* Kept faint on purpose: caramel this thick carries a slow, soft gloss, and
+   anything stronger reads as grey bars laid across the picture. */
+.ss-splash-sheen-band {
+  position: absolute;
+  inset: -100% 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(255 233 196 / 0%) 0,
+    rgb(255 233 196 / 5%) 3.4%,
+    rgb(255 233 196 / 15%) 6.2%,
+    rgb(255 233 196 / 5%) 9%,
+    rgb(255 233 196 / 0%) 12.4%,
+    rgb(255 233 196 / 0%) 16.667%
+  );
+  mix-blend-mode: overlay;
+  animation: ss-pour-run 6.5s linear infinite;
+}
+
+/* The band is three cards tall and its gradient repeats every sixth of that,
+   so sliding it by one sixth of itself lands exactly on the next repeat. */
+@keyframes ss-pour-run {
+  to {
+    transform: translate3d(0, 16.667%, 0);
+  }
+}
+
+/* The photograph's pour ends in a drop hanging seven eighths of the way down;
+   this carries it the rest of the way off the bottom of the screen. It is
+   placed in the plate's own coordinates — the drop hangs at 354/704 across —
+   and starts up inside the bulb, so it stays hidden until the bulb narrows to
+   its own gauge and the stream appears to be drawn out of the drop rather
+   than butted onto it. 100vh of height clears the bottom of the screen from
+   wherever the drop lands on a given viewport; the card clips the overhang. */
+.ss-splash-stream {
+  position: absolute;
+  left: 50.28%;
+  top: 84%;
+  width: 8.52%;
+  height: 100vh;
+  transform: translateX(-50%);
+  transform-origin: 50% 0;
+  pointer-events: none;
+  animation: ss-pour-fall 1.3s cubic-bezier(0.45, 0, 0.55, 1) 0.55s both;
+}
+
+/* It runs out of the drop rather than appearing under it. */
+@keyframes ss-pour-fall {
+  from {
+    transform: translateX(-50%) scaleY(0.015);
+  }
+  to {
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+/* The cross-section is read straight off the column above the drop, so the
+   stream carries the picture's own shading — lit down its left flank, dark at
+   both rims — instead of a colour picked by eye. It draws in a little as it
+   falls, the way a stream does once gravity has hold of it. */
+.ss-splash-stream-run {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
+  background: linear-gradient(
+    to right,
+    #6d4d34 0%,
+    #db903f 8.3%,
+    #fedcb7 16.7%,
+    #f8d0ac 25%,
+    #c37233 33.3%,
+    #bc6224 41.7%,
+    #b95c21 50%,
+    #b35521 58.3%,
+    #ab4f1e 66.7%,
+    #a6461c 75%,
+    #9a3e19 83.3%,
+    #8b3119 91.7%,
+    #592a20 100%
+  );
+  /* Faded in at the top so it is drawn out of the drop over the length of the
+     bulb's taper, instead of starting on a hard edge. */
+  -webkit-mask: linear-gradient(to bottom, transparent 0, #000 4.2%);
+  mask: linear-gradient(to bottom, transparent 0, #000 4.2%);
+}
+
+/* The same travelling light as the pour above, so the stream reads as part of
+   the same body of caramel and not a bar stuck on underneath it. */
+.ss-splash-stream-run::after {
+  content: "";
+  position: absolute;
+  inset: -100% 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(255 233 196 / 0%) 0,
+    rgb(255 233 196 / 6%) 3.4%,
+    rgb(255 233 196 / 18%) 6.2%,
+    rgb(255 233 196 / 6%) 9%,
+    rgb(255 233 196 / 0%) 12.4%,
+    rgb(255 233 196 / 0%) 16.667%
+  );
+  mix-blend-mode: overlay;
+  animation: ss-pour-run 6.5s linear infinite;
+}
+
+/* Swells running down the stream: caramel this thick does not fall at an even
+   gauge, it travels in slugs that stretch as they go. Each is nearly twice the
+   stream's width, so it bulges past both edges, and its highlight is placed to
+   land on the stream's own specular line — a swell in the same body of caramel
+   catches the light in the same place, and anywhere else it reads as a bubble
+   stuck on the side. They fade up out of the drop rather than popping into
+   existence on top of it. */
+.ss-splash-bead {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 210%;
+  aspect-ratio: 1 / 1.5;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    66% 60% at 33% 27%,
+    #fde3c2 0%,
+    #f3c188 14%,
+    #d07c33 40%,
+    #b95c21 62%,
+    #93401b 84%,
+    rgb(105 52 34 / 0%) 100%
+  );
+  /* Linear, because caramel this viscous runs at a steady gauge rather than
+     accelerating the way a free drop would. */
+  animation: ss-pour-bead 3.6s linear infinite;
+}
+
+.ss-splash-bead:nth-child(3) {
+  animation-delay: -1.8s;
+}
+
+/* The travel is cut to the stretch of stream that is actually on screen —
+   roughly a fifth of the viewport below the drop — so a swell reaches full
+   size while it can still be seen, rather than out of frame underneath. It
+   comes up out of the drop's shadow and stretches as it goes. */
+@keyframes ss-pour-bead {
+  0% {
+    transform: translate(-50%, 3vh) scale(0.42, 0.34);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, 7.6vh) scale(0.85, 0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 26vh) scale(1.02, 1.28);
+    opacity: 1;
+  }
+}
+
 @keyframes ss-splash-word {
   from {
     opacity: 0;
@@ -352,9 +524,18 @@ html[data-splash="showing"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-splash-ground,
-  .ss-splash-plate {
+  .ss-splash-plate,
+  .ss-splash-sheen-band,
+  .ss-splash-stream,
+  .ss-splash-stream-run::after,
+  .ss-splash-bead {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
     animation: none !important;
+  }
+
+  /* A swell held still at the top of the stream is just a lump on the drop. */
+  .ss-splash-bead {
+    display: none;
   }
 
   .ss-splash[data-state="leaving"] {

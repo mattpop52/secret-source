@@ -120,6 +120,19 @@ export function Splash() {
             src="/brand/splash-pour.jpg"
             width={704}
           />
+          {/* Light running down the caramel, clipped to it by a mask cut from
+              the picture, and the stream that carries the pour off the bottom
+              of the screen. Both sit over the photograph and under the logo. */}
+          <div className="ss-splash-sheen">
+            <div className="ss-splash-sheen-band" />
+          </div>
+
+          <div className="ss-splash-stream">
+            <div className="ss-splash-stream-run" />
+            <span className="ss-splash-bead" />
+            <span className="ss-splash-bead" />
+          </div>
+
           {/* The real logo, off the original artwork, over the shaded-out band
               where the rendered picture had it garbled. */}
           <Image
