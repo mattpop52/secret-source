@@ -169,8 +169,7 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
-  /* Each mass's rendered width, used both to size the artwork and to place
-     the drips that leave its points. Change one and the drips follow. */
+  /* Rendered width of the two stretching top corners. */
   --mass-tl: clamp(160px, 27.1vw, 420px);
   --mass-tr: clamp(130px, 21.6vw, 340px);
 
@@ -226,72 +225,6 @@ html[data-splash="showing"] body {
     rgb(5 5 5 / 45%) 62%,
     rgb(5 5 5 / 88%) 100%
   );
-}
-
-/* ── The paint ────────────────────────────────────────────────────────── */
-
-.ss-paint {
-  position: absolute;
-  height: auto;
-  pointer-events: none;
-  /* Each mass is anchored to its own corner, so scaling grows the drips
-     inward — the same move as paint actually running. */
-  will-change: transform;
-}
-
-.ss-paint-tl {
-  top: 0;
-  left: 0;
-  width: var(--mass-tl);
-  transform-origin: top left;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) both,
-    ss-ooze 9s ease-in-out 1.2s infinite alternate;
-}
-
-.ss-paint-tr {
-  top: 0;
-  right: 0;
-  width: var(--mass-tr);
-  transform-origin: top right;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.09s both,
-    ss-ooze 10.5s ease-in-out 1.3s infinite alternate;
-}
-
-.ss-paint-bl {
-  bottom: 0;
-  left: 0;
-  width: clamp(120px, 19.3vw, 300px);
-  transform-origin: bottom left;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.18s both,
-    ss-ooze 11s ease-in-out 1.4s infinite alternate;
-}
-
-.ss-paint-br {
-  right: 0;
-  bottom: 0;
-  width: clamp(150px, 24vw, 380px);
-  transform-origin: bottom right;
-  animation:
-    ss-paint-in 1.1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.27s both,
-    ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
-}
-
-/* Pours in from off-frame and settles. */
-@keyframes ss-paint-in {
-  from {
-    transform: scale(1.45);
-    opacity: 0;
-  }
-  60% {
-    opacity: 1;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 /* ── Centre ───────────────────────────────────────────────────────────── */
@@ -454,32 +387,63 @@ html[data-splash="showing"] body {
 }
 
 /* ══ Liquid paint ═══════════════════════════════════════════════════════
-   Every mass is one SVG in two layers sharing one gradient, so all the
-   paint on the page reads as a single body of liquid. Wrappers here only
-   place and scale each mass; motion lives on the SVG geometry inside, and
-   it is transforms all the way down — the goo-filter version of this
-   measured 5fps. */
+   The bottom corners cannot drip upward, so they stay put and only
+   breathe. The top corners have somewhere to drip to: each is a photograph
+   of the banner's own paint (public/brand/paint-tl.png, paint-tr.png),
+   stretched vertically from its anchored top edge — the same move as the
+   splash's caramel pour. One element, one scaleY, no shape drawn that was
+   not already in the artwork. */
 
 .ss-paint {
   z-index: 2;
+  position: absolute;
+  top: 0;
+  pointer-events: none;
 }
 
-/* Mass bodies ride above every run, so the corner patches read as one
-   unbroken border and nothing is drawn across them. */
-.ss-paint-body {
-  z-index: 3;
+/* Each mass is anchored to its own corner and its ooze breathes from that
+   same corner, so the scale grows inward — the same move as paint actually
+   settling in place. */
+.ss-paint-tl {
+  left: 0;
+  width: var(--mass-tl);
+  transform-origin: top left;
+  animation: ss-ooze 9s ease-in-out 1.2s infinite alternate;
+}
+
+.ss-paint-tr {
+  right: 0;
+  width: var(--mass-tr);
+  transform-origin: top right;
+  animation: ss-ooze 10.5s ease-in-out 1.3s infinite alternate;
+}
+
+.ss-paint-bl {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  width: clamp(120px, 19.3vw, 300px);
+  transform-origin: bottom left;
+  animation: ss-ooze 11s ease-in-out 1.4s infinite alternate;
+}
+
+.ss-paint-br {
+  top: auto;
+  bottom: 0;
+  right: 0;
+  width: clamp(150px, 24vw, 380px);
+  transform-origin: bottom right;
+  animation: ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
 }
 
 .ss-paint svg {
   display: block;
   width: 100%;
   height: auto;
-  overflow: visible;
 }
 
 /* The paint breathes on the wrapper, where the compositor animates it for
-   free — the geometry inside is static between keyframes. This is the
-   reference clip's slow surface undulation. */
+   free — no geometry recomputed between keyframes. */
 @keyframes ss-ooze {
   from {
     transform: scale(1, 1);
@@ -489,144 +453,31 @@ html[data-splash="showing"] body {
   }
 }
 
-/* A run: the stem stretches out of its tip while a heavier head leads it.
-   The default curve is fitted to the reference clip's measured tongue
-   fronts (start speed half the average, end speed double — paint that
-   gathers, lets go and accelerates, never stalling); each stem can carry
-   its own via --ease. */
-.ss-lq-stem {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  transform: scaleY(0);
+/* The photographed top corner, pulled downward from its own top edge.
+   scaleY only — the width never changes, so nothing about the artwork's
+   own silhouette is altered, only how far down it reaches. Runs once and
+   holds, the same shape as the caramel pour lengthening. */
+.ss-paint-stretch {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: top;
   will-change: transform;
-  animation: ss-lq-run var(--dur) var(--delay) both;
-  animation-timing-function: var(--ease, cubic-bezier(0.5, 0.25, 0.9, 0.8));
+  animation: ss-paint-stretch 9s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
 }
 
-.ss-lq-head {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  will-change: transform;
-  animation: ss-lq-fall var(--dur) var(--delay) both;
-  animation-timing-function: var(--ease, cubic-bezier(0.5, 0.25, 0.9, 0.8));
+.ss-paint-tr .ss-paint-stretch {
+  animation-delay: 2s;
 }
 
-/* A head whose tip sheds drops recoils as each one lets go — measured off
-   the clip: the tip snaps back up, then regrows while the next drop
-   gathers. The recoil owns the transform once it starts (its start is the
-   drop cycle's start, after the fall has landed), so its resting frames
-   restate the landed position. */
-.ss-lq-head-recoil {
-  animation:
-    ss-lq-fall var(--dur) var(--delay) both,
-    ss-lq-recoil var(--rperiod) ease-in-out var(--rstart) infinite;
-  animation-timing-function:
-    var(--ease, cubic-bezier(0.5, 0.25, 0.9, 0.8)), ease-in-out;
-}
-
-/* Timed to the drop's cycle: it pulls visibly free about 40% in (its
-   translate runs 26%-88%, and it reads as detached once its top clears the
-   bulb), so the tip snaps up just then and regrows while the next drop
-   gathers. */
-@keyframes ss-lq-recoil {
-  0%,
-  36% {
-    transform: translateY(var(--run));
-  }
-  45% {
-    transform: translateY(calc(var(--run) - 13px));
-  }
-  72% {
-    transform: translateY(var(--run));
-  }
-  100% {
-    transform: translateY(var(--run));
-  }
-}
-
-/* The belly gathers out of its lobe over the run's first moments, so at
-   t=0 the silhouette is the banner's own and nothing bulges below it. */
-.ss-lq-gather {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: ss-lq-gather calc(var(--dur) * 0.18) cubic-bezier(0.3, 0, 0.6, 1)
-    var(--delay) both;
-}
-
-@keyframes ss-lq-gather {
+/* 9x clears the bottom of the screen on every reasonable viewport from
+   either corner's own rest height; the card clips the overhang. */
+@keyframes ss-paint-stretch {
   from {
-    transform: scale(0.55);
+    transform: scaleY(1);
   }
   to {
-    transform: scale(1);
-  }
-}
-
-/* The catchlight on a belly — the one bright mark that sells it as wet. */
-.ss-lq-gloss {
-  fill: #fff8e6;
-  opacity: 0.62;
-}
-
-@keyframes ss-lq-run {
-  from {
-    transform: scaleY(0) scaleX(1);
-  }
-  to {
-    transform: scaleY(1) scaleX(0.82);
-  }
-}
-
-@keyframes ss-lq-fall {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(var(--run));
-  }
-}
-
-/* A drop: gathers at the tip, necks off, falls, and the next one starts
-   gathering. Runs forever. */
-.ss-lq-drop {
-  transform-box: fill-box;
-  will-change: transform;
-  animation: ss-lq-drop var(--dur) cubic-bezier(0.5, 0, 0.75, 0.4) var(--delay)
-    infinite;
-}
-
-@keyframes ss-lq-drop {
-  0% {
-    transform: translateY(0) scale(0.35);
-    opacity: 1;
-  }
-  26% {
-    transform: translateY(4px) scale(1);
-  }
-  88% {
-    transform: translateY(var(--run)) scale(0.85);
-    opacity: 1;
-  }
-  89%,
-  100% {
-    transform: translateY(var(--run)) scale(0.85);
-    opacity: 0;
-  }
-}
-
-/* After a run has gone, paint keeps gathering at the tip it left from. */
-.ss-lq-bead {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ss-lq-bead var(--dur) ease-in-out var(--delay) infinite alternate;
-}
-
-@keyframes ss-lq-bead {
-  from {
-    transform: scale(0.9);
-  }
-  to {
-    transform: scale(1.25);
+    transform: scaleY(9);
   }
 }
 
@@ -644,24 +495,9 @@ html[data-splash="showing"] body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* With nothing moving, the card should be the banner exactly: no runs,
-     no heads, no drops — the artwork's own silhouettes and nothing else. */
-  .ss-lq-stem,
-  .ss-lq-head,
-  .ss-lq-gather,
-  .ss-lq-drop,
-  .ss-lq-bead {
-    /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat the animations it turns off */
+  /* With nothing moving, the card is the banner exactly. */
+  .ss-paint-stretch {
+    /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat the animation it turns off */
     animation: none !important;
-  }
-
-  .ss-lq-stem {
-    transform: scaleY(0);
-  }
-
-  .ss-lq-head,
-  .ss-lq-drop,
-  .ss-lq-bead {
-    opacity: 0;
   }
 }
