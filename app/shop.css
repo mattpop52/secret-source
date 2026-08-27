@@ -223,123 +223,6 @@ html[data-splash="showing"] body {
   );
 }
 
-/* ── The pour ─────────────────────────────────────────────────────────── */
-
-/* Paint running the full height of the card: a bank across the top with an
-   uneven festooned edge, and runs of every gauge stringing out of it and
-   hanging down behind the wordmark, the longest clearing the bottom edge.
-   The artwork itself never moves — only the clip-path windowing it does, so
-   the shapes rasterise once and each frame just re-clips. */
-.ss-pour {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-  transform-origin: top center;
-}
-
-.ss-pour svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Every window grows down from a fixed top edge, uncovering more of the
-   static artwork rather than moving any of it. */
-.ss-pour-mass,
-.ss-pour-run {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
-  will-change: transform;
-}
-
-/* The mass floods across first. It has to finish before any run starts, or
-   a run's own rectangular window would uncover a tab of still-hidden mass
-   beside it. */
-.ss-pour-mass {
-  animation: ss-pour-mass-in 1.15s cubic-bezier(0.3, 0.62, 0.28, 1) 0.15s both;
-}
-
-@keyframes ss-pour-mass-in {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-/* A run strings out quickly as the bead breaks away, then the paint's own
-   weight fights its viscosity and it creeps the last stretch — hence the
-   fast entry and very long settle. */
-.ss-pour-run {
-  animation: ss-pour-run-in var(--dur, 4s) cubic-bezier(0.24, 0.58, 0.2, 1)
-    var(--delay, 0s) both;
-}
-
-@keyframes ss-pour-run-in {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-/* Rides the same descending front as its run's window, on the same timing,
-   so the reveal's leading edge is this circle's arc — a growing run ends in
-   a round tip instead of a square cut. */
-.ss-pour-tip {
-  will-change: transform;
-  animation: ss-pour-tip-in var(--dur, 4s) cubic-bezier(0.24, 0.58, 0.2, 1)
-    var(--delay, 0s) both;
-}
-
-@keyframes ss-pour-tip-in {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(var(--travel, 0px));
-  }
-}
-
-/* Paint gathering in the bottom corners rises behind a level front, the way
-   standing liquid does. */
-.ss-pour-pool {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  will-change: transform;
-  animation: ss-pour-pool-in 1.9s cubic-bezier(0.26, 0.6, 0.24, 1)
-    var(--delay, 0s) both;
-}
-
-@keyframes ss-pour-pool-in {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-/* Loose droplets simply appear, the way one does when it snaps off. */
-.ss-pour-fleck {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  animation: ss-pour-fleck-in 0.28s ease-out var(--delay, 0s) both;
-}
-
-@keyframes ss-pour-fleck-in {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
 /* ── Centre ───────────────────────────────────────────────────────────── */
 
 .ss-splash-centre {
@@ -371,54 +254,19 @@ html[data-splash="showing"] body {
   }
 }
 
-/* A slab of the same caramel, with the label knocked out of it: lit along the
-   top edge, turning under at the bottom, and shedding one drip off the right
-   the way a poured shape does. The corner radii are deliberately unequal —
-   paint does not set to a rectangle. */
+/* The same solid button the rest of the shop uses for its primary action. */
 .ss-splash-enter {
-  position: relative;
-  background: linear-gradient(
-    180deg,
-    #ebaa76 0%,
-    #dd8d50 32%,
-    #d4844a 68%,
-    #be6d38 100%
-  );
-  color: #221005;
-  padding: 1.05rem 2.6rem;
+  background-color: var(--ss-orange);
+  color: #120c00;
+  padding: 1rem 2.5rem;
   font-size: 0.8rem;
   cursor: pointer;
-  border-radius: 17px 23px 15px 21px / 21px 15px 23px 17px;
-  box-shadow:
-    inset 0 3px 0 rgb(255 244 219 / 70%),
-    inset 0 -3px 0 rgb(122 66 14 / 40%),
-    0 10px 20px rgb(0 0 0 / 45%);
-  transition: filter 0.2s ease;
+  transition: background-color 0.2s ease;
   animation: ss-splash-cta 0.7s ease 0.85s both;
 }
 
-/* The drip. Sits under the slab's own bottom edge, so it reads as paint that
-   has run off it rather than a tab stuck on. */
-.ss-splash-enter::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  right: 17%;
-  width: 13px;
-  height: 30px;
-  margin-top: -4px;
-  border-radius: 30% 30% 50% 50% / 8% 8% 44% 44%;
-  background: linear-gradient(
-    90deg,
-    #9a5026 0%,
-    #e1975f 30%,
-    #d4844a 62%,
-    #a1552b 100%
-  );
-}
-
 .ss-splash-enter:hover {
-  filter: brightness(1.08);
+  background-color: var(--ss-orange-hot);
 }
 
 @keyframes ss-splash-cta {
@@ -445,27 +293,12 @@ html[data-splash="showing"] body {
 .ss-splash-flood {
   position: absolute;
   inset: -2px;
-  /* The pour's own body colour, not the brand orange: the flood comes up
-     behind the drips and any difference between them reads as two paints. */
-  background-color: #dd8d50;
+  background-color: var(--ss-orange);
   opacity: 0;
   pointer-events: none;
 }
 
-/* Phase one: the pour surges the rest of the way down the card and the
-   flood comes up under it, so strands and flood become one sheet of
-   orange. The pour already spans the full height, so this is a short
-   shove rather than the long stretch the top-edge band used to need. */
-.ss-splash[data-state="leaving"] .ss-pour {
-  animation: ss-pour-flood 0.52s cubic-bezier(0.5, 0, 0.9, 0.4) both;
-}
-
-@keyframes ss-pour-flood {
-  to {
-    transform: scaleY(1.5);
-  }
-}
-
+/* Phase one: the flood fills the whole card in the brand orange. */
 .ss-splash[data-state="leaving"] .ss-splash-flood {
   animation: ss-flood-fill 0.42s ease-in 0.16s both;
 }
@@ -512,29 +345,10 @@ html[data-splash="showing"] body {
     animation: none !important;
   }
 
-  /* The paint holds its fully settled shape instead of pouring in. */
-  .ss-pour-mass,
-  .ss-pour-run,
-  .ss-pour-pool,
-  .ss-pour-fleck {
-    /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
-    animation: none !important;
-    transform: scaleY(1);
-  }
-
-  /* Each tip circle parks at the end of its own run's travel, so the settled
-     silhouette matches the animated one exactly. */
-  .ss-pour-tip {
-    /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
-    animation: none !important;
-    transform: translateY(var(--travel, 0px));
-  }
-
   .ss-splash[data-state="leaving"] {
     animation: ss-splash-fade 0.25s linear both;
   }
 
-  .ss-splash[data-state="leaving"] .ss-pour,
   .ss-splash[data-state="leaving"] .ss-splash-flood,
   .ss-splash[data-state="leaving"] .ss-splash-centre {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
@@ -548,7 +362,7 @@ html[data-splash="showing"] body {
   }
 }
 
-/* Stacking: paint over the drips-free ground, controls over the paint. */
+/* Stacking: the ground at the bottom, controls and flood above it. */
 .ss-splash-backdrop {
   z-index: 4;
 }
