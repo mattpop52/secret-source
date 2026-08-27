@@ -225,259 +225,58 @@ html[data-splash="showing"] body {
 
 /* ── Centre ───────────────────────────────────────────────────────────── */
 
-/* Everything in here — the picture and everything drawn over it — is inert:
-   pointer-events are off so a click passes straight through to the full-card
-   button behind it (see .ss-splash-backdrop). The one exception is the
-   labelled button (.ss-splash-cta), which switches pointer-events back on for
-   itself and needs this whole layer stacked above the backdrop to be
-   reachable at all. */
 .ss-splash-centre {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
+  padding: 12vw 8vw;
 }
 
-/* The picture and the wordmark sitting on it have to stay in register at every
-   viewport, so both are placed inside a plate pinned to the picture's own
-   aspect ratio rather than against the card. Below roughly tablet width the
-   plate is grown until it covers the card, spilling over whichever axis is
-   short — the picture's ratio is close enough to a phone's that only a sliver
-   is lost. From tablet width up that same crop would hide most of a portrait
-   picture on a landscape screen, so it sits at its own size over the tiled
-   ground instead. 46.164vh is 704/1525 of the viewport height: the width at
-   which the plate is exactly tall enough to cover.
-
-   Centred with auto margins rather than a translate, because the entrance
-   animation sets transform and would overwrite it; auto margins go negative
-   when the plate is wider than the card, so it stays centred as it overflows. */
-.ss-splash-plate {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  aspect-ratio: 704 / 1525;
-  width: max(100%, 46.164vh);
+.ss-splash-wordmark {
+  width: clamp(240px, 58vw, 720px);
+  height: auto;
+  filter: drop-shadow(0 18px 30px rgb(0 0 0 / 70%));
   animation: ss-splash-word 1s cubic-bezier(0.16, 0.84, 0.32, 1) 0.28s both;
-}
-
-/* The three terms are the same cap as before, expressed as widths so the
-   aspect ratio derives the height: 90vw, 88vh, and 880px tall. */
-@media (min-width: 768px) {
-  .ss-splash-plate {
-    width: min(90vw, 40.62vh, 406px);
-  }
-}
-
-.ss-splash-pour {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* The lettering is not left to the picture: the pour was rendered with the
-   wordmark garbled into it, so that band is shaded out in the JPEG and the
-   real logo — lifted off the original artwork — is laid back over it here, at
-   its own resolution rather than the picture's. These offsets are where the
-   wordmark sits within the 704x1525 plate, so the two stay locked together
-   however the plate is scaled. */
-.ss-splash-mark {
-  position: absolute;
-  left: 21.165%;
-  top: 35.869%;
-  width: 57.386%;
-  height: auto;
-}
-
-/* ── The pour, running ────────────────────────────────────────────────── */
-
-/* The pour is a photograph, so it is made to flow rather than redrawn: bands
-   of light travel down it, clipped to the caramel by a mask cut from the
-   picture itself. Only a transform animates, so the whole thing stays on the
-   compositor — the filter-driven attempt at this ran at four frames a second. */
-.ss-splash-sheen {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  -webkit-mask: url("/brand/splash-pour-mask.png") 0 0 / 100% 100% no-repeat;
-  mask: url("/brand/splash-pour-mask.png") 0 0 / 100% 100% no-repeat;
-}
-
-/* Kept faint on purpose: caramel this thick carries a slow, soft gloss, and
-   anything stronger reads as grey bars laid across the picture. */
-.ss-splash-sheen-band {
-  position: absolute;
-  inset: -100% 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgb(255 233 196 / 0%) 0,
-    rgb(255 233 196 / 5%) 3.4%,
-    rgb(255 233 196 / 15%) 6.2%,
-    rgb(255 233 196 / 5%) 9%,
-    rgb(255 233 196 / 0%) 12.4%,
-    rgb(255 233 196 / 0%) 16.667%
-  );
-  mix-blend-mode: overlay;
-  animation: ss-pour-run 6.5s linear infinite;
-}
-
-/* The band is three cards tall and its gradient repeats every sixth of that,
-   so sliding it by one sixth of itself lands exactly on the next repeat. */
-@keyframes ss-pour-run {
-  to {
-    transform: translate3d(0, 16.667%, 0);
-  }
-}
-
-/* ── The pour, lengthening ────────────────────────────────────────────── */
-
-/* The lower run of caramel — the column under the pill and the drop at its
-   end — is cut from the photograph and laid back exactly over itself as one
-   connected body in two pieces: the column, and the drop carrying a run of
-   column as its neck. The column stretches from its anchored top; the drop
-   rides its far end. Both run on the same clock and easing, and the drop's
-   travel equals the column's added length — 152 plate-px of column gaining
-   6x is 912, which is 325.714% of the drop piece's 280 plate-px height — so the
-   two never part: the whole run lengthens as one movement until it has
-   poured off the bottom of the screen. Where the pieces overlap they share
-   the column's constant cross-section, cut from the same pixels, so no join
-   shows at rest or in motion. All positions are in the plate's coordinates
-   (the cut spans 276..436 across of 704) so registration holds everywhere. */
-.ss-splash-taffy {
-  position: absolute;
-  left: 39.205%;
-  top: 66.557%;
-  width: 22.727%;
-  transform-origin: 50% 0;
-  pointer-events: none;
-  animation: ss-taffy-stretch 8s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
-}
-
-.ss-splash-fall {
-  position: absolute;
-  left: 39.205%;
-  top: 72.131%;
-  width: 22.727%;
-  pointer-events: none;
-  animation: ss-taffy-fall 8s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
-}
-
-.ss-splash-taffy img,
-.ss-splash-fall img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* 7x carries the column's end past the bottom of the screen on every
-   reasonable viewport; the card clips the overhang. One shot, held: caramel
-   that has reached the floor does not climb back up. */
-@keyframes ss-taffy-stretch {
-  from {
-    transform: scaleY(1);
-  }
-  to {
-    transform: scaleY(7);
-  }
-}
-
-@keyframes ss-taffy-fall {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(0, 325.714%, 0);
-  }
 }
 
 @keyframes ss-splash-word {
   from {
     opacity: 0;
-    transform: scale(0.97);
+    transform: scale(0.94) translateY(10px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
-/* ── The button ───────────────────────────────────────────────────────── */
-
-/* "ENTER THE SHOP" used to be baked into the photograph — a handful of pixels
-   at 704px wide, blurred further by scaling and JPEG compression. That text is
-   now erased from the picture (inpainted into the pill's own gloss) and set
-   here instead, in the brand's real label type, sharp at any size, with real
-   press feedback. The pill artwork itself is untouched — only the label and
-   its glow sit on top of it. Sized and placed from the pill's own measured
-   bounds — 245..505 of 704 across the text band, 848..924 down — with room
-   either side for a comfortable target rather than only the printed letters.
-   pointer-events is switched back on here because .ss-splash-centre, its
-   containing block, turns it off for everything else in the plate (see
-   above) so a click there falls through to the full-card button behind it. */
-.ss-splash-cta {
-  position: absolute;
-  left: 34.09%;
-  top: 55.74%;
-  width: 33%;
-  height: 4.46%;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
+/* The same solid button the rest of the shop uses for its primary action. */
+.ss-splash-enter {
+  background-color: var(--ss-orange);
+  color: #120c00;
+  padding: 1rem 2.5rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  background: transparent;
-  border: 0;
-  border-radius: 999px;
-  padding: 0;
-  color: #3f1400;
-  font-family: var(--font-ss-stencil), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.62rem, 2.2vw + 0.3rem, 0.85rem);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: transform 0.15s ease;
+  transition: background-color 0.2s ease;
+  animation: ss-splash-cta 0.7s ease 0.85s both;
 }
 
-@media (min-width: 768px) {
-  .ss-splash-cta {
-    font-size: 0.8rem;
+.ss-splash-enter:hover {
+  background-color: var(--ss-orange-hot);
+}
+
+@keyframes ss-splash-cta {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-}
-
-/* A sheen the pill itself does not have: it brightens under the label on
-   hover and focus, the way a pressable surface catches the light, without
-   moving the photograph underneath it. */
-.ss-splash-cta::before {
-  content: "";
-  position: absolute;
-  inset: -18% -12%;
-  border-radius: 999px;
-  background: radial-gradient(
-    60% 100% at 50% 30%,
-    rgb(255 244 214 / 55%) 0%,
-    rgb(255 244 214 / 0%) 70%
-  );
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-}
-
-.ss-splash-cta:hover::before,
-.ss-splash-cta:focus-visible::before {
-  opacity: 1;
-}
-
-.ss-splash-cta:active {
-  transform: scale(0.95);
-}
-
-@media (hover: none) {
-  .ss-splash-cta::before {
-    display: none;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -540,10 +339,8 @@ html[data-splash="showing"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-splash-ground,
-  .ss-splash-plate,
-  .ss-splash-sheen-band,
-  .ss-splash-taffy,
-  .ss-splash-fall {
+  .ss-splash-wordmark,
+  .ss-splash-enter {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
     animation: none !important;
   }
@@ -565,12 +362,15 @@ html[data-splash="showing"] body {
   }
 }
 
-/* Stacking: the ground and vignette sit unlayered at the bottom; the full-card
-   button (z-index unset, so 0) sits above them; the picture and its labelled
-   button (.ss-splash-centre, z-index 2) sit above that so the label is
-   reachable — see the pointer-events note on .ss-splash-centre for how clicks
-   still fall through to the full-card button everywhere else; the flood tops
-   everything for the exit. */
+/* Stacking: the ground at the bottom, controls and flood above it. */
+.ss-splash-backdrop {
+  z-index: 4;
+}
+
+.ss-splash-centre {
+  z-index: 5;
+}
+
 .ss-splash-flood {
-  z-index: 3;
+  z-index: 6;
 }
