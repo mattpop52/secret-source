@@ -225,9 +225,17 @@ html[data-splash="showing"] body {
 
 /* ── Centre ───────────────────────────────────────────────────────────── */
 
+/* Everything in here — the picture and everything drawn over it — is inert:
+   pointer-events are off so a click passes straight through to the full-card
+   button behind it (see .ss-splash-backdrop). The one exception is the
+   labelled button (.ss-splash-cta), which switches pointer-events back on for
+   itself and needs this whole layer stacked above the backdrop to be
+   reachable at all. */
 .ss-splash-centre {
   position: absolute;
   inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* The picture and the wordmark sitting on it have to stay in register at every
@@ -395,6 +403,84 @@ html[data-splash="showing"] body {
   }
 }
 
+/* ── The button ───────────────────────────────────────────────────────── */
+
+/* "ENTER THE SHOP" used to be baked into the photograph — a handful of pixels
+   at 704px wide, blurred further by scaling and JPEG compression. That text is
+   now erased from the picture (inpainted into the pill's own gloss) and set
+   here instead, in the brand's real label type, sharp at any size, with real
+   press feedback. The pill artwork itself is untouched — only the label and
+   its glow sit on top of it. Sized and placed from the pill's own measured
+   bounds — 245..505 of 704 across the text band, 848..924 down — with room
+   either side for a comfortable target rather than only the printed letters.
+   pointer-events is switched back on here because .ss-splash-centre, its
+   containing block, turns it off for everything else in the plate (see
+   above) so a click there falls through to the full-card button behind it. */
+.ss-splash-cta {
+  position: absolute;
+  left: 34.09%;
+  top: 55.74%;
+  width: 33%;
+  height: 4.46%;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  color: #3f1400;
+  font-family: var(--font-ss-stencil), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.62rem, 2.2vw + 0.3rem, 0.85rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .ss-splash-cta {
+    font-size: 0.8rem;
+  }
+}
+
+/* A sheen the pill itself does not have: it brightens under the label on
+   hover and focus, the way a pressable surface catches the light, without
+   moving the photograph underneath it. */
+.ss-splash-cta::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  border-radius: 999px;
+  background: radial-gradient(
+    60% 100% at 50% 30%,
+    rgb(255 244 214 / 55%) 0%,
+    rgb(255 244 214 / 0%) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.ss-splash-cta:hover::before,
+.ss-splash-cta:focus-visible::before {
+  opacity: 1;
+}
+
+.ss-splash-cta:active {
+  transform: scale(0.95);
+}
+
+@media (hover: none) {
+  .ss-splash-cta::before {
+    display: none;
+  }
+}
+
 /* ── The exit ─────────────────────────────────────────────────────────── */
 
 .ss-splash-backdrop {
@@ -479,18 +565,12 @@ html[data-splash="showing"] body {
   }
 }
 
-/* Stacking: the ground at the bottom, then the picture, then the button that
-   makes the whole card clickable (it has to sit above the picture, not below
-   it, or the picture would block clicks from ever reaching it), then the
-   flood on top of everything for the exit. */
-.ss-splash-centre {
-  z-index: 4;
-}
-
-.ss-splash-backdrop {
-  z-index: 5;
-}
-
+/* Stacking: the ground and vignette sit unlayered at the bottom; the full-card
+   button (z-index unset, so 0) sits above them; the picture and its labelled
+   button (.ss-splash-centre, z-index 2) sit above that so the label is
+   reachable — see the pointer-events note on .ss-splash-centre for how clicks
+   still fall through to the full-card button everywhere else; the flood tops
+   everything for the exit. */
 .ss-splash-flood {
-  z-index: 6;
+  z-index: 3;
 }

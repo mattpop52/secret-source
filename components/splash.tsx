@@ -109,9 +109,9 @@ export function Splash() {
 
       <div className="ss-splash-centre">
         <div className="ss-splash-plate">
-          {/* Decorative: the pour, the tiled ground and the drawn-in button are
-              scenery. Everything it says is said by the wordmark's alt text and
-              the button's label below. */}
+          {/* Decorative: the pour and the tiled ground are scenery, with no
+              text of their own any more. Everything it says is said by the
+              wordmark's alt text and the labelled button below. */}
           <Image
             alt=""
             className="ss-splash-pour"
@@ -158,17 +158,30 @@ export function Splash() {
             src="/brand/splash-wordmark.png"
             width={1600}
           />
+
+          {/* "Enter the shop" used to be baked into the photograph — a few
+              dozen pixels of type, blurred by scaling and JPEG compression.
+              It is set here instead, in the brand's real label type, over the
+              pill drawn into the picture (which no longer carries any text of
+              its own), so it is sharp at any size and gets real press
+              feedback. Everything else in the plate is inert (see
+              .ss-splash-centre below) so this is the one thing in the picture
+              a pointer can actually land on. */}
+          <button className="ss-splash-cta" onClick={enter} type="button">
+            Enter the shop
+          </button>
         </div>
       </div>
 
-      {/* The whole card is the door — a real button, so it is reachable by
-          keyboard and announced, rather than a div with a click handler. It
-          sits above the picture (which is otherwise inert) so the entire
-          card is clickable, not just the button drawn into the image. */}
+      {/* The whole card is also a door: a click or tap anywhere on it works.
+          It is hidden from screen readers and keyboard tabbing, since the
+          labelled button above is the one control worth landing on with a
+          keyboard or hearing announced. */}
       <button
-        aria-label="Enter the shop"
+        aria-hidden="true"
         className="ss-splash-backdrop"
         onClick={enter}
+        tabIndex={-1}
         type="button"
       />
 
