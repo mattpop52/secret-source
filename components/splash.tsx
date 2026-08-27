@@ -9,9 +9,14 @@ const SEEN_KEY = "ss-splash-v1";
 const EXIT_MS = 1150;
 
 /**
- * The landing card: tiled monogram ground and the wordmark. Shown once per
- * session, then the screen floods and falls away to reveal the shop already
- * sitting underneath it.
+ * The landing card: tiled monogram ground behind a single rendered image —
+ * the caramel pour, wordmark and "Enter the shop" button all baked into one
+ * picture rather than built from live shapes. On a phone-shaped viewport it
+ * fills edge to edge (its own aspect ratio is close enough to a phone's that
+ * the crop is unnoticeable); on anything wider it sits centred at its own
+ * aspect ratio, so the tiled ground shows through at the sides instead of
+ * stretching or cropping the picture. Shown once per session, then the
+ * screen floods and falls away to reveal the shop already sitting under it.
  */
 export function Splash() {
   const [phase, setPhase] = useState<"in" | "leaving" | "gone">("in");
@@ -100,34 +105,27 @@ export function Splash() {
       <div className="ss-splash-ground" />
       <div className="ss-splash-vignette" />
 
+      <div className="ss-splash-centre">
+        <Image
+          alt="Secret Source — your plug for all drip necessities. Enter the shop."
+          className="ss-splash-pour"
+          height={1525}
+          priority
+          src="/brand/splash-pour.jpg"
+          width={704}
+        />
+      </div>
+
       {/* The whole card is the door — a real button, so it is reachable by
-          keyboard and announced, rather than a div with a click handler. */}
+          keyboard and announced, rather than a div with a click handler. It
+          sits above the picture (which is otherwise inert) so the entire
+          card is clickable, not just the button drawn into the image. */}
       <button
         aria-label="Enter the shop"
         className="ss-splash-backdrop"
         onClick={enter}
-        tabIndex={-1}
         type="button"
       />
-
-      <div className="ss-splash-centre">
-        <Image
-          alt="Secret Source — your plug for all drip necessities"
-          className="ss-splash-wordmark"
-          height={732}
-          priority
-          src="/brand/splash-wordmark.png"
-          width={1148}
-        />
-
-        <button
-          className="ss-splash-enter ss-stencil"
-          onClick={enter}
-          type="button"
-        >
-          Enter the shop
-        </button>
-      </div>
 
       {/* The flood: hidden until the exit, then it swallows the card and drops away. */}
       <div className="ss-splash-flood" />
