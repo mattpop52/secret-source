@@ -6,11 +6,16 @@ import { PAINT_SHAPES } from "@/lib/paint-shapes";
  *
  * The top corners have somewhere to drip to, so they are photographs of the
  * banner's own paint (public/brand/paint-tl.png, paint-tr.png — pixels cut
- * straight out of the artwork) stretched vertically from an anchored top
- * edge, the same way the splash's caramel pour is lengthened: one element,
- * one scaleY, no shape drawn that was not already there. The bottom
- * corners cannot drip upward, so they stay the static vector silhouettes
- * traced from the artwork (lib/paint-shapes.ts) and only breathe.
+ * straight out of the artwork, at 4x the source banner's own resolution so
+ * the later CSS stretch has real pixels to work with instead of upscaling
+ * an already-small crop) stretched vertically from an anchored top edge,
+ * the same way the splash's caramel pour is lengthened: one element, one
+ * height animation, no shape drawn that was not already there. unoptimized
+ * on both — Next's own pipeline would otherwise pick a variant sized for
+ * the element's intrinsic width/height and miss that the stretch displays
+ * it far taller. The bottom corners cannot drip upward, so they stay the
+ * static vector silhouettes traced from the artwork (lib/paint-shapes.ts)
+ * and only breathe.
  *
  * An earlier version of this drew a whole parametric system on top of the
  * artwork — tapered stem paths, radial-gradient heads, catchlights, gather
@@ -25,10 +30,11 @@ export function LiquidPaint() {
         <Image
           alt=""
           className="ss-paint-stretch"
-          height={172}
+          height={688}
           priority
           src="/brand/paint-tl.png"
-          width={275}
+          unoptimized
+          width={1100}
         />
       </div>
 
@@ -36,10 +42,11 @@ export function LiquidPaint() {
         <Image
           alt=""
           className="ss-paint-stretch"
-          height={234}
+          height={936}
           priority
           src="/brand/paint-tr.png"
-          width={220}
+          unoptimized
+          width={880}
         />
       </div>
 
