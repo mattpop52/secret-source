@@ -19,7 +19,6 @@ export function SiteFooter() {
   const { t } = useLanguage();
 
   const HELP_LINKS = [
-    { href: "/authenticity", label: t("legitCheck") },
     { href: "/help#delivery", label: t("delivery") },
     { href: "/help#returns", label: t("returns") },
     { href: "/help#sizing", label: t("sizing") },

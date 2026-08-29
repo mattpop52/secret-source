@@ -19,7 +19,6 @@ import {
 import {
   DELIVERY_WINDOW,
   FREE_SHIPPING_THRESHOLD,
-  RETURNS_WINDOW,
   SHOP_INSTAGRAM,
   SHOP_INSTAGRAM_URL,
 } from "@/lib/constants";
@@ -46,21 +45,6 @@ function formatBrandList(brands: { name: string }[]): string {
   const remaining = names.length - LIMIT;
   return `${shown.join(", ")} and ${remaining} more brand${remaining === 1 ? "" : "s"}`;
 }
-
-const CHECKS = [
-  {
-    title: "In hand before it's listed",
-    body: "Nothing on this shelf is a pre-order or a group buy. If it's up, it's boxed in the room and it ships this week.",
-  },
-  {
-    title: "Checked piece by piece",
-    body: "Stitching, tags, hardware, box, and the receipt trail behind it. Anything that doesn't sit right never makes the shelf.",
-  },
-  {
-    title: "Backed after it lands",
-    body: `Not right? ${RETURNS_WINDOW} to send it back. Not authentic? Full refund, no argument, and you keep the receipts.`,
-  },
-];
 
 const STEPS = [
   {
@@ -128,12 +112,6 @@ export default function SecretSourceHome() {
                 href="/collections/all"
               >
                 Shop the shelf
-              </Link>
-              <Link
-                className="ss-stencil border border-[var(--ss-hairline-strong)] px-8 py-4 text-[0.8rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
-                href="/authenticity"
-              >
-                How we legit check
               </Link>
             </div>
 
@@ -347,43 +325,6 @@ export default function SecretSourceHome() {
         </div>
       </Section>
 
-      {/* ── Legit check ───────────────────────────────────────────────── */}
-      <Section>
-        <SectionHeading
-          index="03"
-          label="Why people order twice"
-          title={
-            <>
-              Checked before it's
-              <br />
-              anywhere near you
-            </>
-          }
-        />
-
-        <div className="mt-10 grid gap-px bg-[var(--ss-hairline)] lg:grid-cols-3">
-          {CHECKS.map((check) => (
-            <article
-              className="bg-[var(--ss-black)] px-7 py-8"
-              key={check.title}
-            >
-              <PlugMark className="size-7 text-[var(--ss-orange)]" />
-              <h3 className="ss-display mt-5 text-2xl">{check.title}</h3>
-              <p className="mt-3 text-[var(--ss-smoke)] text-sm leading-relaxed">
-                {check.body}
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <Link
-          className="ss-stencil mt-8 inline-block border border-[var(--ss-hairline-strong)] px-6 py-3.5 text-[0.7rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
-          href="/authenticity"
-        >
-          Read the full legit check
-        </Link>
-      </Section>
-
       <TapeMarquee
         items={["No bots", "No queues", "No maybes", "Just the plug"]}
         tone="outline"
@@ -391,7 +332,7 @@ export default function SecretSourceHome() {
 
       {/* ── How it works ──────────────────────────────────────────────── */}
       <Section>
-        <SectionHeading index="04" label="Ordering" title="Three steps, done" />
+        <SectionHeading index="03" label="Ordering" title="Three steps, done" />
 
         <ol className="mt-10 grid gap-px bg-[var(--ss-hairline)] lg:grid-cols-3">
           {STEPS.map((step) => (

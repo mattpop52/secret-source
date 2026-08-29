@@ -162,12 +162,6 @@ export default async function ProductPage({
                 </li>
               ))}
             </ul>
-            <Link
-              className="ss-stencil mt-5 inline-block text-[0.62rem] text-[var(--ss-bone)] underline underline-offset-4 transition-colors hover:text-[var(--ss-orange)]"
-              href="/authenticity"
-            >
-              How the legit check works
-            </Link>
           </div>
         </div>
 
@@ -263,14 +257,7 @@ export default async function ProductPage({
                 Docket {product.code} is checked in-house before it reaches the
                 shelf — construction, hardware, tagging, packaging and the trail
                 behind it. If anything you receive doesn't hold up, it comes
-                back for a full refund.{" "}
-                <Link
-                  className="text-[var(--ss-bone)] underline underline-offset-4"
-                  href="/authenticity"
-                >
-                  How the check works
-                </Link>
-                .
+                back for a full refund.
               </p>
             </details>
 

@@ -8,7 +8,6 @@ import type { LanguageCode } from "./i18n";
 
 export type TranslationKey =
   | "openMenu"
-  | "legitCheck"
   | "basket"
   | "everything"
   | "everythingInStock"
@@ -70,7 +69,6 @@ type Dictionary = Record<TranslationKey, string>;
 
 const en: Dictionary = {
   openMenu: "Open menu",
-  legitCheck: "Legit check",
   basket: "Basket",
   everything: "Everything",
   everythingInStock: "Everything in stock",
@@ -138,7 +136,6 @@ const en: Dictionary = {
 
 const fr: Dictionary = {
   openMenu: "Ouvrir le menu",
-  legitCheck: "Contrôle d'authenticité",
   basket: "Panier",
   everything: "Tout",
   everythingInStock: "Tout le stock",
@@ -209,7 +206,6 @@ const fr: Dictionary = {
 
 const es: Dictionary = {
   openMenu: "Abrir menú",
-  legitCheck: "Verificación de autenticidad",
   basket: "Cesta",
   everything: "Todo",
   everythingInStock: "Todo el stock",
@@ -279,7 +275,6 @@ const es: Dictionary = {
 
 const de: Dictionary = {
   openMenu: "Menü öffnen",
-  legitCheck: "Echtheitsprüfung",
   basket: "Warenkorb",
   everything: "Alles",
   everythingInStock: "Gesamter Bestand",

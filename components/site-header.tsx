@@ -76,12 +76,6 @@ export function SiteHeader() {
           <div className="hidden sm:block">
             <RegionPicker variant="compact" />
           </div>
-          <Link
-            className="ss-stencil hidden whitespace-nowrap px-3 py-2 text-[0.62rem] text-[var(--ss-bone)]/70 transition-colors hover:text-[var(--ss-orange)] sm:block"
-            href="/authenticity"
-          >
-            {t("legitCheck")}
-          </Link>
           <button
             className="ss-stencil flex items-center gap-2 border border-[var(--ss-hairline-strong)] px-4 py-2.5 text-[0.7rem] transition-colors hover:border-[var(--ss-orange)] hover:text-[var(--ss-orange)]"
             onClick={openCart}

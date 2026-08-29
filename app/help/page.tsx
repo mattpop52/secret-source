@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Price } from "@/components/price";
 import {
   DELIVERY_WINDOW,
@@ -185,12 +184,6 @@ export default function HelpPage() {
               >
                 {SHOP_EMAIL}
               </a>
-              <Link
-                className="ss-stencil px-6 py-2 text-center text-[0.62rem] text-[var(--ss-smoke)] underline-offset-4 hover:text-[var(--ss-bone)] hover:underline"
-                href="/authenticity"
-              >
-                Read the legit check
-              </Link>
             </div>
           </div>
         </section>
