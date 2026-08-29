@@ -99,46 +99,47 @@ float sdRoundCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
    early, then a tail that never quite stops. */
 float ease(float x){ return 1.0 - pow(1.0 - clamp(x, 0.0, 1.0), 2.8); }
 
-/* The fraction of a run's cycle spent lengthening, before the front gets too
-   heavy and lets go. */
-const float RELEASE = 0.78;
+/* A run, on a loop that only ever goes downward.
 
-/* One run, on a loop. It lengthens while sauce arrives faster than it drains,
-   the front gathers into a bead, the bead gets too heavy and goes, and what
-   is left — lighter now — draws back up before the next lot comes down. That
-   is the whole cycle of a real drip, and it is why this can repeat without
-   ever looking like it restarted. */
-float runSdf(vec2 p, vec2 top, float len, float w0, float w1, float t0, float period){
+   The head leaves the mass and travels the whole height of the card and out
+   of the bottom of it; once it is gone the tail lifts off the mass and
+   follows it out, and the next one starts from nothing. Nothing is ever
+   drawn back up. A drip that retracts reads as a rewind, and a rewind is the
+   one thing that gives a loop away — so the cycle is not extend-and-retract
+   but a whole rivulet crossing the page and leaving.
+
+   Bounded on x first: a run is narrow, and it is the only part of the field
+   that reaches the full height, so without this every pixel down the middle
+   of the card would pay for all five of them. */
+float runSdf(vec2 q, float x, float y0, float travel, float w0, float w1,
+             float t0, float period, float grow){
+  if (abs(q.x - x) > 0.5 + grow) return 1e5;
+
   float ph = fract((uTime + t0) / period);
-  float g = ph < RELEASE
-    ? mix(0.26, 1.0, ease(ph / RELEASE))
-    : mix(1.0, 0.26, smoothstep(0.0, 1.0, (ph - RELEASE) / (1.0 - RELEASE)));
-  vec2  end = top + vec2(0.0, len * g);
-  float body = sdRoundCone(p, top, end, w0, w1);
-  /* The bead swells as the run slows: mass arriving faster than it drains. */
-  float bead = sdCircle(p, end, w1 * (0.85 + 0.62 * g));
+  /* The head is off the bottom by three quarters of the way through, and the
+     tail only lets go in the last fifth — so a run is on the card for nearly
+     its whole cycle, and for a stretch in the middle it is a stream spanning
+     the full height. Letting the tail leave early was what left the card bare
+     whenever the five happened to line up. */
+  float head = travel * ease(min(ph / 0.74, 1.0));
+  float tail = travel * smoothstep(0.88, 1.0, ph);
+
+  /* While the mass is still feeding it the run leaves at full width; once it
+     has let go, that end closes up like the far one. */
+  float att = 1.0 - smoothstep(0.88, 0.98, ph);
+
+  vec2 a = vec2(x, y0 + tail);
+  /* head and tail meet at both ends of the cycle, and a cone of zero length
+     has no direction — hold them apart by half a width. */
+  vec2 b = vec2(x, y0 + max(head, tail + w1 * 0.5));
+
+  float body = sdRoundCone(q, a, b, mix(w1 * 1.15, w0, att), w1);
+  /* The front gathers weight as it goes: the bead is what reads as falling
+     rather than as a line being drawn. */
+  float bead = sdCircle(q, b, w1 * (0.95 + 0.55 * min(ph / 0.74, 1.0)));
   return smin(body, bead, w1 * 1.1);
 }
 
-/* The drop a run has just let go of, on that run's own clock so the two are
-   one event: it leaves at the moment the run starts drawing back up, then
-   accelerates and draws out as it falls. */
-float dropSdf(vec2 p, float x, float tip, float r, float fall, float t0, float period){
-  float ph = fract((uTime + t0) / period);
-  if (ph < RELEASE) return 1e5;
-  float u = (ph - RELEASE) / (1.0 - RELEASE);
-  float v = u * u;
-  float st = 1.0 + v * 3.0;
-  vec2  q = (p - vec2(x, tip + v * fall)) / vec2(1.0, st);
-  return (length(q) - r) / st;
-}
-
-/* Every corner is built the same way in its own frame, with the corner at the
-   origin and both axes running inward — one description used four times, so
-   the card cannot end up subtly different corner to corner. A slab bled off
-   both edges keeps the corner solid and says the paint came from outside the
-   card; the lobes inside the frame are what make it a shape rather than a
-   fillet, so the blend stays tight enough that each one still reads. */
 /* Lobes wider than they are tall, because sauce spreads under its own weight
    rather than holding a ball. Cheap ellipse: unit-circle test in squashed
    space, scaled back by the smaller semi-axis, which under-reads the distance
@@ -156,12 +157,14 @@ float corner(vec2 q, float k, float a, float b, float c){
 }
 
 /* Distance to the paint, in units of the master scale.
-   Each corner is skipped outright for pixels it cannot reach. A fragment is
-   near at most one corner, so this is close to a four-fold saving on the part
-   of the shader that dominates the frame, and the branches are coherent
-   across a warp because the regions are large and contiguous. The bounds
-   carry enough slack for the contact shadow, which is sampled at an offset,
-   and they grow with the flood. */
+
+   Each corner mass is skipped outright for pixels it cannot reach, and each
+   run is skipped for every column it does not fall down. A fragment is near
+   at most one corner and at most one or two runs, so this is close to a
+   four-fold saving on the part of the shader that dominates the frame, and
+   the branches are coherent across a warp because the regions are large and
+   contiguous. The bounds carry enough slack for the contact shadow, which is
+   sampled at an offset, and they grow with the flood. */
 float paintSdf(vec2 P){
   float W = uRes.x / uScale;
   float H = uRes.y / uScale;
@@ -170,42 +173,39 @@ float paintSdf(vec2 P){
   float d = 1e5;
 
   vec2 tl = P;
-  if (tl.x < 2.1 + grow && tl.y < 2.8 + grow) {
-    /* Top left: the heaviest, and the only one that runs the whole way down. */
-    float c = corner(tl, k, 0.62, 0.46, 0.33);
-    c = smin(c, runSdf(tl, vec2(0.02,  0.56), 1.72, 0.125, 0.058, 0.00, 5.6), 0.12);
-    c = smin(c, runSdf(tl, vec2(0.70,  0.22), 0.98, 0.094, 0.045, 0.50, 6.9), 0.10);
-    c = smin(c, runSdf(tl, vec2(1.26, -0.14), 0.54, 0.068, 0.034, 1.10, 4.8), 0.08);
-    d = c;
-  }
-
   vec2 tr = vec2(W - P.x, P.y);
-  if (tr.x < 2.1 + grow && tr.y < 2.4 + grow) {
-    /* Top right: lighter and shorter, so the card is never symmetrical. */
-    float c = corner(tr, k, 0.54, 0.40, 0.28);
-    c = smin(c, runSdf(tr, vec2(0.04, 0.46), 1.24, 0.108, 0.050, 0.25, 6.2), 0.11);
-    c = smin(c, runSdf(tr, vec2(0.70, 0.12), 0.62, 0.076, 0.036, 0.80, 5.1), 0.09);
-    d = min(d, c);
-  }
-
-  /* The bottom two, where it has gathered. Paint cannot run upward, so
-     nothing hangs off these: they only sit and catch. */
   vec2 bl = vec2(P.x, H - P.y);
+  vec2 br = vec2(W - P.x, H - P.y);
+
+  /* The four masses, which sit still: sauce that has arrived and settled. */
+  if (tl.x < 2.0 + grow && tl.y < 1.5 + grow) {
+    d = corner(tl, k, 0.62, 0.46, 0.33);
+  }
+  if (tr.x < 2.0 + grow && tr.y < 1.4 + grow) {
+    d = min(d, corner(tr, k, 0.54, 0.40, 0.28));
+  }
+  /* Sauce cannot run upward, so nothing hangs off the bottom two: they only
+     sit and catch what comes down. */
   if (bl.x < 2.0 + grow && bl.y < 1.3 + grow) {
     d = min(d, corner(bl, k, 0.50, 0.37, 0.26));
   }
-
-  vec2 br = vec2(W - P.x, H - P.y);
   if (br.x < 2.0 + grow && br.y < 1.3 + grow) {
     d = min(d, corner(br, k, 0.58, 0.43, 0.30));
   }
 
-  /* The drops the two longest runs let go of — same clock, same phase, so
-     each one leaves the tip it came from at the moment that run lets go. */
-  d = min(d, dropSdf(P, 0.02,     2.28, 0.056, H + 1.0, 0.00, 5.6));
-  d = min(d, dropSdf(P, W - 0.04, 1.70, 0.050, H + 1.0, 0.25, 6.2));
+  /* The runs. Each crosses the whole card and leaves it, on its own period so
+     they never fall into step, and each starts inside the lobe that feeds it
+     so the join cannot show. */
+  /* Held off the edges. A run at x≈0 is a continuous stripe down the side of
+     the card for most of its cycle, and that reads as a border rather than as
+     something falling. Each still starts inside the lobe that feeds it. */
+  d = smin(d, runSdf(tl, 0.26,  0.48, H + 0.9, 0.125, 0.058, 0.20, 4.7, grow), 0.12);
+  d = smin(d, runSdf(tl, 0.86,  0.16, H + 1.2, 0.094, 0.045, 2.55, 5.9, grow), 0.10);
+  d = smin(d, runSdf(tl, 1.30, -0.18, H + 1.5, 0.068, 0.034, 4.70, 6.8, grow), 0.08);
+  d = smin(d, runSdf(tr, 0.28,  0.38, H + 1.0, 0.108, 0.050, 1.30, 5.3, grow), 0.11);
+  d = smin(d, runSdf(tr, 0.84,  0.04, H + 1.3, 0.076, 0.036, 3.75, 6.3, grow), 0.09);
 
-  /* The exit: every surface swells until the card is one sheet of paint. */
+  /* The exit: every surface swells until the card is one sheet of sauce. */
   return d - grow;
 }
 
@@ -270,18 +270,32 @@ void main(){
     float hb = sqrt(max(1.0 - ub * ub, 0.0));
 
     /* Normal from the height field. Forward differences: two extra field
-       evaluations rather than four, which matters because this runs for
-       every pixel of the silhouette. */
-    float e = max(px, 0.005);
+       evaluations rather than four, which matters because this runs for every
+       pixel of the silhouette.
+
+       The step is deliberately several pixels rather than one. A difference
+       taken over a single pixel is about the same size as the field's own
+       precision, so whatever the hardware rounds off arrives in the normal
+       multiplied by the reciprocal of the step — which shows up as contour
+       rings banding across every surface, and gets worse on exactly the GPUs
+       that can least afford extra work. Taking the step wider costs a little
+       crispness at the rim and buys a normal that survives mediump.
+
+       Only the direction is kept: for a true distance field the gradient is
+       already unit length, so its magnitude carries no information here and
+       normalising throws away the noisiest part of the measurement. */
+    float e = max(px * 2.0, 0.032);
     vec2  g = vec2(paintSdf(P + vec2(e, 0.0)) - d,
-                   paintSdf(P + vec2(0.0, e)) - d) / e;
+                   paintSdf(P + vec2(0.0, e)) - d);
+    float glen = length(g);
+    vec2  dir = glen > 1e-6 ? g / glen : vec2(0.0);
     float slope = min(u / max(h, 0.10), 7.0)
                 + min(ub / max(hb, 0.10), 3.0) * 0.12;
-    vec3  n = normalize(vec3(g * slope * 1.25, 1.0));
+    vec3  n = normalize(vec3(dir * slope * 1.25, 1.0));
 
     /* The gradient falls below unit length inside a blend, which is exactly
        where two bodies have merged: free occlusion in the creases. */
-    float ao = mix(0.42, 1.0, clamp(length(g) * 1.05, 0.0, 1.0));
+    float ao = mix(0.42, 1.0, clamp(glen / e * 1.05, 0.0, 1.0));
 
     /* The body is still moving, so the surface is never quite flat. Ripples
        ride down it and drag the highlight with them, and that travelling
@@ -290,11 +304,20 @@ void main(){
        carries is streaks along the direction of flow, not a pebbled surface.
        This is also what breaks the highlight into something that travels,
        instead of one round glint sitting still on a dome. */
-    vec2  fp = P * vec2(2.7, 0.85) + vec2(0.0, -uTime * 0.13);
+    /* Coarse on purpose. Finer than this and the normal varies faster than
+       the pixel grid can carry, which does not read as texture — it reads as
+       a cross-hatch crawling over the surface, and it gets worse the further
+       the resolution controller has had to step down. */
+    vec2  fp = P * vec2(1.9, 0.62) + vec2(0.0, -uTime * 0.11);
     float f0 = ripple(fp);
-    vec2  fg = vec2(ripple(fp + vec2(0.13, 0.0)) - f0,
-                    ripple(fp + vec2(0.0, 0.13)) - f0);
-    n = normalize(n + vec3(fg * vec2(3.2, 1.5) * t, 0.0));
+    vec2  fg = vec2(ripple(fp + vec2(0.07, 0.0)) - f0,
+                    ripple(fp + vec2(0.0, 0.07)) - f0);
+    /* Faded out as the buffer gets coarser. The resolution controller steps
+       down on exactly the machines least able to carry fine detail, and a
+       normal perturbation the pixel grid cannot resolve does not read as
+       texture — it reads as the surface crawling. */
+    float fine = clamp(0.0075 / px, 0.0, 1.0);
+    n = normalize(n + vec3(fg * vec2(1.4, 0.7) * t * fine, 0.0));
 
     vec3 V  = vec3(0.0, 0.0, 1.0);
     vec3 L1 = normalize(vec3(-0.46, -0.72, 0.52));
