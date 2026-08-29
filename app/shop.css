@@ -169,9 +169,9 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
-  /* Rendered width of all four corners — the top two named for the
-     stretching photographs, the bottom two for the static pools their
-     growth needs to leave clear (see ss-paint-grow-tl/tr below). */
+  /* Rendered width of each of the four corner masses. Every run's geometry
+     is expressed inside its corner's own viewBox, so these widths scale the
+     runs along with the paint they leave. */
   --mass-tl: clamp(160px, 27.1vw, 420px);
   --mass-tr: clamp(130px, 21.6vw, 340px);
   --mass-bl: clamp(120px, 19.3vw, 300px);
@@ -391,12 +391,21 @@ html[data-splash="showing"] body {
 }
 
 /* ══ Liquid paint ═══════════════════════════════════════════════════════
-   The bottom corners cannot drip upward, so they stay put and only
-   breathe. The top corners have somewhere to drip to: each is a photograph
-   of the banner's own paint (public/brand/paint-tl.png, paint-tr.png),
-   stretched vertically from its anchored top edge — the same move as the
-   splash's caramel pour. One element, one scaleY, no shape drawn that was
-   not already in the artwork. */
+   The four corner masses never move or change shape — they are the banner's
+   own artwork and stay pixel-exact. The only thing that animates is a
+   handful of runs of paint descending out of lobes the artwork already
+   points downward, drawn flat in the paint's own measured colour.
+
+   Two earlier versions of this failed and both failures are instructive.
+   One drew photoreal liquid over the artwork — tapered stems with lit
+   gradients, glossy heads, catchlights — which collided with the fact that
+   this paint is FLAT graphic art (58,080 interior pixels sampled: mean
+   #cb8a29, standard deviation under 7). Photoreal gloss beside flat shapes
+   reads as clip-art pasted on. The other stretched whole corner masses
+   vertically, which scales the wide shoulder at the same rate as the narrow
+   lobe and smears a deliberately drawn silhouette into a blob. Runs avoid
+   both: the geometry is what real paint does, and the rendering is flat,
+   matching the artwork exactly. */
 
 .ss-paint {
   z-index: 2;
@@ -405,30 +414,16 @@ html[data-splash="showing"] body {
   pointer-events: none;
 }
 
-/* Each mass is anchored to its own corner and its ooze breathes from that
-   same corner, so the scale grows inward — the same move as paint actually
-   settling in place. Height is set explicitly (matching the photograph's
-   own aspect ratio) rather than left to auto, because it is what the grow
-   animation below animates — an explicit length at both ends is what a
-   CSS animation can reliably interpolate. */
+/* Anchored to its own corner. Nothing here animates — the masses hold the
+   banner's composition exactly, and the motion belongs to the runs. */
 .ss-paint-tl {
   left: 0;
   width: var(--mass-tl);
-  height: calc(var(--mass-tl) * 172 / 275);
-  transform-origin: top left;
-  animation:
-    ss-ooze 9s ease-in-out 1.2s infinite alternate,
-    ss-paint-grow-tl 9s cubic-bezier(0.5, 0.05, 0.25, 1) 1.4s both;
 }
 
 .ss-paint-tr {
   right: 0;
   width: var(--mass-tr);
-  height: calc(var(--mass-tr) * 234 / 220);
-  transform-origin: top right;
-  animation:
-    ss-ooze 10.5s ease-in-out 1.3s infinite alternate,
-    ss-paint-grow-tr 9s cubic-bezier(0.5, 0.05, 0.25, 1) 3.4s both;
 }
 
 .ss-paint-bl {
@@ -436,8 +431,6 @@ html[data-splash="showing"] body {
   bottom: 0;
   left: 0;
   width: var(--mass-bl);
-  transform-origin: bottom left;
-  animation: ss-ooze 11s ease-in-out 1.4s infinite alternate;
 }
 
 .ss-paint-br {
@@ -445,61 +438,57 @@ html[data-splash="showing"] body {
   bottom: 0;
   right: 0;
   width: var(--mass-br);
-  transform-origin: bottom right;
-  animation: ss-ooze 8.5s ease-in-out 1.5s infinite alternate;
 }
 
-.ss-paint svg {
+.ss-paint img,
+.ss-paint > svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* The paint breathes on the wrapper, where the compositor animates it for
-   free — no geometry recomputed between keyframes. */
-@keyframes ss-ooze {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.008, 1.022);
-  }
+/* The runs overlay their corner's photograph in that photograph's own
+   coordinates (the viewBox is the crop's banner-pixel size, so one unit
+   here is one banner pixel however the corner is scaled) and are allowed
+   to spill below it. */
+.ss-paint-runs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
 }
 
-/* The photographed top corner fills whatever box its wrapper currently is
-   — object-fit: fill stretches to the box exactly, ignoring the photo's
-   own aspect ratio, so as the wrapper's height below grows the picture
-   simply stretches taller. The width never changes, so nothing about the
-   artwork's own silhouette is altered, only how far down it reaches. */
-.ss-paint-stretch {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
+/* A run is authored at full length and revealed by scaling vertically, so
+   its bottom edge is always the authored bottom edge: that width never
+   changes, and the bead riding at the edge matches it at every frame. */
+.ss-run {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  will-change: transform;
+  animation: ss-run-out var(--dur) cubic-bezier(0.45, 0.05, 0.25, 1)
+    var(--delay) both;
 }
 
-/* The wrapper's own rest height is the photograph's real height at its
-   current rendered width (see .ss-paint-tl/.ss-paint-tr above); growing
-   to a viewport-height figure — not a fixed multiple of that rest height
-   — is what keeps the reach "about halfway down the page" regardless of
-   how wide or narrow the corner itself is rendering. That target is capped
-   short of halfway wherever the pool sharing its edge (tl with bl, tr with
-   br) would otherwise be tall enough to reach up and meet it — the bottom
-   pools scale with viewport width the same as the top corners do, so on a
-   wide, short window their own height can be a real fraction of the
-   screen. Runs once and holds, the same shape as the splash's caramel
-   pour lengthening. */
-@keyframes ss-paint-grow-tl {
+@keyframes ss-run-out {
   to {
-    /* The 56px margin covers the pool's own ooze breathing (up to ~2.2%
-       taller at its peak) on top of a plain visual gap. */
-    height: min(50vh, calc(100vh - (var(--mass-bl) * 330 / 194) - 56px));
+    transform: scaleY(1);
   }
 }
 
-@keyframes ss-paint-grow-tr {
+/* The bead leads the run down on the same clock and easing, so it sits on
+   the run's end rather than racing it or lagging behind. */
+.ss-run-bead {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  will-change: transform;
+  animation: ss-run-fall var(--dur) cubic-bezier(0.45, 0.05, 0.25, 1)
+    var(--delay) both;
+}
+
+@keyframes ss-run-fall {
   to {
-    height: min(50vh, calc(100vh - (var(--mass-br) * 117 / 241) - 56px));
+    transform: translateY(var(--len));
   }
 }
 
@@ -516,10 +505,15 @@ html[data-splash="showing"] body {
   z-index: 6;
 }
 
-/* The earlier reduced-motion block (targeting the shared .ss-paint class)
-   already turns off both the ooze and the grow: they are declared on
-   .ss-paint-tl/.ss-paint-tr, which is to say on elements that also carry
-   .ss-paint, and !important beats a non-important rule regardless of which
-   selector is more specific. Reduced motion leaves each wrapper at its
-   plain rest height, which is the banner exactly — nothing further needed
-   here. */
+@media (prefers-reduced-motion: reduce) {
+  /* Hiding the runs outright leaves the four static masses, which is the
+     banner exactly. Turning only their animations off would strand each
+     bead at its lobe tip as a visible blob.
+
+     Selected through the parent so this outweighs `.ss-paint > svg`, which
+     sets these to block and is one specificity point heavier than the class
+     on its own. */
+  .ss-paint > svg.ss-paint-runs {
+    display: none;
+  }
+}
