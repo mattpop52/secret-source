@@ -99,45 +99,44 @@ float sdRoundCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
    early, then a tail that never quite stops. */
 float ease(float x){ return 1.0 - pow(1.0 - clamp(x, 0.0, 1.0), 2.8); }
 
-/* A run, on a loop that only ever goes downward.
+/* A run, and the drops it lets go of.
 
-   The head leaves the mass and travels the whole height of the card and out
-   of the bottom of it; once it is gone the tail lifts off the mass and
-   follows it out, and the next one starts from nothing. Nothing is ever
-   drawn back up. A drip that retracts reads as a rewind, and a rewind is the
-   one thing that gives a loop away — so the cycle is not extend-and-retract
-   but a whole rivulet crossing the page and leaving.
+   A rivulet of something thick does not keep travelling: it reaches the
+   length where the weight hanging off the end balances what is holding it
+   up, and it stops there. What carries on down the page after that is the
+   drops. So the run arrives once, slowly, and then holds at its own height —
+   each one different — while the tip gathers weight, lets go, and gathers
+   again. Nothing is ever drawn back up, and nothing is ever reset: the only
+   thing that repeats is the falling.
 
-   Bounded on x first: a run is narrow, and it is the only part of the field
-   that reaches the full height, so without this every pixel down the middle
-   of the card would pay for all five of them. */
-float runSdf(vec2 q, float x, float y0, float travel, float w0, float w1,
-             float t0, float period, float grow){
+   The drop is computed here rather than as its own shape so that it shares
+   the run's bound on x. Both are narrow and both hang off the same column,
+   so one test keeps every pixel outside that column from paying for either. */
+float runSdf(vec2 q, float x, float y0, float tip, float w0, float w1,
+             float t0, float period, float H, float grow){
   if (abs(q.x - x) > 0.5 + grow) return 1e5;
 
+  /* The single slow arrival. Long, because thick sauce takes its time and
+     because this is the first thing the card does. */
+  float g = ease(clamp((uTime - 0.4) / 7.5, 0.0, 1.0));
+  vec2  a = vec2(x, y0);
+  vec2  b = vec2(x, y0 + (tip - y0) * g);
+
   float ph = fract((uTime + t0) / period);
-  /* The head is off the bottom by three quarters of the way through, and the
-     tail only lets go in the last fifth — so a run is on the card for nearly
-     its whole cycle, and for a stretch in the middle it is a stream spanning
-     the full height. Letting the tail leave early was what left the card bare
-     whenever the five happened to line up. */
-  float head = travel * ease(min(ph / 0.74, 1.0));
-  float tail = travel * smoothstep(0.88, 1.0, ph);
+  /* The tip swells until it cannot hold, then pinches off. */
+  float swell = smoothstep(0.0, 0.70, ph) * (1.0 - smoothstep(0.70, 0.88, ph));
+  float d = smin(sdRoundCone(q, a, b, w0, w1),
+                 sdCircle(q, b, w1 * (0.82 + 1.10 * swell)), w1 * 1.2);
 
-  /* While the mass is still feeding it the run leaves at full width; once it
-     has let go, that end closes up like the far one. */
-  float att = 1.0 - smoothstep(0.88, 0.98, ph);
-
-  vec2 a = vec2(x, y0 + tail);
-  /* head and tail meet at both ends of the cycle, and a cone of zero length
-     has no direction — hold them apart by half a width. */
-  vec2 b = vec2(x, y0 + max(head, tail + w1 * 0.5));
-
-  float body = sdRoundCone(q, a, b, mix(w1 * 1.15, w0, att), w1);
-  /* The front gathers weight as it goes: the bead is what reads as falling
-     rather than as a line being drawn. */
-  float bead = sdCircle(q, b, w1 * (0.95 + 0.55 * min(ph / 0.74, 1.0)));
-  return smin(body, bead, w1 * 1.1);
+  /* And what it let go of, taking the rest of the card at its own pace. */
+  if (ph > 0.70) {
+    float u = (ph - 0.70) / 0.30;
+    float v = u * u;
+    float st = 1.0 + v * 3.2;
+    vec2  r = (q - vec2(x, b.y + v * (H + 1.2 - b.y))) / vec2(1.0, st);
+    d = min(d, (length(r) - w1 * 1.2) / st);
+  }
+  return d;
 }
 
 /* Lobes wider than they are tall, because sauce spreads under its own weight
@@ -196,14 +195,16 @@ float paintSdf(vec2 P){
   /* The runs. Each crosses the whole card and leaves it, on its own period so
      they never fall into step, and each starts inside the lobe that feeds it
      so the join cannot show. */
-  /* Held off the edges. A run at x≈0 is a continuous stripe down the side of
-     the card for most of its cycle, and that reads as a border rather than as
-     something falling. Each still starts inside the lobe that feeds it. */
-  d = smin(d, runSdf(tl, 0.26,  0.48, H + 0.9, 0.125, 0.058, 0.20, 4.7, grow), 0.12);
-  d = smin(d, runSdf(tl, 0.86,  0.16, H + 1.2, 0.094, 0.045, 2.55, 5.9, grow), 0.10);
-  d = smin(d, runSdf(tl, 1.30, -0.18, H + 1.5, 0.068, 0.034, 4.70, 6.8, grow), 0.08);
-  d = smin(d, runSdf(tr, 0.28,  0.38, H + 1.0, 0.108, 0.050, 1.30, 5.3, grow), 0.11);
-  d = smin(d, runSdf(tr, 0.84,  0.04, H + 1.3, 0.076, 0.036, 3.75, 6.3, grow), 0.09);
+  /* Each stops at its own height, all of them inside the upper half, so the
+     card reads as five separate runs rather than one repeated one — and the
+     wordmark keeps the room below them. Held off the left and right edges
+     too: a run at x near zero is a stripe down the side of the card, and
+     that reads as a border rather than as something falling. */
+  d = smin(d, runSdf(tl, 0.26,  0.48, H * 0.50, 0.125, 0.058, 0.00, 11.5, H, grow), 0.12);
+  d = smin(d, runSdf(tl, 0.86,  0.16, H * 0.34, 0.094, 0.045, 4.30, 13.1, H, grow), 0.10);
+  d = smin(d, runSdf(tl, 1.30, -0.18, H * 0.25, 0.068, 0.034, 8.10,  9.7, H, grow), 0.08);
+  d = smin(d, runSdf(tr, 0.28,  0.38, H * 0.44, 0.108, 0.050, 2.20, 12.3, H, grow), 0.11);
+  d = smin(d, runSdf(tr, 0.84,  0.04, H * 0.29, 0.076, 0.036, 6.40, 10.6, H, grow), 0.09);
 
   /* The exit: every surface swells until the card is one sheet of sauce. */
   return d - grow;
@@ -217,7 +218,7 @@ vec3 env(vec3 r){
   vec3 key = normalize(vec3(-0.40, 1.0, 0.55));
   float k = max(dot(normalize(q), key), 0.0);
   c += vec3(1.00, 0.96, 0.90) * pow(k, 2.6) * 1.05;
-  c += vec3(1.00, 0.98, 0.95) * pow(k, 64.0) * 5.0;
+  c += vec3(1.00, 0.98, 0.95) * pow(k, 44.0) * 2.4;
   /* The page under the card is warm, and thick gloss picks that up. */
   c += vec3(0.42, 0.17, 0.03) * smoothstep(0.25, -0.9, up) * 0.55;
   return c;
@@ -325,37 +326,50 @@ void main(){
 
     /* One clean colour: cartoon forms want a flat, confident fill, and the
        shape does the describing. */
-    vec3 albedo = pow(vec3(0.735, 0.386, 0.048), vec3(2.2));
+    /* Redder and deeper than it was. Golden-amber plus light coming through
+       the thin parts is exactly the recipe for honey; sauce is a pigment that
+       stops light rather than carrying it. */
+    vec3 albedo = pow(vec3(0.745, 0.298, 0.052), vec3(2.2));
 
     float nl1 = max(dot(n, L1), 0.0);
     float nl2 = max(dot(n, L2), 0.0);
 
     /* Keep the fill mean so the body has somewhere dark to go: a form lit
        from every side has no shape, and the highlight has nothing to beat. */
-    vec3 diff = albedo * (0.045 + 1.60 * nl1) * ao
-              + albedo * vec3(1.0, 0.78, 0.56) * 0.20 * nl2;
+    vec3 diff = albedo * (0.055 + 1.80 * nl1) * ao
+              + albedo * vec3(1.0, 0.74, 0.50) * 0.22 * nl2;
 
-    /* Where the film thins at the rim, light gets through it. */
-    diff += pow(vec3(1.00, 0.46, 0.10), vec3(2.2)) * pow(u, 2.6) * 0.65 * ao;
+    /* A trace of light through the very thinnest edge, and no more than a
+       trace: a body that glows where it is thin is the single strongest
+       honey cue there is. */
+    diff += pow(vec3(0.95, 0.30, 0.06), vec3(2.2)) * pow(u, 3.2) * 0.16 * ao;
 
     float nv = max(dot(n, V), 0.0);
     float fres = 0.035 + 0.965 * pow(1.0 - nv, 5.0);
     /* Held back at grazing angles: with the rim rolled this tightly, a strong
        fresnel puts a hard bright line all the way round every shape, and a
        drawn outline is the one thing that will not read as liquid. */
-    vec3 refl = env(reflect(-V, n)) * (0.20 + 0.40 * fres);
+    vec3 refl = env(reflect(-V, n)) * (0.13 + 0.28 * fres);
 
     /* Wet, not polished. A tight lobe puts a single round glint on every mass
        and that one detail reads as a balloon no matter what the silhouette is
        doing; a broader one lets the flow structure above shape the highlight
        into streaks, which is what a sauce actually does with a light. */
-    vec3 spec = vec3(1.0, 0.985, 0.96)
-              * (ggx(n, V, L1, 0.115) * 1.00 + ggx(n, V, L2, 0.26) * 0.26);
+    /* Wet, but not glassy. A tight lobe over a translucent body is what
+       honey looks like; widening it and pulling it down leaves a sheen that
+       sits on the surface instead of appearing to come from inside it. */
+    /* Softer than a lit sphere wants to be, on purpose. The normal is
+       reconstructed by differencing the distance field, so it carries a
+       fraction of a degree of uncertainty, and a narrow lobe turns that into
+       a shimmer crawling through the bright band. Widening the lobe both
+       hides it and is the truer material: sauce has a sheen, not a glint. */
+    vec3 spec = vec3(1.0, 0.96, 0.90)
+              * (ggx(n, V, L1, 0.215) * 0.52 + ggx(n, V, L2, 0.34) * 0.18);
 
     /* A rim of the key catching the far shoulder, kept low: a bright outline
        all the way round is the other half of the balloon read. */
     float rim = pow(1.0 - nv, 3.5) * max(dot(n, normalize(vec3(-0.6, -0.75, 0.0))), 0.0);
-    spec += vec3(1.0, 0.86, 0.62) * rim * 0.26;
+    spec += vec3(1.0, 0.82, 0.56) * rim * 0.18;
 
     col = diff + refl + spec;
 
