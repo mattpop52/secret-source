@@ -69,15 +69,50 @@ float ripple(vec2 p){
   return 0.66 * vnoise(p) + 0.34 * vnoise(p * 2.03);
 }
 
-float smin(float a, float b, float k){
-  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
-  return mix(b, a, h) - k * h * (1.0 - h);
-}
-float dot2(vec2 v){ return dot(v, v); }
-float sdCircle(vec2 p, vec2 c, float r){ return length(p - c) - r; }
+/* ── the field ───────────────────────────────────────────────────────────
 
-/* A cone with round caps: the shape a run of paint makes as it thins. */
-float sdRoundCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
+   Everything below carries a distance AND its gradient: x is the distance,
+   yz is the surface direction there. Nothing is ever differenced.
+
+   Reconstructing the normal by sampling the field either side of a pixel is
+   the obvious way to do this and it has two costs. It evaluates the whole
+   field three times per pixel instead of once. And the difference it takes is
+   about the same size as the field's own numerical precision, so whatever the
+   hardware rounds off comes back multiplied by the reciprocal of the step —
+   which arrives as a shimmer crawling through the highlights, worst on the
+   GPUs least able to afford the extra work in the first place.
+
+   Every primitive here knows its own normal exactly, and both combinators
+   carry it through, so the shading normal is exact and the field is evaluated
+   once. The gradients are unit length as they leave each primitive; what
+   comes out the far end is shorter than unit only where two bodies have been
+   blended, which is precisely the crease-occlusion signal wanted later. */
+
+float dot2(vec2 v){ return dot(v, v); }
+
+vec3 pCircle(vec2 p, vec2 c, float r){
+  vec2  v = p - c;
+  float l = max(length(v), 1e-6);
+  return vec3(l - r, v / l);
+}
+
+/* Lobes wider than they are tall, because sauce spreads under its own weight
+   rather than holding a ball. Cheap ellipse: a unit-circle test in squashed
+   space, scaled back by the smaller semi-axis, which under-reads the distance
+   slightly and so is safe to feed a smooth minimum. The gradient of that is
+   exact and is normalised, so the ellipse's own sub-unit gradient does not
+   get mistaken for a crease. */
+vec3 pLobe(vec2 p, vec2 c, float rx, float ry){
+  vec2  q = (p - c) / vec2(rx, ry);
+  float l = max(length(q), 1e-6);
+  return vec3((l - 1.0) * min(rx, ry), normalize((q / l) / vec2(rx, ry)));
+}
+
+/* A cone with round caps: the shape a run of sauce makes as it thins. On the
+   lateral face the normal tilts off the perpendicular by exactly the taper —
+   sin of that angle is the radius difference over the length — which is why
+   it can be written down rather than measured. */
+vec3 pCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
   vec2  ba = b - a;
   float l2 = dot(ba, ba);
   float rr = r1 - r2;
@@ -90,12 +125,34 @@ float sdRoundCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
   float y2 = y * y * l2;
   float z2 = z * z * l2;
   float k = sign(rr) * rr * rr * x2;
-  if (sign(z) * a2 * z2 > k) return sqrt(x2 + z2) * il2 - r2;
-  if (sign(y) * a2 * y2 < k) return sqrt(x2 + y2) * il2 - r1;
-  return (sqrt(x2 * a2 * il2) + y * rr) * il2 - r1;
+
+  if (sign(z) * a2 * z2 > k) {
+    vec2  v = p - b;
+    float l = max(length(v), 1e-6);
+    return vec3(l - r2, v / l);
+  }
+  if (sign(y) * a2 * y2 < k) {
+    vec2  v = p - a;
+    float l = max(length(v), 1e-6);
+    return vec3(l - r1, v / l);
+  }
+  float L  = sqrt(l2);
+  vec2  ax = ba / L;                       /* along the axis */
+  vec2  px = vec2(ax.y, -ax.x);            /* across it */
+  vec2  g  = px * sign(dot(pa, px)) * (sqrt(max(a2, 0.0)) / L) + ax * (rr / L);
+  return vec3((sqrt(x2 * a2 * il2) + y * rr) * il2 - r1, g);
 }
 
-/* Paint that has run a long way is still creeping: most of the distance
+/* The blend, with its gradient. For the polynomial smooth minimum the terms
+   in the derivative of the blend factor cancel exactly, so mixing the two
+   gradients by that same factor is not an approximation. */
+vec3 fSmin(vec3 a, vec3 b, float k){
+  float h = clamp(0.5 + 0.5 * (b.x - a.x) / k, 0.0, 1.0);
+  return vec3(mix(b.x, a.x, h) - k * h * (1.0 - h), mix(b.yz, a.yz, h));
+}
+vec3 fMin(vec3 a, vec3 b){ return a.x < b.x ? a : b; }
+
+/* Sauce that has run a long way is still creeping: most of the distance
    early, then a tail that never quite stops. */
 float ease(float x){ return 1.0 - pow(1.0 - clamp(x, 0.0, 1.0), 2.8); }
 
@@ -112,9 +169,9 @@ float ease(float x){ return 1.0 - pow(1.0 - clamp(x, 0.0, 1.0), 2.8); }
    The drop is computed here rather than as its own shape so that it shares
    the run's bound on x. Both are narrow and both hang off the same column,
    so one test keeps every pixel outside that column from paying for either. */
-float runSdf(vec2 q, float x, float y0, float tip, float w0, float w1,
-             float t0, float period, float H, float grow){
-  if (abs(q.x - x) > 0.5 + grow) return 1e5;
+vec3 runField(vec2 q, float x, float y0, float tip, float w0, float w1,
+              float t0, float period, float H, float grow){
+  if (abs(q.x - x) > 0.5 + grow) return vec3(1e5, 0.0, 0.0);
 
   /* The single slow arrival. Long, because thick sauce takes its time and
      because this is the first thing the card does. */
@@ -125,89 +182,93 @@ float runSdf(vec2 q, float x, float y0, float tip, float w0, float w1,
   float ph = fract((uTime + t0) / period);
   /* The tip swells until it cannot hold, then pinches off. */
   float swell = smoothstep(0.0, 0.70, ph) * (1.0 - smoothstep(0.70, 0.88, ph));
-  float d = smin(sdRoundCone(q, a, b, w0, w1),
-                 sdCircle(q, b, w1 * (0.82 + 1.10 * swell)), w1 * 1.2);
+  vec3  f = fSmin(pCone(q, a, b, w0, w1),
+                  pCircle(q, b, w1 * (0.82 + 1.10 * swell)), w1 * 1.2);
 
-  /* And what it let go of, taking the rest of the card at its own pace. */
+  /* And what it let go of, taking the rest of the card at its own pace. The
+     drop stretches as it accelerates, so its gradient is squashed the same
+     way the shape is. */
   if (ph > 0.70) {
     float u = (ph - 0.70) / 0.30;
     float v = u * u;
     float st = 1.0 + v * 3.2;
     vec2  r = (q - vec2(x, b.y + v * (H + 1.2 - b.y))) / vec2(1.0, st);
-    d = min(d, (length(r) - w1 * 1.2) / st);
+    float l = max(length(r), 1e-6);
+    vec3  drop = vec3((l - w1 * 1.2) / st,
+                      normalize((r / l) / vec2(1.0, st)));
+    f = fMin(f, drop);
   }
-  return d;
+  return f;
 }
 
-/* Lobes wider than they are tall, because sauce spreads under its own weight
-   rather than holding a ball. Cheap ellipse: unit-circle test in squashed
-   space, scaled back by the smaller semi-axis, which under-reads the distance
-   slightly and so is safe to feed a smooth minimum. */
-float sdLobe(vec2 p, vec2 c, float rx, float ry){
-  return (length((p - c) / vec2(rx, ry)) - 1.0) * min(rx, ry);
+vec3 corner(vec2 q, float k, float a, float b, float c){
+  vec3 f = pLobe(q, vec2(-0.62, -0.58), 1.30, 1.02);
+  f = fSmin(f, pLobe(q, vec2(0.02,  0.06), a * 1.28, a * 0.82), k);
+  f = fSmin(f, pLobe(q, vec2(0.68, -0.18), b * 1.30, b * 0.80), k);
+  f = fSmin(f, pLobe(q, vec2(1.24, -0.44), c * 1.26, c * 0.84), k);
+  return f;
 }
 
-float corner(vec2 q, float k, float a, float b, float c){
-  float d = sdLobe(q, vec2(-0.62, -0.58), 1.30, 1.02);
-  d = smin(d, sdLobe(q, vec2(0.02,  0.06), a * 1.28, a * 0.82), k);
-  d = smin(d, sdLobe(q, vec2(0.68, -0.18), b * 1.30, b * 0.80), k);
-  d = smin(d, sdLobe(q, vec2(1.24, -0.44), c * 1.26, c * 0.84), k);
-  return d;
-}
-
-/* Distance to the paint, in units of the master scale.
+/* The sauce, in units of the master scale: distance in x, surface direction
+   in yz.
 
    Each corner mass is skipped outright for pixels it cannot reach, and each
-   run is skipped for every column it does not fall down. A fragment is near
-   at most one corner and at most one or two runs, so this is close to a
-   four-fold saving on the part of the shader that dominates the frame, and
-   the branches are coherent across a warp because the regions are large and
-   contiguous. The bounds carry enough slack for the contact shadow, which is
-   sampled at an offset, and they grow with the flood. */
-float paintSdf(vec2 P){
+   run is skipped for every column it does not hang in. A fragment is near at
+   most one corner and one or two runs, so this is close to a four-fold saving
+   on the part of the shader that dominates the frame, and the branches are
+   coherent across a warp because the regions are large and contiguous. The
+   bounds carry enough slack for the contact shadow, which is sampled at an
+   offset, and they grow with the flood. */
+vec3 paintField(vec2 P){
   float W = uRes.x / uScale;
   float H = uRes.y / uScale;
   float k = 0.21;
   float grow = uFlood * uFlood * (W + H);
-  float d = 1e5;
+  vec3  f = vec3(1e5, 0.0, 0.0);
 
   vec2 tl = P;
   vec2 tr = vec2(W - P.x, P.y);
   vec2 bl = vec2(P.x, H - P.y);
   vec2 br = vec2(W - P.x, H - P.y);
 
-  /* The four masses, which sit still: sauce that has arrived and settled. */
+  /* The four masses, which sit still: sauce that has arrived and settled.
+     Each is described in its own frame, so the gradient comes back in that
+     frame too and has to be flipped on whichever axis was mirrored. */
   if (tl.x < 2.0 + grow && tl.y < 1.5 + grow) {
-    d = corner(tl, k, 0.62, 0.46, 0.33);
+    f = corner(tl, k, 0.62, 0.46, 0.33);
   }
   if (tr.x < 2.0 + grow && tr.y < 1.4 + grow) {
-    d = min(d, corner(tr, k, 0.54, 0.40, 0.28));
+    vec3 c = corner(tr, k, 0.54, 0.40, 0.28);
+    f = fMin(f, vec3(c.x, -c.y, c.z));
   }
   /* Sauce cannot run upward, so nothing hangs off the bottom two: they only
      sit and catch what comes down. */
   if (bl.x < 2.0 + grow && bl.y < 1.3 + grow) {
-    d = min(d, corner(bl, k, 0.50, 0.37, 0.26));
+    vec3 c = corner(bl, k, 0.50, 0.37, 0.26);
+    f = fMin(f, vec3(c.x, c.y, -c.z));
   }
   if (br.x < 2.0 + grow && br.y < 1.3 + grow) {
-    d = min(d, corner(br, k, 0.58, 0.43, 0.30));
+    vec3 c = corner(br, k, 0.58, 0.43, 0.30);
+    f = fMin(f, vec3(c.x, -c.y, -c.z));
   }
 
-  /* The runs. Each crosses the whole card and leaves it, on its own period so
-     they never fall into step, and each starts inside the lobe that feeds it
-     so the join cannot show. */
-  /* Each stops at its own height, all of them inside the upper half, so the
-     card reads as five separate runs rather than one repeated one — and the
-     wordmark keeps the room below them. Held off the left and right edges
-     too: a run at x near zero is a stripe down the side of the card, and
-     that reads as a border rather than as something falling. */
-  d = smin(d, runSdf(tl, 0.26,  0.48, H * 0.50, 0.125, 0.058, 0.00, 11.5, H, grow), 0.12);
-  d = smin(d, runSdf(tl, 0.86,  0.16, H * 0.34, 0.094, 0.045, 4.30, 13.1, H, grow), 0.10);
-  d = smin(d, runSdf(tl, 1.30, -0.18, H * 0.25, 0.068, 0.034, 8.10,  9.7, H, grow), 0.08);
-  d = smin(d, runSdf(tr, 0.28,  0.38, H * 0.44, 0.108, 0.050, 2.20, 12.3, H, grow), 0.11);
-  d = smin(d, runSdf(tr, 0.84,  0.04, H * 0.29, 0.076, 0.036, 6.40, 10.6, H, grow), 0.09);
+  /* Each run stops at its own height, all of them inside the upper half, so
+     the card reads as five separate runs rather than one repeated one — and
+     the wordmark keeps the room below them. Held off the left and right edges
+     too: a run at x near zero is a stripe down the side of the card, and that
+     reads as a border rather than as something falling. */
+  f = fSmin(f, runField(tl, 0.26,  0.48, H * 0.50, 0.125, 0.058, 0.00, 11.5, H, grow), 0.12);
+  f = fSmin(f, runField(tl, 0.86,  0.16, H * 0.34, 0.094, 0.045, 4.30, 13.1, H, grow), 0.10);
+  f = fSmin(f, runField(tl, 1.30, -0.18, H * 0.25, 0.068, 0.034, 8.10,  9.7, H, grow), 0.08);
+
+  vec3 r1 = runField(tr, 0.28, 0.38, H * 0.44, 0.108, 0.050, 2.20, 12.3, H, grow);
+  vec3 r2 = runField(tr, 0.84, 0.04, H * 0.29, 0.076, 0.036, 6.40, 10.6, H, grow);
+  f = fSmin(f, vec3(r1.x, -r1.y, r1.z), 0.11);
+  f = fSmin(f, vec3(r2.x, -r2.y, r2.z), 0.09);
 
   /* The exit: every surface swells until the card is one sheet of sauce. */
-  return d - grow;
+  f.x -= grow;
+  return f;
 }
 
 /* A studio for the paint to reflect. Linear values throughout. */
@@ -218,7 +279,7 @@ vec3 env(vec3 r){
   vec3 key = normalize(vec3(-0.40, 1.0, 0.55));
   float k = max(dot(normalize(q), key), 0.0);
   c += vec3(1.00, 0.96, 0.90) * pow(k, 2.6) * 1.05;
-  c += vec3(1.00, 0.98, 0.95) * pow(k, 44.0) * 2.4;
+  c += vec3(1.00, 0.98, 0.95) * pow(k, 40.0) * 1.3;
   /* The page under the card is warm, and thick gloss picks that up. */
   c += vec3(0.42, 0.17, 0.03) * smoothstep(0.25, -0.9, up) * 0.55;
   return c;
@@ -236,7 +297,8 @@ void main(){
   vec2 P = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uScale;
   float px = 1.0 / uScale;               /* one device pixel, in scale units */
 
-  float d = paintSdf(P);
+  vec3  f = paintField(P);
+  float d = f.x;
 
   /* The shadow reaches further than the paint, so the early-out has to clear
      it too — paint sitting on a page with nothing underneath it is the
@@ -252,7 +314,7 @@ void main(){
   /* Under opaque paint the shadow cannot show, so it is not worth sampling. */
   float shade = 0.0;
   if (cov < 0.999) {
-    shade = smoothstep(SH, -0.02 * SH, paintSdf(P - vec2(0.28, 0.40) * SH)) * 0.80;
+    shade = smoothstep(SH, -0.02 * SH, paintField(P - vec2(0.28, 0.40) * SH).x) * 0.80;
   }
 
   vec3 col = vec3(0.0);
@@ -270,33 +332,18 @@ void main(){
     float ub = 1.0 - clamp(-d / 2.60, 0.0, 1.0);
     float hb = sqrt(max(1.0 - ub * ub, 0.0));
 
-    /* Normal from the height field. Forward differences: two extra field
-       evaluations rather than four, which matters because this runs for every
-       pixel of the silhouette.
-
-       The step is deliberately several pixels rather than one. A difference
-       taken over a single pixel is about the same size as the field's own
-       precision, so whatever the hardware rounds off arrives in the normal
-       multiplied by the reciprocal of the step — which shows up as contour
-       rings banding across every surface, and gets worse on exactly the GPUs
-       that can least afford extra work. Taking the step wider costs a little
-       crispness at the rim and buys a normal that survives mediump.
-
-       Only the direction is kept: for a true distance field the gradient is
-       already unit length, so its magnitude carries no information here and
-       normalising throws away the noisiest part of the measurement. */
-    float e = max(px * 2.0, 0.032);
-    vec2  g = vec2(paintSdf(P + vec2(e, 0.0)) - d,
-                   paintSdf(P + vec2(0.0, e)) - d);
-    float glen = length(g);
-    vec2  dir = glen > 1e-6 ? g / glen : vec2(0.0);
+    /* The surface direction came back with the distance, exactly, so the
+       normal is just the height's slope along it. */
+    float glen = length(f.yz);
+    vec2  dir = glen > 1e-6 ? f.yz / glen : vec2(0.0);
     float slope = min(u / max(h, 0.10), 7.0)
                 + min(ub / max(hb, 0.10), 3.0) * 0.12;
     vec3  n = normalize(vec3(dir * slope * 1.25, 1.0));
 
-    /* The gradient falls below unit length inside a blend, which is exactly
-       where two bodies have merged: free occlusion in the creases. */
-    float ao = mix(0.42, 1.0, clamp(glen / e * 1.05, 0.0, 1.0));
+    /* Every primitive hands back a unit gradient, so anything shorter than
+       unit here is the blend having mixed two that disagreed — which is
+       exactly where two bodies have merged. Free occlusion in the creases. */
+    float ao = mix(0.42, 1.0, clamp(glen * 1.05, 0.0, 1.0));
 
     /* The body is still moving, so the surface is never quite flat. Ripples
        ride down it and drag the highlight with them, and that travelling
@@ -336,7 +383,7 @@ void main(){
 
     /* Keep the fill mean so the body has somewhere dark to go: a form lit
        from every side has no shape, and the highlight has nothing to beat. */
-    vec3 diff = albedo * (0.055 + 1.80 * nl1) * ao
+    vec3 diff = albedo * (0.055 + 1.62 * nl1) * ao
               + albedo * vec3(1.0, 0.74, 0.50) * 0.22 * nl2;
 
     /* A trace of light through the very thinnest edge, and no more than a
@@ -349,7 +396,7 @@ void main(){
     /* Held back at grazing angles: with the rim rolled this tightly, a strong
        fresnel puts a hard bright line all the way round every shape, and a
        drawn outline is the one thing that will not read as liquid. */
-    vec3 refl = env(reflect(-V, n)) * (0.13 + 0.28 * fres);
+    vec3 refl = env(reflect(-V, n)) * (0.10 + 0.22 * fres);
 
     /* Wet, not polished. A tight lobe puts a single round glint on every mass
        and that one detail reads as a balloon no matter what the silhouette is
@@ -363,20 +410,25 @@ void main(){
        fraction of a degree of uncertainty, and a narrow lobe turns that into
        a shimmer crawling through the bright band. Widening the lobe both
        hides it and is the truer material: sauce has a sheen, not a glint. */
+    /* Tighter again. The lobe was only ever wide to hide the noise in a
+       differenced normal, and a wide lobe spreads a highlight into a pale
+       wash across half a form — which reads as satin, not sauce. With the
+       normal exact it can be a small bright sheen that leaves the colour
+       alone everywhere else. */
     vec3 spec = vec3(1.0, 0.96, 0.90)
-              * (ggx(n, V, L1, 0.215) * 0.52 + ggx(n, V, L2, 0.34) * 0.18);
+              * (ggx(n, V, L1, 0.130) * 0.52 + ggx(n, V, L2, 0.30) * 0.13);
 
     /* A rim of the key catching the far shoulder, kept low: a bright outline
        all the way round is the other half of the balloon read. */
     float rim = pow(1.0 - nv, 3.5) * max(dot(n, normalize(vec3(-0.6, -0.75, 0.0))), 0.0);
-    spec += vec3(1.0, 0.82, 0.56) * rim * 0.18;
+    spec += vec3(1.0, 0.82, 0.56) * rim * 0.12;
 
     col = diff + refl + spec;
 
     /* Roll the highlights off on luminance so the hue survives the clip. A
        per-channel curve turns every hot spot cream, which is exactly what
        makes rendered liquid look like plastic. */
-    col *= 1.0 / (1.0 + max(col.r, max(col.g, col.b)) * 0.42);
+    col *= 1.0 / (1.0 + max(col.r, max(col.g, col.b)) * 0.32);
     col = pow(clamp(col, 0.0, 1.0), vec3(1.0 / 2.2));
   }
 
