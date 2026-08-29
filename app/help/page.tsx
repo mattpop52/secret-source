@@ -50,11 +50,6 @@ const SECTIONS = [
         answer: `${RETURNS_WINDOW} from the day it lands. Unworn, tags on, packaging intact — footwear back in its original box, inside a shipping box.`,
       },
       {
-        question: "What if it isn't authentic?",
-        answer:
-          "Full refund including postage both ways, no argument. That's the whole promise the shop runs on.",
-      },
-      {
         question: "Can I swap a size instead?",
         answer:
           "Yes, when the size you want is on the shelf. Message before sending anything back so it can be held for you.",
