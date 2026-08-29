@@ -109,11 +109,18 @@
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(var(--marquee-shift), 0, 0);
   }
 }
 
+/* The track is the line repeated end to end, slid left by exactly one copy
+   and then snapped back. For that to look continuous the copies still on
+   screen at the end of the slide have to reach the right edge, so the number
+   of them has to depend on how wide the line is — hence the shift being a
+   variable the component sets rather than a fixed half. */
 .ss-marquee-track {
+  --marquee-shift: -50%;
+
   display: flex;
   width: max-content;
   animation: ss-marquee 38s linear infinite;

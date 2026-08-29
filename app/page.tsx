@@ -207,9 +207,7 @@ export default function SecretSourceHome() {
         </div>
       </section>
 
-      <TapeMarquee
-        items={["Authentic", "Checked", "Sealed", "Shipped", "Tracked"]}
-      />
+      <TapeMarquee items={["Checked", "Sealed", "Shipped", "Tracked"]} />
 
       {/* ── Shop by category ─────────────────────────────────────────── */}
       <Section>
