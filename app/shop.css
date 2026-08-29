@@ -169,14 +169,6 @@
    session over the shop, which is already rendered underneath it. */
 
 .ss-splash {
-  /* Rendered width of each of the four corner masses. Every run's geometry
-     is expressed inside its corner's own viewBox, so these widths scale the
-     runs along with the paint they leave. */
-  --mass-tl: clamp(160px, 27.1vw, 420px);
-  --mass-tr: clamp(130px, 21.6vw, 340px);
-  --mass-bl: clamp(120px, 19.3vw, 300px);
-  --mass-br: clamp(150px, 24vw, 380px);
-
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -313,17 +305,11 @@ html[data-splash="showing"] body {
   pointer-events: none;
 }
 
-/* Phase one: the paint swells past the frame and the flood comes up under
-   it, so corners and flood become one sheet of orange. */
-.ss-splash[data-state="leaving"] .ss-paint {
-  animation: ss-paint-flood 0.52s cubic-bezier(0.5, 0, 0.9, 0.4) both;
-}
-
-@keyframes ss-paint-flood {
-  to {
-    transform: scale(4.2);
-  }
-}
+/* Phase one is inside the paint itself: every surface swells until the card
+   is one sheet of orange, and the flood comes up under it. Growing the body
+   in the field rather than scaling the canvas means the paint stays lit and
+   keeps its rolled edge all the way out, instead of becoming a magnified
+   picture of paint. */
 
 .ss-splash[data-state="leaving"] .ss-splash-flood {
   animation: ss-flood-fill 0.42s ease-in 0.16s both;
@@ -365,7 +351,6 @@ html[data-splash="showing"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-splash-ground,
-  .ss-paint,
   .ss-splash-wordmark,
   .ss-splash-enter {
     /* biome-ignore lint/complexity/noImportantStyles: a reduced-motion override must beat every animation it turns off */
@@ -376,7 +361,6 @@ html[data-splash="showing"] body {
     animation: ss-splash-fade 0.25s linear both;
   }
 
-  .ss-splash[data-state="leaving"] .ss-paint,
   .ss-splash[data-state="leaving"] .ss-splash-flood,
   .ss-splash[data-state="leaving"] .ss-splash-centre {
     /* biome-ignore lint/complexity/noImportantStyles: same reason — the point is to override, unconditionally */
@@ -390,106 +374,20 @@ html[data-splash="showing"] body {
   }
 }
 
-/* ══ Liquid paint ═══════════════════════════════════════════════════════
-   The four corner masses never move or change shape — they are the banner's
-   own artwork and stay pixel-exact. The only thing that animates is a
-   handful of runs of paint descending out of lobes the artwork already
-   points downward, drawn flat in the paint's own measured colour.
-
-   Two earlier versions of this failed and both failures are instructive.
-   One drew photoreal liquid over the artwork — tapered stems with lit
-   gradients, glossy heads, catchlights — which collided with the fact that
-   this paint is FLAT graphic art (58,080 interior pixels sampled: mean
-   #cb8a29, standard deviation under 7). Photoreal gloss beside flat shapes
-   reads as clip-art pasted on. The other stretched whole corner masses
-   vertically, which scales the wide shoulder at the same rate as the narrow
-   lobe and smears a deliberately drawn silhouette into a blob. Runs avoid
-   both: the geometry is what real paint does, and the rendering is flat,
-   matching the artwork exactly. */
+/* ══ Paint ═════════════════════════════════════════════════════════════
+   One canvas over the whole card. The paint is a distance field shaded per
+   pixel (components/paint.tsx), so there is nothing here to position: the
+   corners, the runs and the drops all live in the field, and this only has
+   to hand the shader the card. */
 
 .ss-paint {
   z-index: 2;
   position: absolute;
-  top: 0;
-  pointer-events: none;
-}
-
-/* Anchored to its own corner. Nothing here animates — the masses hold the
-   banner's composition exactly, and the motion belongs to the runs. */
-.ss-paint-tl {
-  left: 0;
-  width: var(--mass-tl);
-}
-
-.ss-paint-tr {
-  right: 0;
-  width: var(--mass-tr);
-}
-
-.ss-paint-bl {
-  top: auto;
-  bottom: 0;
-  left: 0;
-  width: var(--mass-bl);
-}
-
-.ss-paint-br {
-  top: auto;
-  bottom: 0;
-  right: 0;
-  width: var(--mass-br);
-}
-
-.ss-paint img,
-.ss-paint > svg {
-  display: block;
+  inset: 0;
   width: 100%;
-  height: auto;
-}
-
-/* The runs overlay their corner's photograph in that photograph's own
-   coordinates (the viewBox is the crop's banner-pixel size, so one unit
-   here is one banner pixel however the corner is scaled) and are allowed
-   to spill below it. */
-.ss-paint-runs {
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: visible;
-}
-
-/* A run is authored at full length and revealed by scaling vertically, so
-   its bottom edge is always the authored bottom edge: that width never
-   changes, and the bead riding at the edge matches it at every frame. */
-.ss-run {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  transform: scaleY(0);
-  will-change: transform;
-  animation: ss-run-out var(--dur) cubic-bezier(0.45, 0.05, 0.25, 1)
-    var(--delay) both;
-}
-
-@keyframes ss-run-out {
-  to {
-    transform: scaleY(1);
-  }
-}
-
-/* The bead leads the run down on the same clock and easing, so it sits on
-   the run's end rather than racing it or lagging behind. */
-.ss-run-bead {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  will-change: transform;
-  animation: ss-run-fall var(--dur) cubic-bezier(0.45, 0.05, 0.25, 1)
-    var(--delay) both;
-}
-
-@keyframes ss-run-fall {
-  to {
-    transform: translateY(var(--len));
-  }
+  height: 100%;
+  display: block;
+  pointer-events: none;
 }
 
 /* Stacking: paint over the ground, controls over the paint. */
@@ -503,17 +401,4 @@ html[data-splash="showing"] body {
 
 .ss-splash-flood {
   z-index: 6;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Hiding the runs outright leaves the four static masses, which is the
-     banner exactly. Turning only their animations off would strand each
-     bead at its lobe tip as a visible blob.
-
-     Selected through the parent so this outweighs `.ss-paint > svg`, which
-     sets these to block and is one specificity point heavier than the class
-     on its own. */
-  .ss-paint > svg.ss-paint-runs {
-    display: none;
-  }
 }
