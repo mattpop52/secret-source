@@ -99,23 +99,38 @@ float sdRoundCone(vec2 p, vec2 a, vec2 b, float r1, float r2){
    early, then a tail that never quite stops. */
 float ease(float x){ return 1.0 - pow(1.0 - clamp(x, 0.0, 1.0), 2.8); }
 
-/* One run, with the bead of weight that gathers at its front. */
-float runSdf(vec2 p, vec2 top, float len, float w0, float w1, float t0, float dur){
-  float g = ease((uTime - t0) / dur);
-  vec2  end = top + vec2(0.0, max(len * g, w0 * 0.5));
+/* The fraction of a run's cycle spent lengthening, before the front gets too
+   heavy and lets go. */
+const float RELEASE = 0.78;
+
+/* One run, on a loop. It lengthens while sauce arrives faster than it drains,
+   the front gathers into a bead, the bead gets too heavy and goes, and what
+   is left — lighter now — draws back up before the next lot comes down. That
+   is the whole cycle of a real drip, and it is why this can repeat without
+   ever looking like it restarted. */
+float runSdf(vec2 p, vec2 top, float len, float w0, float w1, float t0, float period){
+  float ph = fract((uTime + t0) / period);
+  float g = ph < RELEASE
+    ? mix(0.26, 1.0, ease(ph / RELEASE))
+    : mix(1.0, 0.26, smoothstep(0.0, 1.0, (ph - RELEASE) / (1.0 - RELEASE)));
+  vec2  end = top + vec2(0.0, len * g);
   float body = sdRoundCone(p, top, end, w0, w1);
   /* The bead swells as the run slows: mass arriving faster than it drains. */
   float bead = sdCircle(p, end, w1 * (0.85 + 0.62 * g));
   return smin(body, bead, w1 * 1.1);
 }
 
-/* A drop that has let go, accelerating and drawing out as it falls. */
-float dropSdf(vec2 p, float x, float y0, float r, float fall, float t0, float period){
+/* The drop a run has just let go of, on that run's own clock so the two are
+   one event: it leaves at the moment the run starts drawing back up, then
+   accelerates and draws out as it falls. */
+float dropSdf(vec2 p, float x, float tip, float r, float fall, float t0, float period){
   float ph = fract((uTime + t0) / period);
-  float v = ph * ph;
-  float st = 1.0 + v * 3.4;
-  vec2  q = (p - vec2(x, y0 + v * fall)) / vec2(1.0, st);
-  return (length(q) - r * smoothstep(0.0, 0.08, ph)) / st;
+  if (ph < RELEASE) return 1e5;
+  float u = (ph - RELEASE) / (1.0 - RELEASE);
+  float v = u * u;
+  float st = 1.0 + v * 3.0;
+  vec2  q = (p - vec2(x, tip + v * fall)) / vec2(1.0, st);
+  return (length(q) - r) / st;
 }
 
 /* Every corner is built the same way in its own frame, with the corner at the
@@ -124,11 +139,19 @@ float dropSdf(vec2 p, float x, float y0, float r, float fall, float t0, float pe
    both edges keeps the corner solid and says the paint came from outside the
    card; the lobes inside the frame are what make it a shape rather than a
    fillet, so the blend stays tight enough that each one still reads. */
+/* Lobes wider than they are tall, because sauce spreads under its own weight
+   rather than holding a ball. Cheap ellipse: unit-circle test in squashed
+   space, scaled back by the smaller semi-axis, which under-reads the distance
+   slightly and so is safe to feed a smooth minimum. */
+float sdLobe(vec2 p, vec2 c, float rx, float ry){
+  return (length((p - c) / vec2(rx, ry)) - 1.0) * min(rx, ry);
+}
+
 float corner(vec2 q, float k, float a, float b, float c){
-  float d = sdCircle(q, vec2(-0.62, -0.58), 1.15);
-  d = smin(d, sdCircle(q, vec2(0.02,  0.10), a), k);
-  d = smin(d, sdCircle(q, vec2(0.66, -0.14), b), k);
-  d = smin(d, sdCircle(q, vec2(1.22, -0.40), c), k);
+  float d = sdLobe(q, vec2(-0.62, -0.58), 1.30, 1.02);
+  d = smin(d, sdLobe(q, vec2(0.02,  0.06), a * 1.28, a * 0.82), k);
+  d = smin(d, sdLobe(q, vec2(0.68, -0.18), b * 1.30, b * 0.80), k);
+  d = smin(d, sdLobe(q, vec2(1.24, -0.44), c * 1.26, c * 0.84), k);
   return d;
 }
 
@@ -142,7 +165,7 @@ float corner(vec2 q, float k, float a, float b, float c){
 float paintSdf(vec2 P){
   float W = uRes.x / uScale;
   float H = uRes.y / uScale;
-  float k = 0.15;
+  float k = 0.21;
   float grow = uFlood * uFlood * (W + H);
   float d = 1e5;
 
@@ -150,9 +173,9 @@ float paintSdf(vec2 P){
   if (tl.x < 2.1 + grow && tl.y < 2.8 + grow) {
     /* Top left: the heaviest, and the only one that runs the whole way down. */
     float c = corner(tl, k, 0.62, 0.46, 0.33);
-    c = smin(c, runSdf(tl, vec2(0.02,  0.60), 1.70, 0.125, 0.058, 0.30, 3.4), 0.12);
-    c = smin(c, runSdf(tl, vec2(0.66,  0.24), 0.98, 0.094, 0.045, 1.15, 3.8), 0.10);
-    c = smin(c, runSdf(tl, vec2(1.24, -0.10), 0.54, 0.068, 0.034, 2.05, 3.2), 0.08);
+    c = smin(c, runSdf(tl, vec2(0.02,  0.56), 1.72, 0.125, 0.058, 0.00, 5.6), 0.12);
+    c = smin(c, runSdf(tl, vec2(0.70,  0.22), 0.98, 0.094, 0.045, 0.50, 6.9), 0.10);
+    c = smin(c, runSdf(tl, vec2(1.26, -0.14), 0.54, 0.068, 0.034, 1.10, 4.8), 0.08);
     d = c;
   }
 
@@ -160,8 +183,8 @@ float paintSdf(vec2 P){
   if (tr.x < 2.1 + grow && tr.y < 2.4 + grow) {
     /* Top right: lighter and shorter, so the card is never symmetrical. */
     float c = corner(tr, k, 0.54, 0.40, 0.28);
-    c = smin(c, runSdf(tr, vec2(0.04, 0.50), 1.22, 0.108, 0.050, 0.70, 3.6), 0.11);
-    c = smin(c, runSdf(tr, vec2(0.68, 0.14), 0.62, 0.076, 0.036, 1.90, 3.1), 0.09);
+    c = smin(c, runSdf(tr, vec2(0.04, 0.46), 1.24, 0.108, 0.050, 0.25, 6.2), 0.11);
+    c = smin(c, runSdf(tr, vec2(0.70, 0.12), 0.62, 0.076, 0.036, 0.80, 5.1), 0.09);
     d = min(d, c);
   }
 
@@ -177,9 +200,10 @@ float paintSdf(vec2 P){
     d = min(d, corner(br, k, 0.58, 0.43, 0.30));
   }
 
-  /* Two drops that have let go of the long runs, on their own clocks. */
-  d = min(d, dropSdf(P, 0.02,     2.45, 0.056, H + 1.0, 0.0, 7.3));
-  d = min(d, dropSdf(P, W - 0.04, 1.85, 0.050, H + 1.0, 3.1, 9.1));
+  /* The drops the two longest runs let go of — same clock, same phase, so
+     each one leaves the tip it came from at the moment that run lets go. */
+  d = min(d, dropSdf(P, 0.02,     2.28, 0.056, H + 1.0, 0.00, 5.6));
+  d = min(d, dropSdf(P, W - 0.04, 1.70, 0.050, H + 1.0, 0.25, 6.2));
 
   /* The exit: every surface swells until the card is one sheet of paint. */
   return d - grow;
@@ -234,12 +258,15 @@ void main(){
   if (cov > 0.0015) {
     /* Thickness as a circular cross-section: nearly flat across the body,
        rolling over hard at the rim. */
-    float t = clamp(-d / 0.115, 0.0, 1.0);
+    float t = clamp(-d / 0.094, 0.0, 1.0);
     float u = 1.0 - t;
     float h = sqrt(max(1.0 - u * u, 0.0));
 
-    /* A second, far broader arc over the whole body. */
-    float ub = 1.0 - clamp(-d / 1.70, 0.0, 1.0);
+    /* A second, far broader arc over the whole body — but only just enough
+       to keep it from reading as a flat field. Any more and a mass curves
+       like something inflated, which is the whole difference between sauce
+       lying on a surface and a bubble sitting on one. */
+    float ub = 1.0 - clamp(-d / 2.60, 0.0, 1.0);
     float hb = sqrt(max(1.0 - ub * ub, 0.0));
 
     /* Normal from the height field. Forward differences: two extra field
@@ -249,7 +276,7 @@ void main(){
     vec2  g = vec2(paintSdf(P + vec2(e, 0.0)) - d,
                    paintSdf(P + vec2(0.0, e)) - d) / e;
     float slope = min(u / max(h, 0.10), 7.0)
-                + min(ub / max(hb, 0.10), 3.0) * 0.28;
+                + min(ub / max(hb, 0.10), 3.0) * 0.12;
     vec3  n = normalize(vec3(g * slope * 1.25, 1.0));
 
     /* The gradient falls below unit length inside a blend, which is exactly
@@ -259,11 +286,15 @@ void main(){
     /* The body is still moving, so the surface is never quite flat. Ripples
        ride down it and drag the highlight with them, and that travelling
        highlight is what the eye reads as wet. */
-    vec2  fp = P * 1.5 + vec2(0.0, -uTime * 0.10);
+    /* Drawn out vertically, because it is running: the structure a sauce
+       carries is streaks along the direction of flow, not a pebbled surface.
+       This is also what breaks the highlight into something that travels,
+       instead of one round glint sitting still on a dome. */
+    vec2  fp = P * vec2(2.7, 0.85) + vec2(0.0, -uTime * 0.13);
     float f0 = ripple(fp);
     vec2  fg = vec2(ripple(fp + vec2(0.13, 0.0)) - f0,
                     ripple(fp + vec2(0.0, 0.13)) - f0);
-    n = normalize(n + vec3(fg * 1.15 * t, 0.0));
+    n = normalize(n + vec3(fg * vec2(3.2, 1.5) * t, 0.0));
 
     vec3 V  = vec3(0.0, 0.0, 1.0);
     vec3 L1 = normalize(vec3(-0.46, -0.72, 0.52));
@@ -271,7 +302,7 @@ void main(){
 
     /* One clean colour: cartoon forms want a flat, confident fill, and the
        shape does the describing. */
-    vec3 albedo = pow(vec3(0.775, 0.425, 0.055), vec3(2.2));
+    vec3 albedo = pow(vec3(0.735, 0.386, 0.048), vec3(2.2));
 
     float nl1 = max(dot(n, L1), 0.0);
     float nl2 = max(dot(n, L2), 0.0);
@@ -286,17 +317,22 @@ void main(){
 
     float nv = max(dot(n, V), 0.0);
     float fres = 0.035 + 0.965 * pow(1.0 - nv, 5.0);
-    vec3 refl = env(reflect(-V, n)) * (0.26 + 0.85 * fres);
+    /* Held back at grazing angles: with the rim rolled this tightly, a strong
+       fresnel puts a hard bright line all the way round every shape, and a
+       drawn outline is the one thing that will not read as liquid. */
+    vec3 refl = env(reflect(-V, n)) * (0.20 + 0.40 * fres);
 
-    /* One tight, confident highlight rather than a scatter of them: the drawn
-       kind, but shaped by a real microfacet lobe so it wraps the form. */
+    /* Wet, not polished. A tight lobe puts a single round glint on every mass
+       and that one detail reads as a balloon no matter what the silhouette is
+       doing; a broader one lets the flow structure above shape the highlight
+       into streaks, which is what a sauce actually does with a light. */
     vec3 spec = vec3(1.0, 0.985, 0.96)
-              * (ggx(n, V, L1, 0.062) * 1.55 + ggx(n, V, L2, 0.20) * 0.30);
+              * (ggx(n, V, L1, 0.115) * 1.00 + ggx(n, V, L2, 0.26) * 0.26);
 
-    /* A rim of the key catching the far shoulder, which is what lifts a
-       cartoon form off its background without outlining it. */
+    /* A rim of the key catching the far shoulder, kept low: a bright outline
+       all the way round is the other half of the balloon read. */
     float rim = pow(1.0 - nv, 3.5) * max(dot(n, normalize(vec3(-0.6, -0.75, 0.0))), 0.0);
-    spec += vec3(1.0, 0.86, 0.62) * rim * 0.55;
+    spec += vec3(1.0, 0.86, 0.62) * rim * 0.26;
 
     col = diff + refl + spec;
 
