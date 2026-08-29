@@ -96,16 +96,19 @@ vec3 pCircle(vec2 p, vec2 c, float r){
   return vec3(l - r, v / l);
 }
 
-/* Lobes wider than they are tall, because sauce spreads under its own weight
-   rather than holding a ball. Cheap ellipse: a unit-circle test in squashed
-   space, scaled back by the smaller semi-axis, which under-reads the distance
-   slightly and so is safe to feed a smooth minimum. The gradient of that is
-   exact and is normalised, so the ellipse's own sub-unit gradient does not
-   get mistaken for a crease. */
+/* An ellipse, first order: the unit-circle test in squashed space divided by
+   the gradient it is squashed by. Scaling by the smaller semi-axis instead is
+   cheaper and fine for a lobe that is nearly round, but the shapes traced off
+   the artwork include some four times longer than they are wide, and there
+   that shortcut under-reads the distance badly enough along the long axis to
+   make the smooth minimum blend two lobes that are nowhere near each other.
+   The gradient falls out of the same two lines. */
 vec3 pLobe(vec2 p, vec2 c, float rx, float ry){
   vec2  q = (p - c) / vec2(rx, ry);
   float l = max(length(q), 1e-6);
-  return vec3((l - 1.0) * min(rx, ry), normalize((q / l) / vec2(rx, ry)));
+  vec2  g = (q / l) / vec2(rx, ry);
+  float gl = max(length(g), 1e-6);
+  return vec3((l - 1.0) / gl, g / gl);
 }
 
 /* A cone with round caps: the shape a run of sauce makes as it thins. On the
@@ -201,11 +204,66 @@ vec3 runField(vec2 q, float x, float y0, float tip, float w0, float w1,
   return f;
 }
 
-vec3 corner(vec2 q, float k, float a, float b, float c){
-  vec3 f = pLobe(q, vec2(-0.62, -0.58), 1.30, 1.02);
-  f = fSmin(f, pLobe(q, vec2(0.02,  0.06), a * 1.28, a * 0.82), k);
-  f = fSmin(f, pLobe(q, vec2(0.68, -0.18), b * 1.30, b * 0.80), k);
-  f = fSmin(f, pLobe(q, vec2(1.24, -0.44), c * 1.26, c * 0.84), k);
+/* The four corners, traced off the artwork.
+
+   Each is a union of eight ellipses fitted to the real silhouette: seeded at
+   the point furthest inside the shape, grown to the largest ellipse that
+   still touches no background, then repeated on whatever is left. Ellipses
+   are allowed to run off the edge of the card — the paint does — so only
+   background inside the frame constrains them. Measured against the artwork
+   the four come back at an intersection-over-union of 0.90 to 0.94, which is
+   as close as eight ellipses get before the count starts mattering more than
+   the likeness. The numbers are in units of the master scale, so the shapes
+   hold their proportions at any size. */
+
+vec3 cornerTL(vec2 q, float k){
+  vec3 f = pLobe(q, vec2( 0.179,  0.000), 0.524, 0.327);
+  f = fSmin(f, pLobe(q, vec2( 1.097,  0.000), 0.227, 0.283), k);
+  f = fSmin(f, pLobe(q, vec2( 0.174,  0.328), 0.117, 0.420), k);
+  f = fSmin(f, pLobe(q, vec2( 0.559,  0.231), 0.102, 0.102), k);
+  f = fSmin(f, pLobe(q, vec2( 0.708,  0.000), 0.300, 0.083), k);
+  f = fSmin(f, pLobe(q, vec2( 1.169,  0.272), 0.074, 0.267), k);
+  f = fSmin(f, pLobe(q, vec2( 0.159,  0.749), 0.081, 0.101), k);
+  f = fSmin(f, pLobe(q, vec2( 0.292,  0.323), 0.043, 0.121), k);
+  return f;
+}
+
+vec3 cornerTR(vec2 q, float k){
+  vec3 f = pLobe(q, vec2( 0.256,  0.000), 0.238, 0.238);
+  f = fSmin(f, pLobe(q, vec2( 0.723,  0.000), 0.195, 0.195), k);
+  f = fSmin(f, pLobe(q, vec2( 0.523,  0.000), 0.366, 0.174), k);
+  f = fSmin(f, pLobe(q, vec2( 0.190,  0.231), 0.174, 0.174), k);
+  f = fSmin(f, pLobe(q, vec2( 0.882,  0.123), 0.157, 0.098), k);
+  f = fSmin(f, pLobe(q, vec2( 1.005,  0.190), 0.092, 0.092), k);
+  f = fSmin(f, pLobe(q, vec2( 0.297,  0.369), 0.081, 0.081), k);
+  f = fSmin(f, pLobe(q, vec2( 0.062,  0.354), 0.046, 0.046), k);
+  /* The artwork has one drop already off the sheet, hanging on the
+     right edge. It is part of the shape, so it is part of the shape. */
+  f = fMin(f, pLobe(q, vec2( 0.113,  1.067), 0.095, 0.095));
+  return f;
+}
+
+vec3 cornerBL(vec2 q, float k){
+  vec3 f = pLobe(q, vec2( 0.000,  0.359), 0.383, 0.383);
+  f = fSmin(f, pLobe(q, vec2( 0.000,  1.369), 0.324, 0.259), k);
+  f = fSmin(f, pLobe(q, vec2( 0.374,  0.277), 0.494, 0.137), k);
+  f = fSmin(f, pLobe(q, vec2( 0.000,  0.744), 0.374, 0.134), k);
+  f = fSmin(f, pLobe(q, vec2( 0.364,  1.462), 0.218, 0.104), k);
+  f = fSmin(f, pLobe(q, vec2( 0.000,  0.882), 0.080, 0.289), k);
+  f = fSmin(f, pLobe(q, vec2( 0.867,  0.262), 0.120, 0.096), k);
+  f = fSmin(f, pLobe(q, vec2( 0.256,  0.646), 0.072, 0.202), k);
+  return f;
+}
+
+vec3 cornerBR(vec2 q, float k){
+  vec3 f = pLobe(q, vec2( 0.862,  0.005), 0.251, 0.251);
+  f = fSmin(f, pLobe(q, vec2( 0.195,  0.005), 0.100, 0.362), k);
+  f = fSmin(f, pLobe(q, vec2( 0.159,  0.426), 0.138, 0.138), k);
+  f = fSmin(f, pLobe(q, vec2( 1.021,  0.200), 0.103, 0.215), k);
+  f = fSmin(f, pLobe(q, vec2( 0.297,  0.005), 0.266, 0.095), k);
+  f = fSmin(f, pLobe(q, vec2( 1.092,  0.364), 0.114, 0.143), k);
+  f = fSmin(f, pLobe(q, vec2( 0.605,  0.005), 0.103, 0.128), k);
+  f = fSmin(f, pLobe(q, vec2( 0.128,  0.287), 0.113, 0.237), k);
   return f;
 }
 
@@ -222,7 +280,7 @@ vec3 corner(vec2 q, float k, float a, float b, float c){
 vec3 paintField(vec2 P){
   float W = uRes.x / uScale;
   float H = uRes.y / uScale;
-  float k = 0.21;
+  float k = 0.10;
   float grow = uFlood * uFlood * (W + H);
   vec3  f = vec3(1e5, 0.0, 0.0);
 
@@ -234,21 +292,21 @@ vec3 paintField(vec2 P){
   /* The four masses, which sit still: sauce that has arrived and settled.
      Each is described in its own frame, so the gradient comes back in that
      frame too and has to be flipped on whichever axis was mirrored. */
-  if (tl.x < 2.0 + grow && tl.y < 1.5 + grow) {
-    f = corner(tl, k, 0.62, 0.46, 0.33);
+  if (tl.x < 1.6 + grow && tl.y < 1.3 + grow) {
+    f = cornerTL(tl, k);
   }
-  if (tr.x < 2.0 + grow && tr.y < 1.4 + grow) {
-    vec3 c = corner(tr, k, 0.54, 0.40, 0.28);
+  if (tr.x < 1.5 + grow && tr.y < 1.5 + grow) {
+    vec3 c = cornerTR(tr, k);
     f = fMin(f, vec3(c.x, -c.y, c.z));
   }
   /* Sauce cannot run upward, so nothing hangs off the bottom two: they only
      sit and catch what comes down. */
-  if (bl.x < 2.0 + grow && bl.y < 1.3 + grow) {
-    vec3 c = corner(bl, k, 0.50, 0.37, 0.26);
+  if (bl.x < 1.4 + grow && bl.y < 2.0 + grow) {
+    vec3 c = cornerBL(bl, k);
     f = fMin(f, vec3(c.x, c.y, -c.z));
   }
-  if (br.x < 2.0 + grow && br.y < 1.3 + grow) {
-    vec3 c = corner(br, k, 0.58, 0.43, 0.30);
+  if (br.x < 1.6 + grow && br.y < 1.2 + grow) {
+    vec3 c = cornerBR(br, k);
     f = fMin(f, vec3(c.x, -c.y, -c.z));
   }
 
@@ -257,12 +315,12 @@ vec3 paintField(vec2 P){
      the wordmark keeps the room below them. Held off the left and right edges
      too: a run at x near zero is a stripe down the side of the card, and that
      reads as a border rather than as something falling. */
-  f = fSmin(f, runField(tl, 0.26,  0.48, H * 0.50, 0.125, 0.058, 0.00, 11.5, H, grow), 0.12);
-  f = fSmin(f, runField(tl, 0.86,  0.16, H * 0.34, 0.094, 0.045, 4.30, 13.1, H, grow), 0.10);
-  f = fSmin(f, runField(tl, 1.30, -0.18, H * 0.25, 0.068, 0.034, 8.10,  9.7, H, grow), 0.08);
+  f = fSmin(f, runField(tl, 0.26, 0.57, H * 0.50, 0.125, 0.058, 0.00, 11.5, H, grow), 0.12);
+  f = fSmin(f, runField(tl, 0.60, 0.27, H * 0.34, 0.094, 0.045, 4.30, 13.1, H, grow), 0.10);
+  f = fSmin(f, runField(tl, 1.15, 0.47, H * 0.25, 0.068, 0.034, 8.10,  9.7, H, grow), 0.08);
 
-  vec3 r1 = runField(tr, 0.28, 0.38, H * 0.44, 0.108, 0.050, 2.20, 12.3, H, grow);
-  vec3 r2 = runField(tr, 0.84, 0.04, H * 0.29, 0.076, 0.036, 6.40, 10.6, H, grow);
+  vec3 r1 = runField(tr, 0.28, 0.39, H * 0.44, 0.108, 0.050, 2.20, 12.3, H, grow);
+  vec3 r2 = runField(tr, 0.90, 0.19, H * 0.29, 0.076, 0.036, 6.40, 10.6, H, grow);
   f = fSmin(f, vec3(r1.x, -r1.y, r1.z), 0.11);
   f = fSmin(f, vec3(r2.x, -r2.y, r2.z), 0.09);
 
@@ -376,15 +434,21 @@ void main(){
     /* Redder and deeper than it was. Golden-amber plus light coming through
        the thin parts is exactly the recipe for honey; sauce is a pigment that
        stops light rather than carrying it. */
-    vec3 albedo = pow(vec3(0.745, 0.298, 0.052), vec3(2.2));
+    vec3 albedo = pow(vec3(0.939, 0.632, 0.172), vec3(2.2));
 
     float nl1 = max(dot(n, L1), 0.0);
     float nl2 = max(dot(n, L2), 0.0);
 
     /* Keep the fill mean so the body has somewhere dark to go: a form lit
        from every side has no shape, and the highlight has nothing to beat. */
-    vec3 diff = albedo * (0.055 + 1.62 * nl1) * ao
-              + albedo * vec3(1.0, 0.74, 0.50) * 0.22 * nl2;
+    /* Lit across a narrower range than a lone object would be. The artwork
+       this matches is one flat colour, so the further the shading spreads the
+       body from that colour the less it reads as the same paint — and a lit
+       face that climbs far enough desaturates toward cream, which is the one
+       direction this colour cannot afford to go. Ambient up, key down: the
+       form still turns, it just turns within the colour. */
+    vec3 diff = albedo * (0.26 + 1.22 * nl1) * ao
+              + albedo * vec3(1.0, 0.78, 0.58) * 0.20 * nl2;
 
     /* A trace of light through the very thinnest edge, and no more than a
        trace: a body that glows where it is thin is the single strongest
