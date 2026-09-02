@@ -50,8 +50,21 @@ async function sendEmail(params: {
       }),
     });
 
-    return response.ok;
-  } catch {
+    if (!response.ok) {
+      // Resend's sandbox sender can only deliver to the address the account
+      // was signed up with until a real domain is verified — logged here so
+      // that restriction (or any other send failure) shows up in Vercel's
+      // runtime logs instead of just quietly not arriving.
+      const body = await response.text().catch(() => "");
+      console.error(
+        `Resend send to ${params.to} failed (${response.status}): ${body}`,
+      );
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Resend send to ${params.to} threw:`, error);
     return false;
   }
 }
