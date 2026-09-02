@@ -9,7 +9,7 @@ export const SHOP_TAGLINE = "Your plug for all drip necessities";
  */
 export const SHOP_INSTAGRAM = "secretsource";
 export const SHOP_INSTAGRAM_URL = "https://instagram.com/secretsource";
-export const SHOP_EMAIL = "orders@secretsource.shop";
+export const SHOP_EMAIL = "secretsourceltd@outlook.com";
 export const SHOP_WHATSAPP_URL = "https://wa.me/447000000000";
 
 /** Free delivery kicks in at this basket value (in pence). */
