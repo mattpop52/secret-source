@@ -1,56 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import type { CartLine } from "./cart-provider";
-import { useCurrency } from "./currency-provider";
+import { useCheckoutDialog } from "./checkout-provider";
 
 /**
- * Hands the basket to the server, which re-prices it against the catalogue
- * and opens a PayPal order for approval. Prices are never sent from here — the
- * browser only says which product, which size, how many, and which currency
- * the shopper picked; the server converts and charges from its own rate
- * table, never trusting a client-sent amount.
+ * Hands the basket to the shared shipping dialog (see checkout-provider.tsx
+ * and checkout-dialog.tsx), which collects a delivery address, then sends
+ * that basket to the server to be re-priced against the catalogue and
+ * turned into a PayPal order for approval. Prices are never sent from here —
+ * the browser only says which product, which size, how many, and which
+ * currency and address the shopper picked; the server converts and charges
+ * from its own rate table, never trusting a client-sent amount.
+ *
+ * Kept as its own hook, rather than having every call site reach for
+ * useCheckoutDialog directly, so this can change again without touching the
+ * three components that call it.
  */
 export function useCheckout() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { currency } = useCurrency();
+  const { open, isSubmitting } = useCheckoutDialog();
 
-  async function checkout(lines: CartLine[]) {
-    if (lines.length === 0 || isSubmitting) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: lines.map((line) => ({
-            slug: line.slug,
-            size: line.size,
-            quantity: line.quantity,
-          })),
-          currency,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok || !payload?.url) {
-        toast.error(payload?.error ?? "Checkout could not be started.");
-        return;
-      }
-
-      window.location.href = payload.url;
-    } catch {
-      toast.error("Checkout could not be reached. Try again in a moment.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  return { checkout, isSubmitting };
+  return { checkout: open, isSubmitting };
 }

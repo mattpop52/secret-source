@@ -87,23 +87,38 @@ export type PaypalLineItem = {
   unitAmountMinor: number;
 };
 
+/** A shipping address collected on the shop's own checkout form. */
+export type ShippingAddress = {
+  fullName: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  region?: string;
+  postalCode: string;
+  countryCode: string;
+};
+
 /**
  * Creates a PayPal order for the exact total already computed from the
  * catalogue, and returns the URL to send the shopper to for approval.
  *
- * shipping_preference: "GET_FROM_FILE" asks PayPal to collect a shipping
- * address from the buyer during approval — the same job Stripe Checkout's
- * shipping_address_collection was doing, so nothing upstream of this needs
- * its own address form.
+ * shipping_preference: "SET_PROVIDED_ADDRESS" locks in the address collected
+ * on the shop's own form rather than asking PayPal to supply one
+ * (GET_FROM_FILE) — that only works if the buyer already has an address
+ * saved with PayPal, which a guest paying by card typically does not, so it
+ * cannot be relied on to always produce one. Providing the address here
+ * guarantees every captured order carries a real, validated destination.
  */
 export async function createPaypalOrder(params: {
   currency: CurrencyCode;
   items: PaypalLineItem[];
   shippingMinor: number;
+  shipping: ShippingAddress;
   returnUrl: string;
   cancelUrl: string;
 }): Promise<{ id: string; approveUrl: string }> {
-  const { currency, items, shippingMinor, returnUrl, cancelUrl } = params;
+  const { currency, items, shippingMinor, shipping, returnUrl, cancelUrl } =
+    params;
   const accessToken = await getAccessToken();
 
   const itemTotalMinor = items.reduce(
@@ -145,11 +160,22 @@ export async function createPaypalOrder(params: {
               value: toAmountString(item.unitAmountMinor, currency),
             },
           })),
+          shipping: {
+            name: { full_name: shipping.fullName.slice(0, 300) },
+            address: {
+              address_line_1: shipping.line1.slice(0, 300),
+              address_line_2: shipping.line2?.slice(0, 300),
+              admin_area_2: shipping.city.slice(0, 120),
+              admin_area_1: shipping.region?.slice(0, 120),
+              postal_code: shipping.postalCode.slice(0, 60),
+              country_code: shipping.countryCode,
+            },
+          },
         },
       ],
       application_context: {
         brand_name: "Secret Source",
-        shipping_preference: "GET_FROM_FILE",
+        shipping_preference: "SET_PROVIDED_ADDRESS",
         user_action: "PAY_NOW",
         return_url: returnUrl,
         cancel_url: cancelUrl,
@@ -174,17 +200,76 @@ export async function createPaypalOrder(params: {
   return { id: data.id, approveUrl };
 }
 
+export type PaypalOrderItem = {
+  name: string;
+  description: string;
+  quantity: number;
+};
+
 export type PaypalCapture = {
   status: string;
-  payerEmail: string | null;
   reference: string;
+  payerEmail: string | null;
+  payerName: string | null;
+  amountValue: string;
+  currency: string;
+  items: PaypalOrderItem[];
+  shippingName: string | null;
+  /** Formatted, in display order — ready to join with line breaks. */
+  shippingLines: string[];
 };
+
+// biome-ignore lint/suspicious/noExplicitAny: shapes a hand-picked subset of PayPal's order/capture response, which is wider than anything worth typing in full
+function toCapture(orderId: string, order: any): PaypalCapture {
+  const unit = order.purchase_units?.[0];
+  const capture = unit?.payments?.captures?.[0];
+  const amount = capture?.amount ?? unit?.amount;
+  const address = unit?.shipping?.address;
+
+  const shippingLines = address
+    ? [
+        address.address_line_1,
+        address.address_line_2,
+        [address.admin_area_2, address.admin_area_1, address.postal_code]
+          .filter(Boolean)
+          .join(", "),
+        address.country_code,
+      ].filter((line): line is string => Boolean(line))
+    : [];
+
+  return {
+    status: capture?.status ?? order.status ?? "UNKNOWN",
+    reference: orderId.slice(-8).toUpperCase(),
+    payerEmail: order.payer?.email_address ?? null,
+    payerName:
+      unit?.shipping?.name?.full_name ??
+      ([order.payer?.name?.given_name, order.payer?.name?.surname]
+        .filter(Boolean)
+        .join(" ") ||
+        null),
+    amountValue: amount?.value ?? "0.00",
+    currency: amount?.currency_code ?? "GBP",
+    items: (unit?.items ?? []).map(
+      (item: { name?: string; description?: string; quantity?: string }) => ({
+        name: item.name ?? "",
+        description: item.description ?? "",
+        quantity: Number(item.quantity ?? 1),
+      }),
+    ),
+    shippingName: unit?.shipping?.name?.full_name ?? null,
+    shippingLines,
+  };
+}
 
 /**
  * Finalises payment on an order the shopper has already approved. Reloading
  * the success page (back button, a refresh) calls this a second time for
  * the same order, so a prior capture is treated as success rather than an
  * error — PayPal reports that case as 422 ORDER_ALREADY_CAPTURED.
+ *
+ * `Prefer: return=representation` asks for the full order back — items,
+ * shipping, payer — in this one call rather than the minimal default
+ * response, which would otherwise need a second request to read back.
  */
 export async function capturePaypalOrder(
   orderId: string,
@@ -198,6 +283,7 @@ export async function capturePaypalOrder(
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
+        Prefer: "return=representation",
       },
     },
   );
@@ -213,16 +299,10 @@ export async function capturePaypalOrder(
   }
 
   // Either the fresh capture response or, on a repeat visit, the order
-  // itself — both carry payer details in the same shape.
+  // itself — both carry the same fields, `Prefer` included.
   const order = alreadyCaptured ? await getPaypalOrder(orderId) : data;
 
-  const capture = order.purchase_units?.[0]?.payments?.captures?.[0];
-
-  return {
-    status: capture?.status ?? order.status ?? "UNKNOWN",
-    payerEmail: order.payer?.email_address ?? null,
-    reference: orderId.slice(-8).toUpperCase(),
-  };
+  return toCapture(orderId, order);
 }
 
 async function getPaypalOrder(orderId: string) {

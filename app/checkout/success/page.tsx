@@ -3,6 +3,11 @@ import Link from "next/link";
 import { ClearCartOnMount } from "@/components/clear-cart";
 import { LogoBadge, PlugMark } from "@/components/logo";
 import { DELIVERY_WINDOW, SHOP_EMAIL } from "@/lib/constants";
+import {
+  isEmailConfigured,
+  sendOrderConfirmation,
+  sendOrderOwnerNotification,
+} from "@/lib/email";
 import { capturePaypalOrder, isPaypalConfigured } from "@/lib/paypal";
 
 export const metadata: Metadata = { title: "Order placed" };
@@ -29,6 +34,17 @@ export default async function CheckoutSuccessPage({
       const capture = await capturePaypalOrder(orderId);
       email = capture.payerEmail;
       reference = capture.reference;
+
+      // Best-effort: the order is already paid for by this point, so a
+      // failed or unconfigured email send should never turn a real success
+      // into an error page. Sent in parallel since neither depends on the
+      // other's outcome.
+      if (isEmailConfigured()) {
+        await Promise.allSettled([
+          sendOrderOwnerNotification(capture),
+          sendOrderConfirmation(capture),
+        ]);
+      }
     } catch {
       captureFailed = true;
     }

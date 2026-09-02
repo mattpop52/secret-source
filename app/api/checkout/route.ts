@@ -26,6 +26,28 @@ const checkoutSchema = z.object({
   // price using the same static rate table the display uses, never trusted
   // from the client.
   currency: z.string().optional(),
+  shipping: z.object({
+    fullName: z.string().trim().min(1).max(300),
+    line1: z.string().trim().min(1).max(300),
+    // The form always submits a string for these, even when left blank, so
+    // an empty string is normalised to undefined here rather than being
+    // sent on to PayPal as a real (empty) address line.
+    line2: z
+      .string()
+      .trim()
+      .max(300)
+      .optional()
+      .transform((value) => value || undefined),
+    city: z.string().trim().min(1).max(120),
+    region: z
+      .string()
+      .trim()
+      .max(120)
+      .optional()
+      .transform((value) => value || undefined),
+    postalCode: z.string().trim().min(1).max(60),
+    countryCode: z.string().trim().length(2),
+  }),
 });
 
 export async function POST(request: Request) {
@@ -95,6 +117,7 @@ export async function POST(request: Request) {
       currency,
       items: lineItems,
       shippingMinor: convertFromGbpMinor(shippingCents, currency),
+      shipping: parsed.data.shipping,
       returnUrl: `${origin}/checkout/success`,
       cancelUrl: `${origin}/cart`,
     });

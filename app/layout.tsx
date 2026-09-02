@@ -4,6 +4,8 @@ import { Toaster } from "sonner";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { CartDrawer } from "@/components/cart-drawer";
 import { CartProvider } from "@/components/cart-provider";
+import { CheckoutDialog } from "@/components/checkout-dialog";
+import { CheckoutProvider } from "@/components/checkout-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { LanguageProvider } from "@/components/language-provider";
 import { SiteFooter } from "@/components/site-footer";
@@ -117,13 +119,16 @@ export default function RootLayout({
 
         <LanguageProvider>
           <CurrencyProvider>
-            <CartProvider>
-              <AnnouncementBar />
-              <SiteHeader />
-              <main>{children}</main>
-              <SiteFooter />
-              <CartDrawer />
-            </CartProvider>
+            <CheckoutProvider>
+              <CartProvider>
+                <AnnouncementBar />
+                <SiteHeader />
+                <main>{children}</main>
+                <SiteFooter />
+                <CartDrawer />
+              </CartProvider>
+              <CheckoutDialog />
+            </CheckoutProvider>
           </CurrencyProvider>
         </LanguageProvider>
 

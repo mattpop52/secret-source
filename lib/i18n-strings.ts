@@ -63,7 +63,18 @@ export type TranslationKey =
   | "noticeChecked"
   | "noticeWorldwideDelivery"
   | "noticeFreeDeliveryOver"
-  | "noticeReturns";
+  | "noticeReturns"
+  | "shippingTitle"
+  | "shippingBlurb"
+  | "fullName"
+  | "addressLine1"
+  | "addressLine2"
+  | "townCity"
+  | "countyRegion"
+  | "postcode"
+  | "country"
+  | "continueToPayment"
+  | "takingYouToPaypal";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -132,6 +143,18 @@ const en: Dictionary = {
   noticeWorldwideDelivery: "Tracked worldwide delivery",
   noticeFreeDeliveryOver: "Free delivery over {amount}",
   noticeReturns: "{returns} returns",
+  shippingTitle: "Where's it going?",
+  shippingBlurb:
+    "PayPal handles the payment — we just need to know where to post it.",
+  fullName: "Full name",
+  addressLine1: "Address line 1",
+  addressLine2: "Address line 2 (optional)",
+  townCity: "Town / city",
+  countyRegion: "County / region (optional)",
+  postcode: "Postcode",
+  country: "Country",
+  continueToPayment: "Continue to PayPal",
+  takingYouToPaypal: "Taking you to PayPal…",
 };
 
 const fr: Dictionary = {
@@ -202,6 +225,18 @@ const fr: Dictionary = {
   noticeWorldwideDelivery: "Livraison suivie partout dans le monde",
   noticeFreeDeliveryOver: "Livraison gratuite dès {amount}",
   noticeReturns: "Retours sous {returns}",
+  shippingTitle: "Où l'envoyer ?",
+  shippingBlurb:
+    "PayPal gère le paiement — il ne nous manque que l'adresse de livraison.",
+  fullName: "Nom complet",
+  addressLine1: "Adresse (ligne 1)",
+  addressLine2: "Adresse (ligne 2, facultatif)",
+  townCity: "Ville",
+  countyRegion: "Région (facultatif)",
+  postcode: "Code postal",
+  country: "Pays",
+  continueToPayment: "Continuer vers PayPal",
+  takingYouToPaypal: "Direction PayPal…",
 };
 
 const es: Dictionary = {
@@ -271,6 +306,18 @@ const es: Dictionary = {
   noticeWorldwideDelivery: "Envío con seguimiento a cualquier parte del mundo",
   noticeFreeDeliveryOver: "Envío gratis a partir de {amount}",
   noticeReturns: "Devoluciones en {returns}",
+  shippingTitle: "¿A dónde lo enviamos?",
+  shippingBlurb:
+    "PayPal gestiona el pago — solo necesitamos saber dónde enviarlo.",
+  fullName: "Nombre completo",
+  addressLine1: "Dirección (línea 1)",
+  addressLine2: "Dirección (línea 2, opcional)",
+  townCity: "Ciudad",
+  countyRegion: "Provincia (opcional)",
+  postcode: "Código postal",
+  country: "País",
+  continueToPayment: "Continuar a PayPal",
+  takingYouToPaypal: "Te llevamos a PayPal…",
 };
 
 const de: Dictionary = {
@@ -341,6 +388,18 @@ const de: Dictionary = {
   noticeWorldwideDelivery: "Versand mit Sendungsverfolgung weltweit",
   noticeFreeDeliveryOver: "Kostenloser Versand ab {amount}",
   noticeReturns: "{returns} Rückgaberecht",
+  shippingTitle: "Wohin soll's gehen?",
+  shippingBlurb:
+    "PayPal übernimmt die Zahlung — wir brauchen nur die Lieferadresse.",
+  fullName: "Vollständiger Name",
+  addressLine1: "Adresse (Zeile 1)",
+  addressLine2: "Adresse (Zeile 2, optional)",
+  townCity: "Stadt",
+  countyRegion: "Region (optional)",
+  postcode: "Postleitzahl",
+  country: "Land",
+  continueToPayment: "Weiter zu PayPal",
+  takingYouToPaypal: "Weiterleitung zu PayPal…",
 };
 
 const DICTIONARIES: Record<LanguageCode, Dictionary> = { en, fr, es, de };
