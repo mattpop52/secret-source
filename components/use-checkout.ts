@@ -7,7 +7,7 @@ import { useCurrency } from "./currency-provider";
 
 /**
  * Hands the basket to the server, which re-prices it against the catalogue
- * and opens a Stripe Checkout session. Prices are never sent from here — the
+ * and opens a PayPal order for approval. Prices are never sent from here — the
  * browser only says which product, which size, how many, and which currency
  * the shopper picked; the server converts and charges from its own rate
  * table, never trusting a client-sent amount.

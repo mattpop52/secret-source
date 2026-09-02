@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import type Stripe from "stripe";
 import { z } from "zod";
 import { getProduct } from "@/lib/catalog";
 import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/constants";
@@ -8,8 +7,8 @@ import {
   DEFAULT_CURRENCY,
   isCurrencyCode,
 } from "@/lib/currency";
-import { ALLOWED_SHIPPING_COUNTRIES } from "@/lib/shipping-countries";
-import { getStripeClient, isStripeConfigured } from "@/lib/stripe";
+import type { PaypalLineItem } from "@/lib/paypal";
+import { createPaypalOrder, isPaypalConfigured } from "@/lib/paypal";
 
 const checkoutSchema = z.object({
   items: z
@@ -41,7 +40,6 @@ export async function POST(request: Request) {
     parsed.data.currency && isCurrencyCode(parsed.data.currency)
       ? parsed.data.currency
       : DEFAULT_CURRENCY;
-  const stripeCurrency = currency.toLowerCase();
 
   /*
    * Prices come from the catalogue on the server, never from the browser —
@@ -49,7 +47,7 @@ export async function POST(request: Request) {
    * re-checked against stock here too, because a basket can sit in
    * localStorage long after a size has gone.
    */
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  const lineItems: PaypalLineItem[] = [];
   let subtotal = 0;
 
   for (const item of parsed.data.items) {
@@ -74,76 +72,34 @@ export async function POST(request: Request) {
     subtotal += product.priceCents * item.quantity;
 
     lineItems.push({
+      name: product.name,
+      description: `${product.colourway.name} · Size ${item.size} · Docket ${product.code}`,
       quantity: item.quantity,
-      price_data: {
-        currency: stripeCurrency,
-        unit_amount: convertFromGbpMinor(product.priceCents, currency),
-        product_data: {
-          name: product.name,
-          description: `${product.colourway.name} · Size ${item.size} · Docket ${product.code}`,
-        },
-      },
+      unitAmountMinor: convertFromGbpMinor(product.priceCents, currency),
     });
   }
 
   const origin = new URL(request.url).origin;
 
-  if (!isStripeConfigured()) {
-    // No Stripe keys in this environment — send the shopper somewhere that
-    // says so plainly rather than failing at a dead button.
+  if (!isPaypalConfigured()) {
+    // No PayPal credentials in this environment — send the shopper somewhere
+    // that says so plainly rather than failing at a dead button.
     return NextResponse.json({ url: "/checkout/demo" });
-  }
-
-  const stripe = getStripeClient();
-
-  if (!stripe) {
-    return NextResponse.json(
-      { error: "Payments are not configured." },
-      { status: 500 },
-    );
   }
 
   const shippingCents =
     subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
 
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: lineItems,
-      shipping_address_collection: {
-        allowed_countries: [...ALLOWED_SHIPPING_COUNTRIES],
-      },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            display_name:
-              shippingCents === 0
-                ? "Free tracked delivery"
-                : "Tracked delivery",
-            fixed_amount: {
-              amount: convertFromGbpMinor(shippingCents, currency),
-              currency: stripeCurrency,
-            },
-            delivery_estimate: {
-              minimum: { unit: "business_day", value: 2 },
-              maximum: { unit: "business_day", value: 4 },
-            },
-          },
-        },
-      ],
-      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/cart`,
+    const order = await createPaypalOrder({
+      currency,
+      items: lineItems,
+      shippingMinor: convertFromGbpMinor(shippingCents, currency),
+      returnUrl: `${origin}/checkout/success`,
+      cancelUrl: `${origin}/cart`,
     });
 
-    if (!session.url) {
-      return NextResponse.json(
-        { error: "Checkout could not be started." },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: order.approveUrl });
   } catch {
     return NextResponse.json(
       { error: "Checkout could not be started. Try again in a moment." },

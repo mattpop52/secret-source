@@ -3,7 +3,7 @@
 The storefront for **Secret Source** — *your plug for all drip necessities*.
 
 A Next.js shop: category collections split into brand subcategories, product
-pages with live size runs, a basket that survives a reload, and Stripe
+pages with live size runs, a basket that survives a reload, and PayPal
 Checkout priced on the server.
 
 ```bash
@@ -61,24 +61,31 @@ still placeholder pending confirmation, both flagged at the top of
    mark, so nothing pretends to be a photograph before the photo exists.
 2. **Set the real contact details** in `lib/constants.ts` — Instagram handle,
    email and WhatsApp number are currently stand-ins.
-3. **Switch payments on.** Set `STRIPE_SECRET_KEY` (see `.env.example`).
-   Without it the checkout button lands on `/checkout/demo`, which says plainly
-   that payments aren't connected rather than failing silently.
-4. **Check the promises.** Delivery window, free-delivery threshold, returns
-   window and the authenticity guarantee are real commitments — they live in
-   `lib/constants.ts`, `app/authenticity/page.tsx` and `app/help/page.tsx`.
+3. **Switch payments on.** Set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`
+   (see `.env.example`) from a PayPal REST app at developer.paypal.com — a
+   separate thing from a PayPal.com pay link, which is fixed-price and can't
+   charge each basket's own total. Without these the checkout button lands
+   on `/checkout/demo`, which says plainly that payments aren't connected
+   rather than failing silently.
+4. **Check the promises.** Delivery window, free-delivery threshold and
+   returns window are real commitments — they live in `lib/constants.ts` and
+   `app/help/page.tsx`.
 
 ## How checkout works
 
 The browser only ever sends `{ slug, size, quantity }`. The route re-reads the
 price from `lib/catalog.ts`, re-checks that the size is still in stock, adds the
-shipping rate, and creates the Stripe Checkout session server-side — so a
-tampered basket in `localStorage` can't change what anybody pays.
+shipping rate, and creates a PayPal order server-side (`lib/paypal.ts`) for
+that exact total — so a tampered basket in `localStorage` can't change what
+anybody pays. The shopper approves on PayPal's own hosted page and lands back
+on `/checkout/success`, which is what actually captures the payment; PayPal
+approving an order doesn't move money on its own.
 
 ## Deploying
 
 Built for Vercel. Push to the connected branch and it deploys; add
-`STRIPE_SECRET_KEY` under the project's environment variables to take payments.
+`PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` under the project's environment
+variables to take payments.
 
 ## Notes
 

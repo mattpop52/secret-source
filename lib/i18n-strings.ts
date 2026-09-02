@@ -85,7 +85,7 @@ const en: Dictionary = {
     "One plug, checked stock, no waiting list. Everything on the shelf is in hand in the UK and ships tracked worldwide.",
   copyright:
     "© {year} Secret Source. Tracked delivery in {window}. {returns} returns.",
-  paymentMethods: "Cards · Apple Pay · Google Pay — secured by Stripe",
+  paymentMethods: "PayPal · Cards — secured by PayPal",
   regionLanguage: "Region & language",
   regionLanguageBlurb: "Prices convert live. The shop's own text follows suit.",
   currency: "Currency",
@@ -112,7 +112,7 @@ const en: Dictionary = {
   moreUnlocksFreeDelivery: "{amount} more unlocks free tracked delivery.",
   checkoutSecurely: "Checkout securely",
   paymentNote:
-    "Card, Apple Pay and Google Pay handled by Stripe. Packed same day, with you in {window}. {returns} to send it back.",
+    "PayPal or card, handled by PayPal. Packed same day, with you in {window}. {returns} to send it back.",
   keepShopping: "Keep shopping",
   oneSize: "One size",
   size: "Size",
@@ -152,7 +152,7 @@ const fr: Dictionary = {
     "Un seul plug, un stock contrôlé, pas de liste d'attente. Tout ce qui est en rayon est en main au Royaume-Uni et expédié partout dans le monde, suivi.",
   copyright:
     "© {year} Secret Source. Livraison suivie en {window}. Retours sous {returns}.",
-  paymentMethods: "Cartes · Apple Pay · Google Pay — sécurisé par Stripe",
+  paymentMethods: "PayPal · Cartes — sécurisé par PayPal",
   regionLanguage: "Région et langue",
   regionLanguageBlurb:
     "Les prix se convertissent en direct. Le texte du site suit.",
@@ -182,7 +182,7 @@ const fr: Dictionary = {
     "Encore {amount} débloque la livraison suivie gratuite.",
   checkoutSecurely: "Paiement sécurisé",
   paymentNote:
-    "Carte, Apple Pay et Google Pay gérés par Stripe. Emballé le jour même, chez vous en {window}. {returns} pour le retourner.",
+    "PayPal ou carte, gérés par PayPal. Emballé le jour même, chez vous en {window}. {returns} pour le retourner.",
   keepShopping: "Continuer mes achats",
   oneSize: "Taille unique",
   size: "Taille",
@@ -222,7 +222,7 @@ const es: Dictionary = {
     "Un solo proveedor, stock revisado, sin listas de espera. Todo lo que hay en el estante está en mano en el Reino Unido y se envía con seguimiento a cualquier parte del mundo.",
   copyright:
     "© {year} Secret Source. Envío con seguimiento en {window}. Devoluciones en {returns}.",
-  paymentMethods: "Tarjetas · Apple Pay · Google Pay — protegido por Stripe",
+  paymentMethods: "PayPal · Tarjetas — protegido por PayPal",
   regionLanguage: "Región e idioma",
   regionLanguageBlurb:
     "Los precios se convierten al momento. El texto de la tienda también cambia.",
@@ -251,7 +251,7 @@ const es: Dictionary = {
     "{amount} más desbloquea el envío con seguimiento gratis.",
   checkoutSecurely: "Pagar de forma segura",
   paymentNote:
-    "Tarjeta, Apple Pay y Google Pay gestionados por Stripe. Empaquetado el mismo día, contigo en {window}. {returns} para devolverlo.",
+    "PayPal o tarjeta, gestionados por PayPal. Empaquetado el mismo día, contigo en {window}. {returns} para devolverlo.",
   keepShopping: "Seguir comprando",
   oneSize: "Talla única",
   size: "Talla",
@@ -291,7 +291,7 @@ const de: Dictionary = {
     "Ein Anbieter, geprüfter Bestand, keine Warteliste. Alles im Regal ist im Vereinigten Königreich vorrätig und wird weltweit verfolgt versandt.",
   copyright:
     "© {year} Secret Source. Versand mit Sendungsverfolgung in {window}. {returns} Rückgaberecht.",
-  paymentMethods: "Karten · Apple Pay · Google Pay — abgesichert von Stripe",
+  paymentMethods: "PayPal · Karten — abgesichert von PayPal",
   regionLanguage: "Region & Sprache",
   regionLanguageBlurb:
     "Preise werden live umgerechnet. Der Text der Seite folgt.",
@@ -321,7 +321,7 @@ const de: Dictionary = {
   moreUnlocksFreeDelivery: "Noch {amount} schaltet kostenlosen Versand frei.",
   checkoutSecurely: "Sicher zur Kasse",
   paymentNote:
-    "Karte, Apple Pay und Google Pay über Stripe abgewickelt. Am selben Tag verpackt, bei dir in {window}. {returns} zum Zurücksenden.",
+    "PayPal oder Karte, abgewickelt über PayPal. Am selben Tag verpackt, bei dir in {window}. {returns} zum Zurücksenden.",
   keepShopping: "Weiter einkaufen",
   oneSize: "Einheitsgröße",
   size: "Größe",

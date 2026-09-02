@@ -84,7 +84,7 @@ const SECTIONS = [
       {
         question: "How do I pay?",
         answer:
-          "Card, Apple Pay or Google Pay, handled by Stripe. Card details are entered on Stripe's own checkout — they never touch this site.",
+          "PayPal, or a card without needing a PayPal account. Payment details are entered on PayPal's own checkout — they never touch this site.",
       },
       {
         question: "Is the price what I pay?",

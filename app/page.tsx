@@ -55,7 +55,7 @@ const STEPS = [
   {
     step: "02",
     title: "Pay how you like",
-    body: "Card, Apple Pay or Google Pay through Stripe. Nothing touches this site.",
+    body: "PayPal, or a card — no PayPal account needed. Nothing touches this site.",
   },
   {
     step: "03",

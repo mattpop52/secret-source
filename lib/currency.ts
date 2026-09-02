@@ -2,7 +2,7 @@
  * Currency display and conversion.
  *
  * The catalogue's real prices are all in GBP pence — that never changes,
- * and the Stripe checkout route always re-reads them from there. This file
+ * and the checkout route always re-reads them from there. This file
  * only converts that GBP figure for *display*, and for the amount actually
  * charged once a shopper picks a currency at checkout.
  *
@@ -21,7 +21,7 @@ export type Currency = {
   locale: string;
   /** Units of this currency per 1 GBP. */
   rate: number;
-  /** Stripe (and most currencies) count in the smallest unit — pence, cents.
+  /** PayPal (and most currencies) count in the smallest unit — pence, cents.
    *  A few, like JPY, have no smaller unit at all. */
   minorUnit: 0 | 2;
 };

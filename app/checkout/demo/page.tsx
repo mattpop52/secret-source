@@ -5,9 +5,10 @@ import { PlugMark } from "@/components/logo";
 export const metadata: Metadata = { title: "Checkout not connected yet" };
 
 /**
- * Where the checkout lands while STRIPE_SECRET_KEY is unset. It exists so a
- * shopper never taps a button that silently does nothing, and so whoever is
- * setting the shop up can see exactly what's missing.
+ * Where the checkout lands while PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET are
+ * unset. It exists so a shopper never taps a button that silently does
+ * nothing, and so whoever is setting the shop up can see exactly what's
+ * missing.
  */
 export default function CheckoutDemoPage() {
   return (
@@ -20,8 +21,8 @@ export default function CheckoutDemoPage() {
 
       <p className="mt-5 text-[var(--ss-smoke)] leading-relaxed">
         Your basket is intact — nothing has been charged, and nothing has been
-        lost. This shop is wired for Stripe Checkout, but this environment has
-        no Stripe key set, so the payment step can't open.
+        lost. This shop is wired for PayPal Checkout, but this environment has
+        no PayPal credentials set, so the payment step can't open.
       </p>
 
       <div className="ss-docket mt-8 px-6 py-6">
@@ -31,14 +32,33 @@ export default function CheckoutDemoPage() {
         <ol className="mt-4 space-y-3 text-[var(--ss-smoke)] text-sm">
           <li className="flex gap-3">
             <span className="ss-num text-[var(--ss-orange)]">01</span>
-            Add <code className="text-[var(--ss-bone)]">STRIPE_SECRET_KEY</code>{" "}
-            to the environment (Vercel project settings, or{" "}
-            <code className="text-[var(--ss-bone)]">.env.local</code> when
-            running locally).
+            <span>
+              Create a REST API app at{" "}
+              <span className="text-[var(--ss-bone)]">
+                developer.paypal.com
+              </span>{" "}
+              → Apps &amp; Credentials, on the same PayPal business account.
+              This is separate from any pay link already created — it's what
+              lets the site charge each order's own total automatically.
+            </span>
           </li>
           <li className="flex gap-3">
             <span className="ss-num text-[var(--ss-orange)]">02</span>
-            Redeploy. The checkout button then opens a live Stripe session,
+            <span>
+              Add{" "}
+              <code className="text-[var(--ss-bone)]">PAYPAL_CLIENT_ID</code>{" "}
+              and{" "}
+              <code className="text-[var(--ss-bone)]">
+                PAYPAL_CLIENT_SECRET
+              </code>{" "}
+              to the environment (Vercel project settings, or{" "}
+              <code className="text-[var(--ss-bone)]">.env.local</code> when
+              running locally).
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="ss-num text-[var(--ss-orange)]">03</span>
+            Redeploy. The checkout button then creates a live PayPal order,
             priced from the catalogue on the server.
           </li>
         </ol>

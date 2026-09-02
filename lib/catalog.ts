@@ -12,7 +12,7 @@
  * follows two conventions: tracksuits, jumpers, short sets, coats and
  * t-shirts carry a full S–XL run (`SIZE_RUN`); shoes, jeans, bags and hats
  * are stocked in whatever single real size the tag reads (`ONE_UNIT`).
- * Prices are the single source of truth for Stripe: the checkout route
+ * Prices are the single source of truth for checkout: the checkout route
  * reads them from here on the server, never from the browser.
  * ─────────────────────────────────────────────────────────────────────────
  */
