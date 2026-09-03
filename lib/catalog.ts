@@ -242,11 +242,7 @@ export const PRODUCTS: Product[] = [
     brand: "the-north-face",
     shape: "tracksuit",
     colourway: { name: "Heather Grey", fill: "#B7B7B4", accent: "#45443F" },
-    // TEMPORARY — dropped to £1 to run one real, live PayPal payment end to
-    // end (order create → approve → capture) before trusting the shop with
-    // its real prices. Revert to 10_000 once the user confirms testing is
-    // actually done (they said "not yet" once already — don't guess again).
-    priceCents: 100,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TNF-0001",
     blurb:
