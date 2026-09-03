@@ -282,14 +282,15 @@ export const PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-FOG-0002",
     blurb:
-      "Fear of God Essentials hoodie and sweatpants in triple black — flocked wordmark across the back, repeated on the left leg.",
+      "Fear of God Essentials hoodie and sweatpants in triple black — printed wordmark at the chest, repeated large across the back and down the left leg.",
     details: [
       "Pullover hood and matching sweatpants, sold as a set",
       "Heavyweight cotton-blend fleece, dropped shoulder",
-      'Flocked "Essentials / Fear of God" branding on the back and left leg',
+      'Printed "Essentials / Fear of God" branding at the chest, back and left leg',
       "New with tags",
     ],
-    image: "/products/essentials-fog-black-tracksuit.jpg",
+    image: "/products/essentials-fog-black-tracksuit-2.jpg",
+    imageBack: "/products/essentials-fog-black-tracksuit.jpg",
     badge: "just-in",
   },
   {
@@ -435,27 +436,6 @@ export const PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/denim-tears-cotton-wreath-tracksuit-black.jpg",
-    badge: "just-in",
-  },
-  {
-    slug: "essentials-fog-tracksuit-black-2",
-    name: "Essentials Tracksuit",
-    category: "tracksuits",
-    brand: "essentials",
-    shape: "tracksuit",
-    colourway: { name: "Black", fill: "#131313", accent: "#6B6B6B" },
-    priceCents: 10_000,
-    sizes: SIZE_RUN(),
-    code: "SS-FOG-0010",
-    blurb:
-      "A second Essentials hoodie and sweatpants in triple black — same set as SS-FOG-0002, a different unit, tags still on both pieces.",
-    details: [
-      "Pullover hood and matching sweatpants, sold as a set",
-      "Heavyweight cotton-blend fleece, dropped shoulder",
-      'Printed "Essentials / Fear of God" branding at the chest and left leg',
-      "New with tags",
-    ],
-    image: "/products/essentials-fog-black-tracksuit-2.jpg",
     badge: "just-in",
   },
   {
