@@ -2394,13 +2394,15 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0104",
     blurb:
-      "Dior tee in black, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed at the chest.",
+      "Dior tee in black, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed small at the chest, the same script printed large across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "'Christian Dior Atelier Paris' script printed at the chest",
+      "Matching script printed large across the back",
       "New with tags",
     ],
     image: "/products/dior-atelier-paris-tee-black.jpg",
+    imageBack: "/products/dior-atelier-paris-tee-black-back.jpg",
     badge: "just-in",
   },
   {
@@ -2593,13 +2595,16 @@ const BASE_PRODUCTS: Product[] = [
     priceCents: 7_000,
     sizes: SIZE_RUN(),
     code: "SS-AMR-0114",
-    blurb: "AMIRI tee in black, the MA monogram printed in grey at the chest.",
+    blurb:
+      "AMIRI tee in black, the MA monogram printed in grey at the chest, the AMIRI wordmark printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "MA monogram printed in grey at the left chest",
+      "AMIRI wordmark printed across the back",
       "New with tags",
     ],
     image: "/products/amiri-ma-monogram-tee-black.jpg",
+    imageBack: "/products/amiri-wordmark-back-tee-black.jpg",
     badge: "just-in",
   },
   {
@@ -2739,26 +2744,6 @@ const BASE_PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/rhude-heraldic-crest-tee-black.jpg",
-    badge: "just-in",
-  },
-  {
-    slug: "amiri-wordmark-back-tee-black",
-    name: "Wordmark Back Tee",
-    category: "t-shirts",
-    brand: "amiri",
-    shape: "tee",
-    colourway: { name: "Black", fill: "#131313", accent: "#8A8A85" },
-    priceCents: 7_000,
-    sizes: SIZE_RUN(),
-    code: "SS-AMR-0122",
-    blurb:
-      "AMIRI tee in black, the AMIRI wordmark printed large across the back — a bigger, back-only take on the chest-logo Wordmark Tee.",
-    details: [
-      "Crewneck tee, lightweight cotton jersey",
-      "AMIRI wordmark printed large across the back",
-      "New with tags",
-    ],
-    image: "/products/amiri-wordmark-back-tee-black.jpg",
     badge: "just-in",
   },
   {
