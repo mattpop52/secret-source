@@ -17,6 +17,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+import priceOverrides from "./prices.json";
 import stockOverrides from "./stock.json";
 
 /** Which piece of vector artwork stands in for a product with no photo yet. */
@@ -2963,27 +2964,33 @@ export const PRODUCTS: Product[] = [
 ];
 
 /**
- * Stock overrides from the admin panel (see app/admin/stock and
- * lib/admin/github-stock.ts) — which sizes are actually in stock right now,
- * keyed by product slug then size label. Saving in the admin panel commits
- * an updated lib/stock.json to GitHub, which redeploys the site with the
- * change baked in here, the same way every other content change on this
- * site ships. Absent here, a product just keeps the sizes it was defined
- * with above.
+ * Stock and price overrides from the admin panel (see app/admin/stock and
+ * lib/admin/github-content.ts) — which sizes are actually in stock, and
+ * what a product actually costs, right now. Saving in the admin panel
+ * commits updated lib/stock.json / lib/prices.json to GitHub, which
+ * redeploys the site with the change baked in here, the same way every
+ * other content change on this site ships. Absent here, a product just
+ * keeps what it was defined with above.
  */
 for (const product of PRODUCTS) {
   const overrides = (
     stockOverrides as Record<string, Record<string, boolean> | undefined>
   )[product.slug];
 
-  if (!overrides) {
-    continue;
+  if (overrides) {
+    for (const size of product.sizes) {
+      if (size.label in overrides) {
+        size.inStock = overrides[size.label];
+      }
+    }
   }
 
-  for (const size of product.sizes) {
-    if (size.label in overrides) {
-      size.inStock = overrides[size.label];
-    }
+  const overridePrice = (priceOverrides as Record<string, number | undefined>)[
+    product.slug
+  ];
+
+  if (typeof overridePrice === "number") {
+    product.priceCents = overridePrice;
   }
 }
 

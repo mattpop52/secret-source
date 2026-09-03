@@ -1,9 +1,9 @@
 import "server-only";
 
 /**
- * Persists admin stock edits by committing lib/stock.json straight to the
- * main branch on GitHub — Vercel is already wired to redeploy on every push
- * to this repo, so saving in the admin panel ships the same way any other
+ * Persists admin edits by committing a JSON file straight to the main
+ * branch on GitHub — Vercel is already wired to redeploy on every push to
+ * this repo, so saving in the admin panel ships the same way any other
  * content change does, just from a form instead of an editor. Changes are
  * live roughly as long as a normal deploy takes, not instantly.
  *
@@ -13,7 +13,6 @@ import "server-only";
 
 const OWNER = "mattpop52";
 const REPO = "secret-source";
-const FILE_PATH = "lib/stock.json";
 const BRANCH = "main";
 
 export function isGithubConfigured(): boolean {
@@ -41,27 +40,30 @@ async function githubFetch(
   });
 }
 
-export async function commitStockOverrides(
-  overrides: Record<string, Record<string, boolean>>,
+/** Overwrites `filePath` on the main branch with `data` and commits it. */
+export async function commitJsonFile(
+  filePath: string,
+  data: unknown,
+  message: string,
 ): Promise<void> {
   const getResponse = await githubFetch(
-    `/repos/${OWNER}/${REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
+    `/repos/${OWNER}/${REPO}/contents/${filePath}?ref=${BRANCH}`,
   );
 
   if (!getResponse.ok) {
-    throw new Error("Could not read the current stock file from GitHub.");
+    throw new Error(`Could not read ${filePath} from GitHub.`);
   }
 
   const current = (await getResponse.json()) as { sha: string };
-  const content = `${JSON.stringify(overrides, null, 2)}\n`;
+  const content = `${JSON.stringify(data, null, 2)}\n`;
 
   const putResponse = await githubFetch(
-    `/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`,
+    `/repos/${OWNER}/${REPO}/contents/${filePath}`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: "Update stock from the admin panel",
+        message,
         content: Buffer.from(content, "utf-8").toString("base64"),
         sha: current.sha,
         branch: BRANCH,
@@ -70,9 +72,11 @@ export async function commitStockOverrides(
   );
 
   if (!putResponse.ok) {
-    const data = (await putResponse.json().catch(() => null)) as {
+    const errorData = (await putResponse.json().catch(() => null)) as {
       message?: string;
     } | null;
-    throw new Error(data?.message ?? "Could not save stock changes to GitHub.");
+    throw new Error(
+      errorData?.message ?? `Could not save changes to ${filePath}.`,
+    );
   }
 }

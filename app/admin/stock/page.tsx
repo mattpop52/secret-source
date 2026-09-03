@@ -14,6 +14,7 @@ export default function AdminStockPage() {
     brand: getBrandName(product.brand),
     category: getCategoryName(product.category),
     colourway: product.colourway.name,
+    priceCents: product.priceCents,
     sizes: product.sizes.map((size) => ({
       label: size.label,
       inStock: size.inStock,

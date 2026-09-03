@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  commitStockOverrides,
-  isGithubConfigured,
-} from "@/lib/admin/github-stock";
+import { commitJsonFile, isGithubConfigured } from "@/lib/admin/github-content";
 
-const stockSchema = z.object({
+const saveSchema = z.object({
   overrides: z.record(z.string(), z.record(z.string(), z.boolean())),
+  prices: z.record(z.string(), z.number().int().positive()),
 });
 
 export async function POST(request: Request) {
@@ -18,15 +16,18 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = stockSchema.safeParse(body);
+  const parsed = saveSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid stock data." }, { status: 400 });
   }
 
   try {
-    await commitStockOverrides(parsed.data.overrides);
-    return NextResponse.json({ ok: true });
+    await commitJsonFile(
+      "lib/stock.json",
+      parsed.data.overrides,
+      "Update stock from the admin panel",
+    );
   } catch (error) {
     return NextResponse.json(
       {
@@ -38,4 +39,21 @@ export async function POST(request: Request) {
       { status: 502 },
     );
   }
+
+  try {
+    await commitJsonFile(
+      "lib/prices.json",
+      parsed.data.prices,
+      "Update prices from the admin panel",
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: `Stock saved, but prices didn't — ${error instanceof Error ? error.message : "try saving again."}`,
+      },
+      { status: 502 },
+    );
+  }
+
+  return NextResponse.json({ ok: true });
 }

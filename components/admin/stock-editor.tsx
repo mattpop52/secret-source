@@ -12,14 +12,42 @@ export type StockProduct = {
   brand: string;
   category: string;
   colourway: string;
+  priceCents: number;
   sizes: StockSize[];
 };
+
+/** A product plus the raw text of its price input — kept separate from
+ *  priceCents so mid-edit states (clearing the field to retype it, a
+ *  trailing decimal point) never get snapped back to a stale value while
+ *  still typing. */
+type EditableProduct = StockProduct & { priceInput: string };
 
 const INPUT_CLASS =
   "border border-[var(--ss-hairline-strong)] bg-[var(--ss-black)] px-3 py-2 text-[0.75rem] text-[var(--ss-bone)] transition-colors placeholder:text-[var(--ss-smoke)] hover:border-[var(--ss-orange)] focus-visible:border-[var(--ss-orange)]";
 
+function formatPounds(cents: number): string {
+  return (cents / 100).toFixed(2);
+}
+
+/** Falls back to the last known-good price for anything that isn't a real,
+ *  positive amount — an admin never accidentally zeroes out a price by
+ *  clearing the field and saving before typing a new one. */
+function parsePriceInput(input: string, fallbackCents: number): number {
+  const value = Number.parseFloat(input);
+
+  if (!Number.isFinite(value) || value <= 0) {
+    return fallbackCents;
+  }
+
+  return Math.round(value * 100);
+}
+
+function toEditable(product: StockProduct): EditableProduct {
+  return { ...product, priceInput: formatPounds(product.priceCents) };
+}
+
 function buildOverrides(
-  products: StockProduct[],
+  products: EditableProduct[],
 ): Record<string, Record<string, boolean>> {
   const overrides: Record<string, Record<string, boolean>> = {};
 
@@ -32,12 +60,27 @@ function buildOverrides(
   return overrides;
 }
 
+function buildPrices(products: EditableProduct[]): Record<string, number> {
+  const prices: Record<string, number> = {};
+
+  for (const product of products) {
+    prices[product.slug] = parsePriceInput(
+      product.priceInput,
+      product.priceCents,
+    );
+  }
+
+  return prices;
+}
+
 export function StockEditor({
   initialProducts,
 }: {
   initialProducts: StockProduct[];
 }) {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState<EditableProduct[]>(() =>
+    initialProducts.map(toEditable),
+  );
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
@@ -102,23 +145,61 @@ export function StockEditor({
     );
   }
 
+  function setPriceInput(slug: string, priceInput: string) {
+    setDirty(true);
+    setProducts((current) =>
+      current.map((product) =>
+        product.slug === slug ? { ...product, priceInput } : product,
+      ),
+    );
+  }
+
+  /** Normalises (or reverts) the text the moment editing stops, so a half
+   *  typed or invalid price never lingers on screen looking saved. */
+  function normalisePrice(slug: string) {
+    setProducts((current) =>
+      current.map((product) =>
+        product.slug === slug
+          ? {
+              ...product,
+              priceInput: formatPounds(
+                parsePriceInput(product.priceInput, product.priceCents),
+              ),
+            }
+          : product,
+      ),
+    );
+  }
+
   async function handleSave() {
     setSaving(true);
 
     try {
-      const response = await fetch("/api/admin/stock", {
+      const response = await fetch("/api/admin/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ overrides: buildOverrides(products) }),
+        body: JSON.stringify({
+          overrides: buildOverrides(products),
+          prices: buildPrices(products),
+        }),
       });
 
       const payload = await response.json().catch(() => null);
 
       if (!response.ok) {
-        toast.error(payload?.error ?? "Could not save stock changes.");
+        toast.error(payload?.error ?? "Could not save changes.");
         return;
       }
 
+      // Re-anchor priceCents/priceInput to what was actually saved, so the
+      // next edit's "revert on invalid" fallback is the saved value, not
+      // whatever was loaded when the page first opened.
+      setProducts((current) =>
+        current.map((product) => ({
+          ...product,
+          priceCents: parsePriceInput(product.priceInput, product.priceCents),
+        })),
+      );
       setDirty(false);
       toast.success("Saved — live on the site in a minute or two.");
     } catch {
@@ -138,10 +219,10 @@ export function StockEditor({
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4 border-[var(--ss-hairline)] border-b pb-6">
         <div>
-          <h1 className="ss-display text-3xl">Stock</h1>
+          <h1 className="ss-display text-3xl">Stock &amp; prices</h1>
           <p className="mt-1 text-[var(--ss-smoke)] text-sm">
-            {filtered.length} of {products.length} products shown. Toggle sizes,
-            then save.
+            {filtered.length} of {products.length} products shown. Toggle sizes
+            or edit a price, then save.
           </p>
         </div>
         <button
@@ -185,20 +266,34 @@ export function StockEditor({
 
       <ul className="divide-y divide-[var(--ss-hairline)]">
         {filtered.map((product) => (
-          <li
-            className="flex flex-wrap items-center justify-between gap-4 py-4"
-            key={product.slug}
-          >
-            <div className="min-w-0">
-              <p className="ss-stencil text-[0.6rem] text-[var(--ss-orange)]">
-                {product.category} · {product.brand}
-              </p>
-              <p className="mt-1 font-semibold">
-                {product.name}{" "}
-                <span className="font-normal text-[var(--ss-smoke)]">
-                  — {product.colourway}
+          <li className="flex flex-col gap-3 py-4" key={product.slug}>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="ss-stencil text-[0.6rem] text-[var(--ss-orange)]">
+                  {product.category} · {product.brand}
+                </p>
+                <p className="mt-1 font-semibold">
+                  {product.name}{" "}
+                  <span className="font-normal text-[var(--ss-smoke)]">
+                    — {product.colourway}
+                  </span>
+                </p>
+              </div>
+
+              <label className="flex items-center gap-1.5">
+                <span className="ss-stencil text-[0.62rem] text-[var(--ss-smoke)]">
+                  £
                 </span>
-              </p>
+                <input
+                  className={`${INPUT_CLASS} w-24`}
+                  inputMode="decimal"
+                  onBlur={() => normalisePrice(product.slug)}
+                  onChange={(event) =>
+                    setPriceInput(product.slug, event.target.value)
+                  }
+                  value={product.priceInput}
+                />
+              </label>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
