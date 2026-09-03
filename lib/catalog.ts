@@ -2233,6 +2233,27 @@ const BASE_PRODUCTS: Product[] = [
     badge: "just-in",
   },
   {
+    slug: "amiri-arts-district-tee-black",
+    name: "Arts District Tee",
+    category: "t-shirts",
+    brand: "amiri",
+    shape: "tee",
+    colourway: { name: "Black", fill: "#131313", accent: "#F2F2ED" },
+    priceCents: 7_000,
+    sizes: SIZE_RUN(),
+    code: "SS-AMR-0134",
+    blurb:
+      "AMIRI tee in black, 'AMIRI Arts District' text logo with coordinates printed across the back.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "'AMIRI Arts District' text logo and coordinates printed across the back",
+      "New with tags",
+    ],
+    image: "/products/amiri-arts-district-tee-black.jpg",
+    imageBack: "/products/amiri-arts-district-tee-black-back.jpg",
+    badge: "just-in",
+  },
+  {
     slug: "amiri-crystal-ball-tee-beige",
     name: "Crystal Ball Tee",
     category: "t-shirts",
