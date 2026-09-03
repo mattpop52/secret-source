@@ -13,6 +13,7 @@ import {
   CATEGORIES,
   getBrandName,
   getBrandsInCategory,
+  getProduct,
   getProductsByCategoryAndBrand,
   PRODUCTS,
 } from "@/lib/catalog";
@@ -23,7 +24,9 @@ import {
   SHOP_INSTAGRAM_URL,
 } from "@/lib/constants";
 
-const featured = PRODUCTS[0];
+// Falls back to the catalogue's first product if this slug is ever removed,
+// so the homepage never renders with no featured piece at all.
+const featured = getProduct("dior-atelier-tracksuit-black") ?? PRODUCTS[0];
 
 /** "A, B and C" — reads straight from the stocked brand list, so the hero
     line never needs a hand edit when a new brand lands. Past a handful,
