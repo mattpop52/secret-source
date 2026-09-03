@@ -168,9 +168,9 @@
     "XL": true
   },
   "dsquared2-maple-leaf-tracksuit-grey": {
-    "S": true,
+    "S": false,
     "M": true,
-    "L": true,
+    "L": false,
     "XL": true
   },
   "moncler-wordmark-tracksuit-navy": {
@@ -684,7 +684,7 @@
   },
   "dsquared2-icon-tee-black": {
     "S": true,
-    "M": true,
+    "M": false,
     "L": true,
     "XL": true
   },
