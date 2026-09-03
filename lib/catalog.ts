@@ -1917,13 +1917,15 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-RHD-0080",
     blurb:
-      "Rhude tee in black, printed crest patch with the Rhude wordmark at the chest.",
+      "Rhude tee in black, printed crest patch with the Rhude wordmark at the chest, the same crest printed large across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "Printed crest patch at the left chest",
+      "Matching heraldic crest printed large across the back",
       "New with tags",
     ],
     image: "/products/rhude-crest-tee-black.jpg",
+    imageBack: "/products/rhude-heraldic-crest-tee-black.jpg",
     badge: "just-in",
   },
   {
@@ -2710,26 +2712,6 @@ const BASE_PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/dior-cd-icon-tee-white.jpg",
-    badge: "just-in",
-  },
-  {
-    slug: "rhude-heraldic-crest-tee-black",
-    name: "Heraldic Crest Tee",
-    category: "t-shirts",
-    brand: "rhude",
-    shape: "tee",
-    colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
-    priceCents: 5_000,
-    sizes: SIZE_RUN(),
-    code: "SS-RHD-0121",
-    blurb:
-      "Rhude tee in black, a large heraldic crest — the Rhude wordmark over a lion-and-shield emblem — printed across the back, a bigger graphic than the existing chest-patch Crest Tee.",
-    details: [
-      "Crewneck tee, lightweight cotton jersey",
-      "Large heraldic crest graphic printed across the back",
-      "New with tags",
-    ],
-    image: "/products/rhude-heraldic-crest-tee-black.jpg",
     badge: "just-in",
   },
   {
