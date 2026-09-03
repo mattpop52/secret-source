@@ -17,6 +17,8 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+import stockOverrides from "./stock.json";
+
 /** Which piece of vector artwork stands in for a product with no photo yet. */
 export type GarmentShape =
   | "tracksuit"
@@ -2977,6 +2979,31 @@ export const PRODUCTS: Product[] = [
     badge: "just-in",
   },
 ];
+
+/**
+ * Stock overrides from the admin panel (see app/admin/stock and
+ * lib/admin/github-stock.ts) — which sizes are actually in stock right now,
+ * keyed by product slug then size label. Saving in the admin panel commits
+ * an updated lib/stock.json to GitHub, which redeploys the site with the
+ * change baked in here, the same way every other content change on this
+ * site ships. Absent here, a product just keeps the sizes it was defined
+ * with above.
+ */
+for (const product of PRODUCTS) {
+  const overrides = (
+    stockOverrides as Record<string, Record<string, boolean> | undefined>
+  )[product.slug];
+
+  if (!overrides) {
+    continue;
+  }
+
+  for (const size of product.sizes) {
+    if (size.label in overrides) {
+      size.inStock = overrides[size.label];
+    }
+  }
+}
 
 export function getCategory(slug: string): Category | undefined {
   return CATEGORIES.find((category) => category.slug === slug);
