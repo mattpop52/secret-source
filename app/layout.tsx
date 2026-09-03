@@ -11,7 +11,7 @@ import { LanguageProvider } from "@/components/language-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { BRANDS } from "@/lib/catalog";
-import { SHOP_NAME, SHOP_TAGLINE } from "@/lib/constants";
+import { SHOP_NAME, SHOP_TAGLINE, SHOP_URL } from "@/lib/constants";
 import "./globals.css";
 
 const META_BRAND_LIST = `${BRANDS.slice(0, 3)
@@ -48,6 +48,7 @@ const bodyFont = Archivo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SHOP_URL),
   title: {
     default: `${SHOP_NAME} — ${SHOP_TAGLINE}`,
     template: `%s — ${SHOP_NAME}`,

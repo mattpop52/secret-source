@@ -1,5 +1,6 @@
 export const SHOP_NAME = "Secret Source";
 export const SHOP_TAGLINE = "Your plug for all drip necessities";
+export const SHOP_URL = "https://www.secretsourceltd.com";
 
 /**
  * Contact + social handles.
