@@ -2837,6 +2837,26 @@ const BASE_PRODUCTS: Product[] = [
     badge: "just-in",
   },
   {
+    slug: "amiri-script-logo-tee-black",
+    name: "Script Logo Tee",
+    category: "t-shirts",
+    brand: "amiri",
+    shape: "tee",
+    colourway: { name: "Black", fill: "#131313", accent: "#2E5C7A" },
+    priceCents: 7_000,
+    sizes: SIZE_RUN(),
+    code: "SS-AMR-0135",
+    blurb:
+      "AMIRI tee in black, an ornate cursive 'Amiri' script with a blue floral flourish at the chest.",
+    details: [
+      "Crewneck tee, lightweight cotton jersey",
+      "Cursive script logo with a blue floral flourish at the chest",
+      "New with tags",
+    ],
+    image: "/products/amiri-script-logo-tee-black.jpg",
+    badge: "just-in",
+  },
+  {
     slug: "amiri-bold-wordmark-tee-black",
     name: "Bold Wordmark Tee",
     category: "t-shirts",
