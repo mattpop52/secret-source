@@ -9,9 +9,10 @@
  * Every product below is real stock, photographed in hand. `priceCents` is
  * still placeholder — a market-rate estimate, not the real ticket price —
  * and needs swapping for a confirmed number before taking orders. Sizing
- * follows two conventions: tracksuits, jumpers, short sets, coats and
- * t-shirts carry a full XS–XXL run (`SIZE_RUN`); shoes, jeans, bags and hats
- * are stocked in whatever single real size the tag reads (`ONE_UNIT`).
+ * follows a few conventions: tracksuits, jumpers, short sets, coats and
+ * t-shirts carry a full XS–XXL run (`SIZE_RUN`); shoes and jeans carry a
+ * full size run of their own (`SHOE_SIZE_RUN`, `JEAN_SIZE_RUN`); bags and
+ * hats are stocked in whatever single real size the tag reads (`ONE_UNIT`).
  * Prices are the single source of truth for checkout: the checkout route
  * reads them from here on the server, never from the browser.
  * ─────────────────────────────────────────────────────────────────────────
@@ -248,6 +249,22 @@ const SHOE_SIZE_RUN = (): SizeOption[] => [
   { label: "UK 9", inStock: true },
   { label: "UK 10", inStock: true },
   { label: "UK 11", inStock: true },
+];
+
+// A full run for jeans stocked across waist sizes rather than as a single
+// resale unit — W30 through W40.
+const JEAN_SIZE_RUN = (): SizeOption[] => [
+  { label: "W30", inStock: true },
+  { label: "W31", inStock: true },
+  { label: "W32", inStock: true },
+  { label: "W33", inStock: true },
+  { label: "W34", inStock: true },
+  { label: "W35", inStock: true },
+  { label: "W36", inStock: true },
+  { label: "W37", inStock: true },
+  { label: "W38", inStock: true },
+  { label: "W39", inStock: true },
+  { label: "W40", inStock: true },
 ];
 
 export const PRODUCTS: Product[] = [
@@ -1175,7 +1192,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#EFEFEA", accent: "#131313" },
-    priceCents: 13_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-CP-0045",
     blurb:
@@ -1196,7 +1213,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
-    priceCents: 18_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0046",
     blurb:
@@ -1217,7 +1234,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "shorts-set",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#141414" },
-    priceCents: 11_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-STI-0047",
     blurb:
@@ -1238,7 +1255,7 @@ export const PRODUCTS: Product[] = [
     brand: "polo-ralph-lauren",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 8_999,
+    priceCents: 7_500,
     sizes: SIZE_RUN(),
     code: "SS-RL-0048",
     blurb:
@@ -1259,7 +1276,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
-    priceCents: 18_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0049",
     blurb:
@@ -1280,7 +1297,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#131313" },
-    priceCents: 17_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0050",
     blurb:
@@ -1301,7 +1318,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "shorts-set",
     colourway: { name: "Beige", fill: "#C9B896", accent: "#131313" },
-    priceCents: 13_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-CP-0051",
     blurb:
@@ -1322,7 +1339,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "Taupe", fill: "#B8A88E", accent: "#3A322A" },
-    priceCents: 18_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0052",
     blurb:
@@ -1343,7 +1360,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "Powder Blue", fill: "#C7D3DC", accent: "#3A4A55" },
-    priceCents: 18_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0053",
     blurb:
@@ -1364,7 +1381,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "shorts-set",
     colourway: { name: "Beige", fill: "#C9B896", accent: "#141414" },
-    priceCents: 11_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-STI-0054",
     blurb:
@@ -1385,7 +1402,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 17_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0055",
     blurb:
@@ -1406,7 +1423,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 13_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-CP-0056",
     blurb:
@@ -1427,7 +1444,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 11_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-STI-0057",
     blurb:
@@ -1448,7 +1465,7 @@ export const PRODUCTS: Product[] = [
     brand: "stone-island",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 11_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-STI-0058",
     blurb:
@@ -1469,7 +1486,7 @@ export const PRODUCTS: Product[] = [
     brand: "polo-ralph-lauren",
     shape: "shorts-set",
     colourway: { name: "Black", fill: "#131313", accent: "#C1272D" },
-    priceCents: 8_999,
+    priceCents: 7_500,
     sizes: SIZE_RUN(),
     code: "SS-RL-0059",
     blurb:
@@ -1490,7 +1507,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 18_999,
+    priceCents: 12_000,
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0060",
     blurb:
@@ -1511,7 +1528,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "shorts-set",
     colourway: { name: "Grey", fill: "#B4B2AE", accent: "#131313" },
-    priceCents: 13_999,
+    priceCents: 8_000,
     sizes: SIZE_RUN(),
     code: "SS-CP-0061",
     blurb:
@@ -1532,7 +1549,7 @@ export const PRODUCTS: Product[] = [
     brand: "boss",
     shape: "shorts-set",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 12_999,
+    priceCents: 5_000,
     sizes: SIZE_RUN(),
     code: "SS-BOSS-0062",
     blurb:
@@ -1574,7 +1591,7 @@ export const PRODUCTS: Product[] = [
     brand: "moose-knuckles",
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#2A2A2A" },
-    priceCents: 39_999,
+    priceCents: 25_000,
     sizes: SIZE_RUN(),
     code: "SS-MK-0064",
     blurb:
@@ -1659,7 +1676,7 @@ export const PRODUCTS: Product[] = [
     brand: "canada-goose",
     shape: "puffer",
     colourway: { name: "Black", fill: "#131313", accent: "#8A6D3B" },
-    priceCents: 44_999,
+    priceCents: 25_000,
     sizes: SIZE_RUN(),
     code: "SS-CG-0068",
     blurb:
@@ -1682,7 +1699,7 @@ export const PRODUCTS: Product[] = [
     brand: "canada-goose",
     shape: "puffer",
     colourway: { name: "Red", fill: "#B5222A", accent: "#131313" },
-    priceCents: 32_999,
+    priceCents: 20_000,
     sizes: SIZE_RUN(),
     code: "SS-CG-0069",
     blurb:
@@ -1704,7 +1721,7 @@ export const PRODUCTS: Product[] = [
     brand: "canada-goose",
     shape: "puffer",
     colourway: { name: "Blue", fill: "#1E3F8F", accent: "#131313" },
-    priceCents: 32_999,
+    priceCents: 20_000,
     sizes: SIZE_RUN(),
     code: "SS-CG-0070",
     blurb:
@@ -1726,7 +1743,7 @@ export const PRODUCTS: Product[] = [
     brand: "canada-goose",
     shape: "puffer",
     colourway: { name: "Grey", fill: "#4A4A4A", accent: "#131313" },
-    priceCents: 32_999,
+    priceCents: 20_000,
     sizes: SIZE_RUN(),
     code: "SS-CG-0071",
     blurb:
@@ -1748,7 +1765,7 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "sneaker",
     colourway: { name: "White / Blue", fill: "#F2F2ED", accent: "#1E3F8F" },
-    priceCents: 22_999,
+    priceCents: 20_000,
     sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0072",
     blurb:
@@ -1769,7 +1786,7 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "sneaker",
     colourway: { name: "White / Olive", fill: "#F2F2ED", accent: "#6B6248" },
-    priceCents: 22_999,
+    priceCents: 20_000,
     sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0073",
     blurb:
@@ -1790,7 +1807,7 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "sneaker",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 22_999,
+    priceCents: 20_000,
     sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0074",
     blurb:
@@ -1811,7 +1828,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "sneaker",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
-    priceCents: 21_999,
+    priceCents: 20_000,
     sizes: SHOE_SIZE_RUN(),
     code: "SS-DIOR-0075",
     blurb:
@@ -1832,7 +1849,7 @@ export const PRODUCTS: Product[] = [
     brand: "dior",
     shape: "bag",
     colourway: { name: "Black", fill: "#131313", accent: "#3A3A3A" },
-    priceCents: 45_999,
+    priceCents: 35_000,
     sizes: ONE_UNIT("One size"),
     code: "SS-DIOR-0077",
     blurb:
@@ -2886,8 +2903,8 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "jeans",
     colourway: { name: "Light Blue", fill: "#8FA3B0", accent: "#5A6E7A" },
-    priceCents: 27_999,
-    sizes: ONE_UNIT("W30"),
+    priceCents: 15_000,
+    sizes: JEAN_SIZE_RUN(),
     code: "SS-AMR-0130",
     blurb:
       "AMIRI MX1 jeans in a light blue wash, skinny fit, distressed rips at the thigh and knee backed with red-and-white plaid patches.",
@@ -2907,8 +2924,8 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "jeans",
     colourway: { name: "Black", fill: "#1A1A1A", accent: "#3A3A3A" },
-    priceCents: 27_999,
-    sizes: ONE_UNIT("W30"),
+    priceCents: 15_000,
+    sizes: JEAN_SIZE_RUN(),
     code: "SS-AMR-0131",
     blurb:
       "AMIRI MX1 jeans in black, skinny fit, distressed rips at the thigh and knee backed with plaid patches.",
@@ -2928,7 +2945,7 @@ export const PRODUCTS: Product[] = [
     brand: "prada",
     shape: "beanie",
     colourway: { name: "Grey", fill: "#8A8A85", accent: "#131313" },
-    priceCents: 8_999,
+    priceCents: 5_000,
     sizes: ONE_UNIT("One size"),
     code: "SS-PRD-0132",
     blurb:
@@ -2948,7 +2965,7 @@ export const PRODUCTS: Product[] = [
     brand: "cp-company",
     shape: "beanie",
     colourway: { name: "Black", fill: "#131313", accent: "#1A1A1A" },
-    priceCents: 9_999,
+    priceCents: 3_500,
     sizes: ONE_UNIT("One size"),
     code: "SS-CP-0133",
     blurb:
