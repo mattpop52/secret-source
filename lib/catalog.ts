@@ -465,7 +465,7 @@ export const PRODUCTS: Product[] = [
       fill: "#AFAFAC",
       accent: "#141414",
     },
-    priceCents: 8_000,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0011",
     blurb:
@@ -1096,7 +1096,7 @@ export const PRODUCTS: Product[] = [
     brand: "trapstar",
     shape: "tracksuit",
     colourway: { name: "Black / White", fill: "#141414", accent: "#F2F2F0" },
-    priceCents: 8_000,
+    priceCents: 10_000,
     sizes: SIZE_RUN(),
     code: "SS-TRP-0041",
     blurb:
