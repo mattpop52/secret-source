@@ -1997,14 +1997,16 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-OFW-0084",
     blurb:
-      "Off-White tee in white, KAWS Companion graphic on the back with the Arrows logo and diagonal stripes — sold and shot for the back print.",
+      "Off-White tee in white, a small KAWS-style skull icon with the Off-White wordmark at the chest, the full KAWS Companion graphic with the Arrows logo and diagonal stripes printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
+      "Skull icon and Off-White wordmark at the left chest",
       "KAWS Companion graphic printed across the back",
       "Off-White Arrows logo above the print",
       "New with tags",
     ],
-    image: "/products/off-white-kaws-companion-tee-white.jpg",
+    image: "/products/off-white-skull-icon-tee-white.jpg",
+    imageBack: "/products/off-white-kaws-companion-tee-white.jpg",
     badge: "just-in",
   },
   {
@@ -2018,14 +2020,16 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-OFW-0085",
     blurb:
-      "Off-White tee in black, KAWS Companion graphic on the back with the Arrows logo and diagonal stripes — sold and shot for the back print.",
+      "Off-White tee in black, a small KAWS-style skull icon with the Off-White wordmark at the chest, the full KAWS Companion graphic with the Arrows logo and diagonal stripes printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
+      "Skull icon and Off-White wordmark at the left chest",
       "KAWS Companion graphic printed across the back",
       "Off-White Arrows logo above the print",
       "New with tags",
     ],
-    image: "/products/off-white-kaws-companion-tee-black.jpg",
+    image: "/products/off-white-skull-icon-tee-black.jpg",
+    imageBack: "/products/off-white-kaws-companion-tee-black.jpg",
     badge: "just-in",
   },
   {
@@ -2374,13 +2378,15 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-AMR-0103",
     blurb:
-      "AMIRI tee in black, a glittered AMIRI wordmark over a hand raising a cocktail glass, printed across the back.",
+      "AMIRI tee in black, a small AMIRI wordmark at the chest, a glittered AMIRI wordmark over a hand raising a cocktail glass printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
+      "AMIRI wordmark printed at the left chest",
       "Glittered AMIRI wordmark and cocktail-glass graphic across the back",
       "New with tags",
     ],
-    image: "/products/amiri-cheers-tee-black.jpg",
+    image: "/products/amiri-cheers-tee-black-front.jpg",
+    imageBack: "/products/amiri-cheers-tee-black.jpg",
     badge: "just-in",
   },
   {
@@ -2687,26 +2693,6 @@ const BASE_PRODUCTS: Product[] = [
     badge: "just-in",
   },
   {
-    slug: "off-white-skull-icon-tee-white",
-    name: "Skull Icon Tee",
-    category: "t-shirts",
-    brand: "off-white",
-    shape: "tee",
-    colourway: { name: "White", fill: "#F2F2ED", accent: "#131313" },
-    priceCents: 6_000,
-    sizes: SIZE_RUN(),
-    code: "SS-OFW-0119",
-    blurb:
-      "Off-White tee in white, a small KAWS-style skull icon with the Off-White wordmark at the chest — a different, smaller graphic from the full-back Companion and Bandana Crest tees.",
-    details: [
-      "Crewneck tee, lightweight cotton jersey",
-      "Skull icon and Off-White wordmark at the left chest",
-      "New with tags",
-    ],
-    image: "/products/off-white-skull-icon-tee-white.jpg",
-    badge: "just-in",
-  },
-  {
     slug: "dior-cd-icon-tee-white",
     name: "CD Icon Tee",
     category: "t-shirts",
@@ -2763,26 +2749,6 @@ const BASE_PRODUCTS: Product[] = [
       "New with tags",
     ],
     image: "/products/prada-triangle-logo-tee-white.jpg",
-    badge: "just-in",
-  },
-  {
-    slug: "off-white-skull-icon-tee-black",
-    name: "Skull Icon Tee",
-    category: "t-shirts",
-    brand: "off-white",
-    shape: "tee",
-    colourway: { name: "Black", fill: "#131313", accent: "#F2F2ED" },
-    priceCents: 6_000,
-    sizes: SIZE_RUN(),
-    code: "SS-OFW-0124",
-    blurb:
-      "Off-White tee in black, a small KAWS-style skull icon with the Off-White wordmark at the chest, alongside the existing white.",
-    details: [
-      "Crewneck tee, lightweight cotton jersey",
-      "Skull icon and Off-White wordmark at the left chest",
-      "New with tags",
-    ],
-    image: "/products/off-white-skull-icon-tee-black.jpg",
     badge: "just-in",
   },
   {
