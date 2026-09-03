@@ -10,7 +10,7 @@
  * still placeholder — a market-rate estimate, not the real ticket price —
  * and needs swapping for a confirmed number before taking orders. Sizing
  * follows two conventions: tracksuits, jumpers, short sets, coats and
- * t-shirts carry a full S–XL run (`SIZE_RUN`); shoes, jeans, bags and hats
+ * t-shirts carry a full XS–XL run (`SIZE_RUN`); shoes, jeans, bags and hats
  * are stocked in whatever single real size the tag reads (`ONE_UNIT`).
  * Prices are the single source of truth for checkout: the checkout route
  * reads them from here on the server, never from the browser.
@@ -228,8 +228,9 @@ export const BRANDS: Brand[] = [
 const ONE_UNIT = (label = "M"): SizeOption[] => [{ label, inStock: true }];
 
 // A full size run, for tracksuits, jumpers, short sets, coats and t-shirts —
-// stocked across S–XL rather than as a single resale unit.
+// stocked across XS–XL rather than as a single resale unit.
 const SIZE_RUN = (): SizeOption[] => [
+  { label: "XS", inStock: true },
   { label: "S", inStock: true },
   { label: "M", inStock: true },
   { label: "L", inStock: true },
