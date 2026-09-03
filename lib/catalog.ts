@@ -1764,7 +1764,7 @@ export const PRODUCTS: Product[] = [
     shape: "sneaker",
     colourway: { name: "White / Blue", fill: "#F2F2ED", accent: "#1E3F8F" },
     priceCents: 22_999,
-    sizes: ONE_UNIT("UK 9"),
+    sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0072",
     blurb:
       "AMIRI MA-1 sneaker in white with blue overlays, chunky ridged sole, MA logo at the tongue and heel, boxed.",
@@ -1785,7 +1785,7 @@ export const PRODUCTS: Product[] = [
     shape: "sneaker",
     colourway: { name: "White / Olive", fill: "#F2F2ED", accent: "#6B6248" },
     priceCents: 22_999,
-    sizes: ONE_UNIT("UK 9"),
+    sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0073",
     blurb:
       "AMIRI MA-1 sneaker in white with olive overlays, chunky ridged sole, MA logo at the tongue and heel, boxed.",
@@ -1806,7 +1806,7 @@ export const PRODUCTS: Product[] = [
     shape: "sneaker",
     colourway: { name: "White / Black", fill: "#F2F2ED", accent: "#131313" },
     priceCents: 22_999,
-    sizes: ONE_UNIT("UK 9"),
+    sizes: SHOE_SIZE_RUN(),
     code: "SS-AMR-0074",
     blurb:
       "AMIRI MA-1 sneaker in white with black overlays, chunky ridged sole, MA logo at the tongue and heel, boxed.",
