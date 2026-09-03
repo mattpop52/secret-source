@@ -760,7 +760,7 @@ export const PRODUCTS: Product[] = [
     brand: "amiri",
     shape: "tracksuit",
     colourway: { name: "Black", fill: "#131313", accent: "#E23A21" },
-    priceCents: 25_000,
+    priceCents: 20_000,
     sizes: SIZE_RUN(),
     code: "SS-AMR-0025",
     blurb:
