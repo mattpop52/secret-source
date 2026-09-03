@@ -18,6 +18,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+import newProducts from "./new-products.json";
 import priceOverrides from "./prices.json";
 import stockOverrides from "./stock.json";
 
@@ -267,7 +268,7 @@ const JEAN_SIZE_RUN = (): SizeOption[] => [
   { label: "W40", inStock: true },
 ];
 
-export const PRODUCTS: Product[] = [
+const BASE_PRODUCTS: Product[] = [
   {
     slug: "the-north-face-drew-peak-tracksuit-grey",
     name: "Drew Peak Tracksuit",
@@ -2978,6 +2979,17 @@ export const PRODUCTS: Product[] = [
     image: "/products/cp-company-goggle-beanie-black.jpg",
     badge: "just-in",
   },
+];
+
+/**
+ * Products added through the admin panel's "Add new item" form (see
+ * app/admin/new and lib/admin/product-templates.ts) — appended after the
+ * hand-authored catalogue above rather than mixed into it, so that huge
+ * literal array never needs programmatic editing.
+ */
+export const PRODUCTS: Product[] = [
+  ...BASE_PRODUCTS,
+  ...(newProducts as Product[]),
 ];
 
 /**

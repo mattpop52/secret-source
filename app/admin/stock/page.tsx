@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
+import { AddProductForm } from "@/components/admin/add-product-form";
 import {
   StockEditor,
   type StockProduct,
 } from "@/components/admin/stock-editor";
-import { getBrandName, getCategoryName, PRODUCTS } from "@/lib/catalog";
+import {
+  BRANDS,
+  CATEGORIES,
+  getBrandName,
+  getCategoryName,
+  PRODUCTS,
+} from "@/lib/catalog";
 
 export const metadata: Metadata = { title: "Stock" };
 
@@ -23,6 +30,13 @@ export default function AdminStockPage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 py-10 sm:px-6">
+      <AddProductForm
+        brands={BRANDS.map((brand) => ({ slug: brand.slug, name: brand.name }))}
+        categories={CATEGORIES.map((category) => ({
+          slug: category.slug,
+          name: category.name,
+        }))}
+      />
       <StockEditor initialProducts={products} />
     </div>
   );
