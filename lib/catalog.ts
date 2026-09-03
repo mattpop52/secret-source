@@ -1895,15 +1895,13 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-AMR-0079",
     blurb:
-      "AMIRI tee in white, an arched AMIRI wordmark over a hand-and-crystal-ball graphic at the chest, plain AMIRI wordmark printed across the back.",
+      "AMIRI tee in white, an arched AMIRI wordmark over a hand-and-crystal-ball graphic at the chest.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "Arched AMIRI wordmark and crystal-ball graphic at the chest",
-      "AMIRI wordmark printed across the back",
       "New with tags",
     ],
     image: "/products/amiri-crystal-ball-tee-white.jpg",
-    imageBack: "/products/amiri-crystal-ball-tee-white-back.jpg",
     badge: "just-in",
   },
   {
