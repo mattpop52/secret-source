@@ -234,6 +234,17 @@ const SIZE_RUN = (): SizeOption[] => [
   { label: "XL", inStock: true },
 ];
 
+// A full run for shoes stocked across sizes rather than as a single
+// resale unit — UK 6 through UK 11.
+const SHOE_SIZE_RUN = (): SizeOption[] => [
+  { label: "UK 6", inStock: true },
+  { label: "UK 7", inStock: true },
+  { label: "UK 8", inStock: true },
+  { label: "UK 9", inStock: true },
+  { label: "UK 10", inStock: true },
+  { label: "UK 11", inStock: true },
+];
+
 export const PRODUCTS: Product[] = [
   {
     slug: "the-north-face-drew-peak-tracksuit-grey",
@@ -1816,7 +1827,7 @@ export const PRODUCTS: Product[] = [
     shape: "sneaker",
     colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
     priceCents: 21_999,
-    sizes: ONE_UNIT("UK 9"),
+    sizes: SHOE_SIZE_RUN(),
     code: "SS-DIOR-0075",
     blurb:
       "Dior B30 runner sneaker in black, mesh and technical fabric upper, CD-outline overlay panel, CD-tread rubber sole, boxed.",
@@ -1827,27 +1838,6 @@ export const PRODUCTS: Product[] = [
       "New in box",
     ],
     image: "/products/dior-b30-sneaker-black.jpg",
-    badge: "just-in",
-  },
-  {
-    slug: "dior-b30-sneaker-black-2",
-    name: "B30 Sneaker",
-    category: "shoes",
-    brand: "dior",
-    shape: "sneaker",
-    colourway: { name: "Black", fill: "#131313", accent: "#EFEFEA" },
-    priceCents: 21_999,
-    sizes: ONE_UNIT("UK 9"),
-    code: "SS-DIOR-0076",
-    blurb:
-      "Dior B30 runner sneaker in black, mesh and technical fabric upper, CD-outline overlay panel, CD-tread rubber sole, boxed.",
-    details: [
-      "Mesh and technical fabric upper with leather overlays",
-      "CD-outline panel at the mid-foot",
-      "Chunky sole with CD-monogram tread pattern",
-      "New in box",
-    ],
-    image: "/products/dior-b30-sneaker-black-2.jpg",
     badge: "just-in",
   },
   {
