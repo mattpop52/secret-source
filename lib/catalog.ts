@@ -2453,13 +2453,16 @@ const BASE_PRODUCTS: Product[] = [
     priceCents: 7_000,
     sizes: SIZE_RUN(),
     code: "SS-AMR-0107",
-    blurb: "AMIRI tee in white, the MA monogram printed in grey at the chest.",
+    blurb:
+      "AMIRI tee in white, the MA monogram printed in grey at the chest, the AMIRI wordmark printed across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "MA monogram printed in grey at the left chest",
+      "AMIRI wordmark printed across the back",
       "New with tags",
     ],
     image: "/products/amiri-ma-monogram-tee-white.jpg",
+    imageBack: "/products/amiri-ma-monogram-tee-white-back.jpg",
     badge: "just-in",
   },
   {
@@ -2808,13 +2811,15 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-DIOR-0125",
     blurb:
-      "Dior tee in white, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed at the chest, alongside the existing black.",
+      "Dior tee in white, 'Christian Dior Atelier Paris — Avenue Montaigne' script printed small at the chest, the same script printed large across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
       "'Christian Dior Atelier Paris' script printed at the chest",
+      "Matching script printed large across the back",
       "New with tags",
     ],
     image: "/products/dior-atelier-paris-tee-white.jpg",
+    imageBack: "/products/dior-atelier-paris-tee-white-back.jpg",
     badge: "just-in",
   },
   {
