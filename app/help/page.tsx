@@ -78,6 +78,22 @@ const SECTIONS = [
     ],
   },
   {
+    id: "sourcing",
+    label: "Sourcing & Wholesale",
+    items: [
+      {
+        question: "Can't find what you're after?",
+        answer:
+          "Message us — most designer pieces that aren't on the shelf can still be sourced, for a sourcing fee on top of the piece itself.",
+      },
+      {
+        question: "Do you do wholesale?",
+        answer:
+          "Yes — message with what you're after and the quantities and we'll put a deal together.",
+      },
+    ],
+  },
+  {
     id: "payment",
     label: "Payment",
     items: [
