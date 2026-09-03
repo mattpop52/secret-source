@@ -74,7 +74,8 @@ export type TranslationKey =
   | "postcode"
   | "country"
   | "continueToPayment"
-  | "takingYouToPaypal";
+  | "takingYouToPaypal"
+  | "inStock";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -155,6 +156,7 @@ const en: Dictionary = {
   country: "Country",
   continueToPayment: "Continue to PayPal",
   takingYouToPaypal: "Taking you to PayPal…",
+  inStock: "In stock",
 };
 
 const fr: Dictionary = {
@@ -237,6 +239,7 @@ const fr: Dictionary = {
   country: "Pays",
   continueToPayment: "Continuer vers PayPal",
   takingYouToPaypal: "Direction PayPal…",
+  inStock: "En stock",
 };
 
 const es: Dictionary = {
@@ -318,6 +321,7 @@ const es: Dictionary = {
   country: "País",
   continueToPayment: "Continuar a PayPal",
   takingYouToPaypal: "Te llevamos a PayPal…",
+  inStock: "En stock",
 };
 
 const de: Dictionary = {
@@ -400,6 +404,7 @@ const de: Dictionary = {
   country: "Land",
   continueToPayment: "Weiter zu PayPal",
   takingYouToPaypal: "Weiterleitung zu PayPal…",
+  inStock: "Auf Lager",
 };
 
 const DICTIONARIES: Record<LanguageCode, Dictionary> = { en, fr, es, de };

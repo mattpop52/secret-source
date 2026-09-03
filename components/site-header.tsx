@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { CATEGORIES } from "@/lib/catalog";
 import { useCart } from "./cart-provider";
 import { CategoryName } from "./category-name";
@@ -10,15 +10,50 @@ import { useLanguage } from "./language-provider";
 import { LogoBadge } from "./logo";
 import { RegionPicker } from "./region-picker";
 
+// Mirrors the "Help" list in the footer — kept as its own array here rather
+// than shared, since the two live in otherwise-unrelated components.
+const HELP_LINKS = [
+  { href: "/help#delivery", key: "delivery" },
+  { href: "/help#returns", key: "returns" },
+  { href: "/help#sizing", key: "sizing" },
+  { href: "/help#contact", key: "contact" },
+] as const;
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={`size-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6 9l6 6 6-6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.4"
+      />
+    </svg>
+  );
+}
+
 export function SiteHeader() {
   const { count, openCart, hydrated } = useCart();
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [inStockOpen, setInStockOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const pathname = usePathname();
+  const inStockId = useId();
+  const helpId = useId();
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the route change IS the trigger — the menu closes when navigation happens
   useEffect(() => {
     setMenuOpen(false);
+    setInStockOpen(false);
+    setHelpOpen(false);
   }, [pathname]);
 
   return (
@@ -91,40 +126,88 @@ export function SiteHeader() {
 
       {menuOpen && (
         <nav
-          aria-label="Categories"
+          aria-label="Menu"
           className="border-[var(--ss-hairline)] border-t bg-[var(--ss-pitch)] lg:hidden"
         >
-          {/*
-           * Per-tile borders rather than the gap-px-over-hairline-background
-           * trick: with a category count that keeps growing (and no
-           * guarantee it lands on an even number), a shared background
-           * showing through the gaps leaves an unfilled grid cell exposed
-           * as a stray solid box whenever the count is odd.
-           */}
-          <ul className="mx-auto grid max-w-[1240px] grid-cols-2 border-t border-l border-[var(--ss-hairline)]">
-            {CATEGORIES.map((category) => (
-              <li
-                className="border-r border-b border-[var(--ss-hairline)]"
-                key={category.slug}
+          <div className="mx-auto max-w-[1240px]">
+            <button
+              aria-controls={inStockId}
+              aria-expanded={inStockOpen}
+              className="ss-stencil flex w-full items-center justify-between border-[var(--ss-hairline)] border-b px-4 py-4 text-[0.7rem] transition-colors hover:text-[var(--ss-orange)]"
+              onClick={() => setInStockOpen((open) => !open)}
+              type="button"
+            >
+              {t("inStock")}
+              <Chevron open={inStockOpen} />
+            </button>
+
+            {inStockOpen && (
+              // Per-tile borders rather than the gap-px-over-hairline-background
+              // trick: with a category count that keeps growing (and no
+              // guarantee it lands on an even number), a shared background
+              // showing through the gaps leaves an unfilled grid cell exposed
+              // as a stray solid box whenever the count is odd.
+              <ul
+                className="grid grid-cols-2 border-l border-[var(--ss-hairline)]"
+                id={inStockId}
               >
-                <Link
-                  className="ss-stencil block bg-[var(--ss-pitch)] px-4 py-4 text-[0.7rem] transition-colors hover:bg-[var(--ss-panel)] hover:text-[var(--ss-orange)]"
-                  href={`/collections/${category.slug}`}
-                >
-                  <CategoryName fallback={category.name} slug={category.slug} />
-                </Link>
-              </li>
-            ))}
-            <li className="col-span-2 border-r border-b border-[var(--ss-hairline)]">
-              <Link
-                className="ss-stencil block bg-[var(--ss-orange)] px-4 py-4 text-[#120c00] text-[0.7rem]"
-                href="/collections/all"
+                {CATEGORIES.map((category) => (
+                  <li
+                    className="border-r border-b border-[var(--ss-hairline)]"
+                    key={category.slug}
+                  >
+                    <Link
+                      className="ss-stencil block bg-[var(--ss-pitch)] px-4 py-4 text-[0.7rem] transition-colors hover:bg-[var(--ss-panel)] hover:text-[var(--ss-orange)]"
+                      href={`/collections/${category.slug}`}
+                    >
+                      <CategoryName
+                        fallback={category.name}
+                        slug={category.slug}
+                      />
+                    </Link>
+                  </li>
+                ))}
+                <li className="col-span-2 border-r border-b border-[var(--ss-hairline)]">
+                  <Link
+                    className="ss-stencil block bg-[var(--ss-orange)] px-4 py-4 text-[#120c00] text-[0.7rem]"
+                    href="/collections/all"
+                  >
+                    {t("everythingInStock")}
+                  </Link>
+                </li>
+              </ul>
+            )}
+
+            <button
+              aria-controls={helpId}
+              aria-expanded={helpOpen}
+              className="ss-stencil flex w-full items-center justify-between border-[var(--ss-hairline)] border-b px-4 py-4 text-[0.7rem] transition-colors hover:text-[var(--ss-orange)]"
+              onClick={() => setHelpOpen((open) => !open)}
+              type="button"
+            >
+              {t("help")}
+              <Chevron open={helpOpen} />
+            </button>
+
+            {helpOpen && (
+              <ul
+                className="border-[var(--ss-hairline)] border-b px-4 py-2"
+                id={helpId}
               >
-                {t("everythingInStock")}
-              </Link>
-            </li>
-          </ul>
-          <div className="border-[var(--ss-hairline)] border-t px-4 py-4">
+                {HELP_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      className="block py-2.5 text-[var(--ss-smoke)] text-sm transition-colors hover:text-[var(--ss-bone)]"
+                      href={link.href}
+                    >
+                      {t(link.key)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="px-4 py-4">
             <RegionPicker variant="compact" />
           </div>
         </nav>
