@@ -2527,13 +2527,15 @@ const BASE_PRODUCTS: Product[] = [
     sizes: SIZE_RUN(),
     code: "SS-OFW-0109",
     blurb:
-      "Off-White tee in black, an ornate bandana-style crest graphic printed across the back — sold and shot for the back print.",
+      "Off-White tee in black, a small paisley 'OFF' graphic at the chest, an ornate bandana-style crest graphic printed large across the back.",
     details: [
       "Crewneck tee, lightweight cotton jersey",
+      "Paisley 'OFF' graphic at the chest",
       "Ornate bandana-style crest graphic printed across the back",
       "New with tags",
     ],
-    image: "/products/off-white-bandana-crest-tee-black.jpg",
+    image: "/products/off-white-bandana-crest-tee-black-front.jpg",
+    imageBack: "/products/off-white-bandana-crest-tee-black.jpg",
     badge: "just-in",
   },
   {
