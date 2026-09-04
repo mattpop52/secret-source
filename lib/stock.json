@@ -738,6 +738,14 @@
     "XL": true,
     "XXL": true
   },
+  "amiri-arts-district-tee-black": {
+    "XS": true,
+    "S": true,
+    "M": true,
+    "L": true,
+    "XL": true,
+    "XXL": true
+  },
   "amiri-crystal-ball-tee-beige": {
     "XS": true,
     "S": true,
@@ -970,6 +978,14 @@
     "XL": true,
     "XXL": true
   },
+  "amiri-script-logo-tee-black": {
+    "XS": true,
+    "S": true,
+    "M": true,
+    "L": true,
+    "XL": true,
+    "XXL": true
+  },
   "amiri-bold-wordmark-tee-black": {
     "XS": true,
     "S": true,
@@ -979,10 +995,30 @@
     "XXL": true
   },
   "amiri-mx1-jeans-light-blue": {
-    "W30": true
+    "W30": true,
+    "W31": true,
+    "W32": true,
+    "W33": true,
+    "W34": true,
+    "W35": true,
+    "W36": true,
+    "W37": true,
+    "W38": true,
+    "W39": true,
+    "W40": true
   },
   "amiri-mx1-jeans-black": {
-    "W30": true
+    "W30": true,
+    "W31": true,
+    "W32": true,
+    "W33": true,
+    "W34": true,
+    "W35": true,
+    "W36": true,
+    "W37": true,
+    "W38": true,
+    "W39": true,
+    "W40": true
   },
   "prada-triangle-logo-beanie-grey": {
     "One size": true
