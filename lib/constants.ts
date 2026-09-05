@@ -13,9 +13,24 @@ export const SHOP_INSTAGRAM_URL = "https://instagram.com/secretsource";
 export const SHOP_EMAIL = "secretsourceltd@outlook.com";
 export const SHOP_WHATSAPP_URL = "https://wa.me/447000000000";
 
-/** Free delivery kicks in at this basket value (in pence). */
+/** Free delivery kicks in at this basket value (in pence), UK only. */
 export const FREE_SHIPPING_THRESHOLD = 20_000;
 export const STANDARD_SHIPPING = 495;
+/** Flat rate for anywhere outside the UK — the free-shipping threshold doesn't apply. */
+export const INTERNATIONAL_SHIPPING = 2_000;
+
+const UK_COUNTRY_CODE = "GB";
+
+export function getShippingCents(
+  subtotalCents: number,
+  countryCode: string,
+): number {
+  if (countryCode !== UK_COUNTRY_CODE) {
+    return INTERNATIONAL_SHIPPING;
+  }
+
+  return subtotalCents >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
+}
 
 export const DELIVERY_WINDOW = "2–4 working days";
 export const RETURNS_WINDOW = "14 days";

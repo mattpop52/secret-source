@@ -3,6 +3,7 @@ import { Price } from "@/components/price";
 import {
   DELIVERY_WINDOW,
   FREE_SHIPPING_THRESHOLD,
+  INTERNATIONAL_SHIPPING,
   RETURNS_WINDOW,
   SHOP_EMAIL,
   SHOP_INSTAGRAM,
@@ -29,15 +30,21 @@ const SECTIONS = [
         question: "What does delivery cost?",
         answer: (
           <>
-            <Price cents={STANDARD_SHIPPING} /> tracked, and free once your
-            basket passes <Price cents={FREE_SHIPPING_THRESHOLD} />.
+            <Price cents={STANDARD_SHIPPING} /> tracked in the UK, and free once
+            your basket passes <Price cents={FREE_SHIPPING_THRESHOLD} />.
           </>
         ),
       },
       {
         question: "Do you ship worldwide?",
-        answer:
-          "Yes — checkout takes addresses worldwide, with tracked delivery wherever you are. Everything ships from the UK.",
+        answer: (
+          <>
+            Yes — checkout takes addresses worldwide, with tracked delivery
+            wherever you are. Outside the UK is a flat{" "}
+            <Price cents={INTERNATIONAL_SHIPPING} />, whatever's in the basket.
+            Everything ships from the UK.
+          </>
+        ),
       },
     ],
   },

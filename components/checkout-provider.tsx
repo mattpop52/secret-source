@@ -10,7 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { getProduct, type Product } from "@/lib/catalog";
-import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/constants";
+import { getShippingCents } from "@/lib/constants";
 import { DEFAULT_COUNTRY } from "@/lib/countries";
 import type { CartLine } from "./cart-provider";
 import { useCurrency } from "./currency-provider";
@@ -57,9 +57,12 @@ function readStoredAddress(): ShippingValues {
 
 export type PendingLine = CartLine & { product: Product; lineTotal: number };
 
-export type PendingOrder = {
+type OrderLines = {
   lines: PendingLine[];
   subtotal: number;
+};
+
+export type PendingOrder = OrderLines & {
   shippingCents: number;
   total: number;
 };
@@ -77,10 +80,24 @@ type CheckoutContextValue = {
 const CheckoutContext = createContext<CheckoutContextValue | null>(null);
 
 export function CheckoutProvider({ children }: { children: ReactNode }) {
-  const [pending, setPending] = useState<PendingOrder | null>(null);
+  const [order, setOrder] = useState<OrderLines | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [values, setValues] = useState<ShippingValues>(EMPTY_ADDRESS);
   const { currency } = useCurrency();
+
+  // Recomputed whenever the shopper changes the country in the address form
+  // below, so the total on screen always matches what checkout will actually
+  // charge — shipping outside the UK is a flat rate, not the free-over-
+  // threshold amount the basket assumed before an address existed.
+  const pending = useMemo<PendingOrder | null>(() => {
+    if (!order) {
+      return null;
+    }
+
+    const shippingCents = getShippingCents(order.subtotal, values.countryCode);
+
+    return { ...order, shippingCents, total: order.subtotal + shippingCents };
+  }, [order, values.countryCode]);
 
   const open = useCallback((lines: CartLine[]) => {
     const resolved: PendingLine[] = [];
@@ -101,15 +118,8 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
     }
 
     const subtotal = resolved.reduce((sum, line) => sum + line.lineTotal, 0);
-    const shippingCents =
-      subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
 
-    setPending({
-      lines: resolved,
-      subtotal,
-      shippingCents,
-      total: subtotal + shippingCents,
-    });
+    setOrder({ lines: resolved, subtotal });
     // Re-read on every open rather than once at mount, so filling the form
     // in one tab and buying in another still picks up the saved address.
     setValues(readStoredAddress());
@@ -117,7 +127,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
   const close = useCallback(() => {
     if (!isSubmitting) {
-      setPending(null);
+      setOrder(null);
     }
   }, [isSubmitting]);
 

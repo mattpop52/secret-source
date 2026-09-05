@@ -20,6 +20,7 @@ import {
 import {
   DELIVERY_WINDOW,
   FREE_SHIPPING_THRESHOLD,
+  INTERNATIONAL_SHIPPING,
   RETURNS_WINDOW,
   SHOP_INSTAGRAM,
   SHOP_INSTAGRAM_URL,
@@ -206,9 +207,10 @@ export default async function ProductPage({
                 key: "delivery-cost",
                 line: (
                   <>
-                    Free tracked delivery over{" "}
+                    Free UK delivery over{" "}
                     <Price cents={FREE_SHIPPING_THRESHOLD} /> — otherwise{" "}
-                    <Price cents={STANDARD_SHIPPING} />
+                    <Price cents={STANDARD_SHIPPING} /> in the UK,{" "}
+                    <Price cents={INTERNATIONAL_SHIPPING} /> worldwide
                   </>
                 ),
               },

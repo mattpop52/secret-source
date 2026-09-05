@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getProduct } from "@/lib/catalog";
-import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/constants";
+import { getShippingCents } from "@/lib/constants";
 import {
   convertFromGbpMinor,
   DEFAULT_CURRENCY,
@@ -109,8 +109,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: "/checkout/demo" });
   }
 
-  const shippingCents =
-    subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
+  const shippingCents = getShippingCents(
+    subtotal,
+    parsed.data.shipping.countryCode,
+  );
 
   try {
     const order = await createPaypalOrder({
