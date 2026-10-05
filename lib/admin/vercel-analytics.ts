@@ -85,30 +85,40 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   const tomorrowStart = new Date(todayStart);
   tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
 
+  // Keep the admin panel's own traffic — this page included — out of the
+  // numbers, so the dashboard reflects shoppers rather than restocking and
+  // repeated checks of this same page.
+  const excludeAdmin = "not startswith(requestPath, '/admin')";
+
   const [today, last7Days, last30Days, byDayRaw, topPathsRaw] =
     await Promise.all([
       analyticsFetch("visits/count", {
         since: todayStart.toISOString(),
         until: tomorrowStart.toISOString(),
+        filter: excludeAdmin,
       }),
       analyticsFetch("visits/count", {
         since: sevenDaysAgo.toISOString(),
         until: tomorrowStart.toISOString(),
+        filter: excludeAdmin,
       }),
       analyticsFetch("visits/count", {
         since: thirtyDaysAgo.toISOString(),
         until: tomorrowStart.toISOString(),
+        filter: excludeAdmin,
       }),
       analyticsFetch("visits/aggregate", {
         by: "day",
         since: thirtyDaysAgo.toISOString(),
         until: now.toISOString(),
+        filter: excludeAdmin,
       }),
       analyticsFetch("visits/aggregate", {
         by: "requestPath",
         since: thirtyDaysAgo.toISOString(),
         until: now.toISOString(),
         limit: "5",
+        filter: excludeAdmin,
       }),
     ]);
 
