@@ -115,16 +115,9 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   };
 }
 
-// The REST API's exact response shape isn't published beyond examples, so
-// these readers are defensive about where the number/rows actually sit
-// rather than trusting one fixed path through the JSON.
 function extractCount(payload: unknown): number {
-  const data = (payload as { data?: unknown })?.data;
-  if (typeof data === "number") {
-    return data;
-  }
-  const count = (data as { count?: unknown })?.count;
-  return typeof count === "number" ? count : 0;
+  const data = (payload as { data?: { pageviews?: number } })?.data;
+  return typeof data?.pageviews === "number" ? data.pageviews : 0;
 }
 
 function extractByDay(payload: unknown): DayCount[] {
@@ -133,8 +126,8 @@ function extractByDay(payload: unknown): DayCount[] {
     return [];
   }
   return rows.map((row) => {
-    const r = row as { day?: string; date?: string; count?: number };
-    return { date: r.day ?? r.date ?? "", count: r.count ?? 0 };
+    const r = row as { timestamp?: string; pageviews?: number };
+    return { date: r.timestamp ?? "", count: r.pageviews ?? 0 };
   });
 }
 
@@ -144,7 +137,7 @@ function extractTopPaths(payload: unknown): PathCount[] {
     return [];
   }
   return rows.map((row) => {
-    const r = row as { requestPath?: string; count?: number };
-    return { path: r.requestPath ?? "(unknown)", count: r.count ?? 0 };
+    const r = row as { requestPath?: string; pageviews?: number };
+    return { path: r.requestPath ?? "(unknown)", count: r.pageviews ?? 0 };
   });
 }
