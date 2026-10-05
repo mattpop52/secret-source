@@ -23,6 +23,7 @@ function StatTile({ label, value }: { label: string; value: number }) {
 
 export default async function AdminAnalyticsPage() {
   if (!isVercelAnalyticsConfigured()) {
+    console.error("[admin/analytics] VERCEL_API_TOKEN is not set at runtime.");
     return (
       <div className="mx-auto max-w-[1240px] px-4 py-10 sm:px-6">
         <AdminNav active="analytics" />
