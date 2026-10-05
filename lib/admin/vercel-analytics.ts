@@ -44,6 +44,10 @@ async function analyticsFetch(
   );
 
   if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error(
+      `[admin/analytics] ${path} failed: ${response.status} ${body}`,
+    );
     throw new Error(`Vercel analytics request failed (${response.status}).`);
   }
 
