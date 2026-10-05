@@ -78,20 +78,26 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   sevenDaysAgo.setUTCDate(sevenDaysAgo.getUTCDate() - 6);
   const thirtyDaysAgo = new Date(todayStart);
   thirtyDaysAgo.setUTCDate(thirtyDaysAgo.getUTCDate() - 29);
+  // The /visits/count endpoint snaps `until` down to day granularity, so
+  // "now" on the same day as `since` collapses to a zero-width window and
+  // silently returns 0. Use the start of tomorrow instead, which always
+  // covers all of today regardless of what time it is.
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
 
   const [today, last7Days, last30Days, byDayRaw, topPathsRaw] =
     await Promise.all([
       analyticsFetch("visits/count", {
         since: todayStart.toISOString(),
-        until: now.toISOString(),
+        until: tomorrowStart.toISOString(),
       }),
       analyticsFetch("visits/count", {
         since: sevenDaysAgo.toISOString(),
-        until: now.toISOString(),
+        until: tomorrowStart.toISOString(),
       }),
       analyticsFetch("visits/count", {
         since: thirtyDaysAgo.toISOString(),
-        until: now.toISOString(),
+        until: tomorrowStart.toISOString(),
       }),
       analyticsFetch("visits/aggregate", {
         by: "day",
