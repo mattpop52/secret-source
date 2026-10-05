@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AddProductForm } from "@/components/admin/add-product-form";
+import { AdminNav } from "@/components/admin/admin-nav";
 import {
   StockEditor,
   type StockProduct,
@@ -30,6 +31,7 @@ export default function AdminStockPage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 py-10 sm:px-6">
+      <AdminNav active="stock" />
       <AddProductForm
         brands={BRANDS.map((brand) => ({ slug: brand.slug, name: brand.name }))}
         categories={CATEGORIES.map((category) => ({

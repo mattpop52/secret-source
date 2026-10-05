@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Archivo, Barlow_Condensed, Lilita_One } from "next/font/google";
 import { Toaster } from "sonner";
@@ -134,6 +135,7 @@ export default function RootLayout({
         </LanguageProvider>
 
         <Toaster position="top-center" theme="dark" />
+        <Analytics />
       </body>
     </html>
   );
